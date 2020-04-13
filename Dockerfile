@@ -13,5 +13,3 @@ RUN chmod -R 777 /vanillapp
 RUN git clone https://github.com/topcoder-platform/forums-plugins.git /tmp/forums-plugins
 RUN cp /tmp/forums-plugins/config/vanilla.config-defaults.php /vanillapp/conf/config-defaults.php
 RUN cp -r /tmp/forums-plugins/. /vanillapp/plugins
-
-

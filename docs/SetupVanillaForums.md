@@ -39,5 +39,9 @@ the Addons list.
 ## Disabling Addons
 1. Disabling an addon will remove whatever features it added, but it never destroys the data associated with it.
  
+# Know Issues
 
+1. 'The specified data type (int unsigned) is not accepted for the MySQL database'.
+The error happens when User enters an invalid email and clicks on 'Continue'.  
+Execute `docker-compose down` and `docker-compose up --build`. Then follow installation steps again.
 
