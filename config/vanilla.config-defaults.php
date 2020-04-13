@@ -4,10 +4,15 @@
 $Configuration = [];
 
 // Auto-enable some addons.
-$Configuration['EnabledPlugins']['stubcontent'] = true;
-$Configuration['EnabledPlugins']['swagger-ui'] = true;
 $Configuration['EnabledApplications']['Dashboard'] = 'dashboard';
+$Configuration['EnabledPlugins']['Topcoder'] = true;
 $Configuration['EnabledPlugins']['rich-editor'] = true;
+$Configuration['EnabledPlugins']['recaptcha'] = true;
+$Configuration['EnabledPlugins']['editor'] = true;
+$Configuration['EnabledPlugins']['emojiextender'] = true;
+$Configuration['EnabledPlugins']['GooglePrettify'] = true;
+$Configuration['EnabledPlugins']['Quotes'] = true;
+$Configuration['EnabledPlugins']['swagger-ui'] = true;
 
 // ImageUpload
 $Configuration['ImageUpload']['Limits']['Enabled'] = false;
