@@ -25,7 +25,6 @@ if (!function_exists('formatString')) {
     function formatString($string, $args = []) {
         _formatStringCallback($args, true);
         $result = preg_replace_callback('/{([^\s][^}]+[^\s]?)}/', '_formatStringCallback', $string);
-
         return $result;
     }
 }
@@ -204,7 +203,6 @@ if (!function_exists('_formatStringCallback')) {
                 case 'his':
                 case 'her':
                 case 'your':
-//                    $Result = print_r($Value, true);
                     $argsBak = $args;
                     if (is_array($value) && count($value) == 1) {
                         $value = array_shift($value);
@@ -214,7 +212,6 @@ if (!function_exists('_formatStringCallback')) {
                         if (isset($value['UserID'])) {
                             $user = $value;
                             $user['Name'] = formatUsername($user, $format, $contextUserID);
-
                             $result = userAnchor($user);
                         } else {
                             $max = c('Garden.FormatUsername.Max', 5);
@@ -260,7 +257,13 @@ if (!function_exists('_formatStringCallback')) {
                             // Store this name separately because of special 'You' case.
                             $name = formatUsername($user, $format, $contextUserID);
                             // Manually build instead of using userAnchor() because of special 'You' case.
-                            $result = anchor(htmlspecialchars($name), userUrl($user));
+                            if(function_exists('topcoderRatingCssClass')) {
+                                $ratingCssClass = topcoderRatingCssClass($user->Name);
+                                $result = anchor(htmlspecialchars($name), userUrl($user), $ratingCssClass);
+                            } else {
+                                $result = anchor(htmlspecialchars($name), userUrl($user));
+                            }
+
                         } else {
                             $result = '';
                         }
