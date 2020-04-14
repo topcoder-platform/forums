@@ -1,11 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$Database = Gdn::database();
-$SQL = $Database->sql();
-
-// use Vanilla\Web\CacheControlMiddleware;
-
 if (c('Garden.Installed')) {
+    $Database = Gdn::database();
+    $SQL = $Database->sql();
+
+    // Logging
+    // saveToConfig('DebugAssets', true);
+    // saveToConfig('Debug', true);
+
     //Disable plugins
     saveToConfig('EnabledPlugins.stubcontent', false);
 
@@ -26,18 +28,24 @@ if (c('Garden.Installed')) {
     saveToConfig('Garden.ThemeOptions.Options.panelToLeft',true);
 
     // Add settings for the Topcoder plugin
-    saveToConfig('Plugins.Topcoder.BaseApiURL', 'https://api.topcoder-dev.com');
-    saveToConfig('Plugins.Topcoder.MemberApiURI', '/v3/members');
-    saveToConfig('Plugins.Topcoder.MemberProfileURL', 'https://www.topcoder.com/members');
+    if(c('Plugins.Topcoder.BaseApiURL') === false) {
+        saveToConfig('Plugins.Topcoder.BaseApiURL', 'https://api.topcoder-dev.com');
+        saveToConfig('Plugins.Topcoder.MemberApiURI', '/v3/members');
+        saveToConfig('Plugins.Topcoder.MemberProfileURL', 'https://www.topcoder.com/members');
+    }
 
     // Add settings for the Editor plugin
-    saveToConfig('Plugins.editor.ForceWysiwyg', false);
+    if(c('Plugins.editor.ForceWysiwyg') === false) {
+        saveToConfig('Plugins.editor.ForceWysiwyg', false);
+    }
 
     // Add settings for the Syntax Prettifier plugin
-    saveToConfig('Plugins.GooglePrettify.LineNumbers', '');
-    saveToConfig('Plugins.GooglePrettify.NoCssFile', '');
-    saveToConfig('Plugins.GooglePrettify.UseTabby', '');
-    saveToConfig('Plugins.GooglePrettify.Language','');
+    if(c('Plugins.GooglePrettify.LineNumbers') === false) {
+        saveToConfig('Plugins.GooglePrettify.LineNumbers', '');
+        saveToConfig('Plugins.GooglePrettify.NoCssFile', '');
+        saveToConfig('Plugins.GooglePrettify.UseTabby', '');
+        saveToConfig('Plugins.GooglePrettify.Language', '');
+    }
 
     //Add settings for the OAuth 2 SSO plugin
     if ($SQL->getWhere('UserAuthenticationProvider', ['AuthenticationKey' => 'oauth2'])->numRows() == 0) {
@@ -56,5 +64,3 @@ if (c('Garden.Installed')) {
         ]);
     }
 }
-
-

@@ -14,4 +14,4 @@ RUN git clone https://github.com/topcoder-platform/forums-plugins.git /tmp/forum
 # Copy all plugins to the Vanilla plugins folder
 RUN cp -r /tmp/forums-plugins/. /vanillapp/plugins
 # Copy Vanilla boostrap file
-COPY ./config/vanilla/bootstrap.early.php /vanillapp/conf/bootstrap.early.php
+COPY ./config/vanilla/. /vanillapp/conf/.
