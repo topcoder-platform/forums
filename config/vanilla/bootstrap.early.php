@@ -4,9 +4,19 @@ if (c('Garden.Installed')) {
     $Database = Gdn::database();
     $SQL = $Database->sql();
 
-    // Logging
-    // saveToConfig('DebugAssets', true);
-    // saveToConfig('Debug', true);
+    // DB settings
+    saveToConfig('Database.Host', getenv('DB_HOSTNAME'), false);
+    saveToConfig('Database.Name', getenv('DB_DATABASE'), false);
+    saveToConfig('Database.User', getenv('DB_USERNAME'), false);
+    saveToConfig('Database.Password', getenv('DB_PASSWORD'), false);
+
+    saveToConfig('Garden.Email.SupportName', getenv('MAIL_FROM_NAME'), false);
+    saveToConfig('Garden.Email.SupportAddress', getenv('MAIL_FROM_ADDRESS'), false);
+    saveToConfig('Garden.Email.SmtpHost', getenv('MAIL_SMTP_HOSTNAME'), false);
+    saveToConfig('Garden.Email.SmtpUser', getenv('MAIL_SMTP_USERNAME'), false);
+    saveToConfig('Garden.Email.SmtpPassword', getenv('MAIL_SMTP_PASSWORD'), false);
+    saveToConfig('Garden.Email.SmtpPort', getenv('MAIL_SMTP_PORT'), false);
+    saveToConfig('Garden.Email.SmtpSecurity', getenv('MAIL_SMTP_SECURITY'), false);
 
     //Disable plugins
     saveToConfig('EnabledPlugins.stubcontent', false);
@@ -29,9 +39,9 @@ if (c('Garden.Installed')) {
 
     // Add settings for the Topcoder plugin
     if(c('Plugins.Topcoder.BaseApiURL') === false) {
-        saveToConfig('Plugins.Topcoder.BaseApiURL', 'https://api.topcoder-dev.com');
-        saveToConfig('Plugins.Topcoder.MemberApiURI', '/v3/members');
-        saveToConfig('Plugins.Topcoder.MemberProfileURL', 'https://www.topcoder.com/members');
+        saveToConfig('Plugins.Topcoder.BaseApiURL', getenv('TOPCODER_PLUGIN_BASE_API_URL'), false);
+        saveToConfig('Plugins.Topcoder.MemberApiURI', getenv('TOPCODER_PLUGIN_MEMBER_API_URI'), false);
+        saveToConfig('Plugins.Topcoder.MemberProfileURL', getenv('TOPCODER_PLUGIN_MEMBER_PROFILE_URL'), false);
     }
 
     // Add settings for the Editor plugin
@@ -47,18 +57,39 @@ if (c('Garden.Installed')) {
         saveToConfig('Plugins.GooglePrettify.Language', '');
     }
 
+    // Add settings for the Recaptcha plugin
+    if(c('Recaptcha.PrivateKey') === false) {
+        saveToConfig('Recaptcha.PrivateKey', getenv('RECAPTCHA_PLUGIN_PRIVATE_KEY'), false);
+        saveToConfig('Recaptcha.PublicKey', getenv('RECAPTCHA_PLUGIN_PUBLIC_KEY'), false);
+    }
+
     //Add settings for the OAuth 2 SSO plugin
     if ($SQL->getWhere('UserAuthenticationProvider', ['AuthenticationKey' => 'oauth2'])->numRows() == 0) {
+        $attributes = array(
+            'AssociationKey'=> getenv('TOPCODER_AUTH0_ASSOCIATION_KEY'),
+            'AuthorizeUrl'=> getenv('TOPCODER_AUTH0_AUTHORIZE_URL'),
+            'TokenUrl'=> getenv('TOPCODER_AUTH0_TOKEN_URL'),
+            'AcceptedScope'=> getenv('TOPCODER_AUTH0_ACCEPTED_SCOPE'),
+            'ProfileKeyEmail'=> getenv('TOPCODER_AUTH0_PROFILE_KEY_EMAIL'),
+            'ProfileKeyPhoto'=> getenv('TOPCODER_AUTH0_PROFILE_KEY_PHOTO'),
+            'ProfileKeyName'=> getenv('TOPCODER_AUTH0_PROFILE_KEY_NAME'),
+            'ProfileKeyFullName'=> getenv('TOPCODER_AUTH0_PROFILE_KEY_FULL_NAME'),
+            'ProfileKeyUniqueID'=> getenv('TOPCODER_AUTH0_PROFILE_KEY_UNIQUE_ID'),
+            'Prompt'=> getenv('TOPCODER_AUTH0_PROMPT'),
+            'BearerToken'=> getenv('TOPCODER_AUTH0_BEARER_TOKEN'),
+            'BaseUrl'=> getenv('TOPCODER_AUTH0_BASE_URL')
+        );
+
         $SQL->insert('UserAuthenticationProvider', [
             'AuthenticationKey' => 'oauth2',
             'AuthenticationSchemeAlias' => 'oauth2',
             'Name' => 'oauth2',
-            'AssociationSecret' => 'yvaegnvYhFhWUwL3s0nObhZz76ZVYE4qVms3z75ngm3ubHu1ZmwyKStML7N_i9nE',
-            'RegisterUrl' => '',
-            'SignInUrl' => 'https://topcoder-dev.auth0.com',
-            'SignOutUrl' => '',
-            'ProfileUrl' => 'https://topcoder-dev.auth0.com/userinfo',
-            'Attributes' => '{"AssociationKey":"Q9iRXM0QzGRidhcUK8MSTXxBRrmvrjA4","AuthorizeUrl":"https://topcoder-dev.auth0.com/authorize","TokenUrl":"https://topcoder-dev.auth0.com/oauth/token","AcceptedScope":"openid email profile","ProfileKeyEmail":"email","ProfileKeyPhoto":"picture","ProfileKeyName":"nickname","ProfileKeyFullName":"name","ProfileKeyUniqueID":"sub","Prompt":"login","BearerToken":false,"BaseUrl":"https://topcoder-dev.auth0.com"}',
+            'AssociationSecret' => getenv('TOPCODER_AUTH0_SECRET'),
+            'RegisterUrl' => getenv('TOPCODER_AUTH0_REGISTER_URL'),
+            'SignInUrl' => getenv('TOPCODER_AUTH0_SIGNIN_URL'),
+            'SignOutUrl' => getenv('TOPCODER_AUTH0_SIGNOUT_URL'),
+            'ProfileUrl' => getenv('TOPCODER_AUTH0_PROFILE_URL'),
+            'Attributes' => json_encode($attributes,JSON_UNESCAPED_SLASHES),
             'Active' => 1,
             'IsDefault' => 1
         ]);
