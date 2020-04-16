@@ -8,9 +8,9 @@ The Vanilla Forums will be available at `http://<your_docker_machine_ip>` by def
 2.You should see Vanilla Forums setup wizard. Vanilla Forums Installer will
 create a database and an admin account. You should type the next values: 
  - **Database Host** - `mysql-local` 
- - **Database Name** - `vanilladb`
+ - **Database Name** - a value of `MYSQL_DATABASE` from `mysql.env`
  - **Database User** - `root`
- - **Database Password** - `root`
+ - **Database Password** -  a value of `MYSQL_ROOT_PASSWORD` from `mysql.env`
  - **Use Vanilla's .htaccess** - selected by default. 
  
  Type other fields. Click on the `Continue` button to complete the installation.
