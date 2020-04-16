@@ -1,0 +1,13 @@
+version: '3'
+services:
+  mysql-local:
+    image: mysql
+    container_name: mysql-local
+    ports:
+      - 3306:3306
+    env_file:
+      - ./mysql.env
+    command: --default-authentication-plugin=mysql_native_password
+  vanilla-local:
+    links:
+      - mysql-local
