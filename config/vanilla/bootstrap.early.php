@@ -37,6 +37,9 @@ if (c('Garden.Installed')) {
     saveToConfig('Garden.ThemeOptions.Styles.Value', '%s_coral');
     saveToConfig('Garden.ThemeOptions.Options.panelToLeft',true);
 
+    // Profile settings
+    saveToConfig('Garden.Profile.EditPhotos', false);
+
     // Add settings for the Topcoder plugin
     if(c('Plugins.Topcoder.BaseApiURL') === false) {
         saveToConfig('Plugins.Topcoder.BaseApiURL', getenv('TOPCODER_PLUGIN_BASE_API_URL'), false);
@@ -63,7 +66,7 @@ if (c('Garden.Installed')) {
         saveToConfig('Recaptcha.PublicKey', getenv('RECAPTCHA_PLUGIN_PUBLIC_KEY'), false);
     }
 
-    //Add settings for the OAuth 2 SSO plugin
+    // Add settings for the OAuth 2 SSO plugin
     if ($SQL->getWhere('UserAuthenticationProvider', ['AuthenticationKey' => 'oauth2'])->numRows() == 0) {
         $attributes = array(
             'AssociationKey'=> getenv('TOPCODER_AUTH0_ASSOCIATION_KEY'),
@@ -79,7 +82,6 @@ if (c('Garden.Installed')) {
             'BearerToken'=> getenv('TOPCODER_AUTH0_BEARER_TOKEN'),
             'BaseUrl'=> getenv('TOPCODER_AUTH0_BASE_URL')
         );
-
         $SQL->insert('UserAuthenticationProvider', [
             'AuthenticationKey' => 'oauth2',
             'AuthenticationSchemeAlias' => 'oauth2',
@@ -94,4 +96,36 @@ if (c('Garden.Installed')) {
             'IsDefault' => 1
         ]);
     }
+
+    // Define Topcoder Member role
+    $topcoderRoleName = 'Topcoder Member';
+    if($SQL->getWhere('Role', ['Name' => $topcoderRoleName])->numRows() == 0) {
+        $roleID = $SQL->insert('Role', [
+            'Name' => $topcoderRoleName,
+            'Type' => 'member',
+            'Deletable' => 0,
+            'CanSession' => 1,
+            'PersonalInfo' => 1,
+            'Description' => 'Topcoder Members can edit Notification Preferences and participate in discussions.'
+        ]);
+
+        // Define the set of permissions to singIn, view Profiles and edit Notification Preferences
+        $SQL->insert('Permission', [
+            'RoleID' => $roleID,
+            '`Garden.SignIn.Allow`' => 1,
+            '`Garden.Profiles.View`' => 1,
+            '`Garden.PersonalInfo.View`' => 1,
+            '`Garden.AdvancedNotifications.Allow`' => 1
+        ]);
+
+        // Define the set of permissions to view categories
+        $SQL->insert('Permission', [
+            'RoleID' => $roleID,
+            'JunctionTable' => 'Category',
+            'JunctionColumn' => 'PermissionCategoryID',
+            'JunctionID' => -1,
+            '`Vanilla.Discussions.View`' => 1
+        ]);
+    }
+
 }
