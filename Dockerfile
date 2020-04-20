@@ -9,6 +9,8 @@ RUN unzip vanilla-${VANILLA_VERSION}.zip -d /tmp
 RUN cp -r /tmp/package/. /vanillapp/
 RUN chmod -R 777 /vanillapp
 
+# Delete the auto-enabled 'stubcontent' plugin which adds stub contents
+RUN rm -R /vanillapp/plugins/stubcontent
 # Clone the forum-plugins repository
 RUN git clone https://github.com/topcoder-platform/forums-plugins.git /tmp/forums-plugins
 # Copy all plugins to the Vanilla plugins folder
