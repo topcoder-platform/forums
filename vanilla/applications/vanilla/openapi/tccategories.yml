@@ -1,5 +1,8 @@
 openapi: 3.0.2
 info:
+  title: Topcoder Categories API
+  description: Topcoder Categories API extends Vanilla Categories API.
+  version: 1.0.0
 paths:
   '/tc-categories/{id}/follow/{userId}':
     put:
