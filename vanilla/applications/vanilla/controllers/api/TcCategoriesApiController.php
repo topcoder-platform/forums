@@ -5,7 +5,7 @@ use Garden\Web\Exception\ClientException;
 /**
  * API Controller for the `/tc-categories` resource.
  */
-class TcCategoriesApiController extends AbstractApiController {
+class TcCategoriesApiController extends CategoriesApiController {
 
     /** @var CategoryModel */
     private $categoryModel;
