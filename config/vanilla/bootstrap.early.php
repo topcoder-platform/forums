@@ -12,6 +12,7 @@ if (c('Garden.Installed')) {
 
     saveToConfig('Garden.Email.SupportName', getenv('MAIL_FROM_NAME'), false);
     saveToConfig('Garden.Email.SupportAddress', getenv('MAIL_FROM_ADDRESS'), false);
+    saveToConfig('Garden.Email.UseSmtp', getenv('MAIL_USE_SMTP'), false);
     saveToConfig('Garden.Email.SmtpHost', getenv('MAIL_SMTP_HOSTNAME'), false);
     saveToConfig('Garden.Email.SmtpUser', getenv('MAIL_SMTP_USERNAME'), false);
     saveToConfig('Garden.Email.SmtpPassword', getenv('MAIL_SMTP_PASSWORD'), false);
@@ -39,6 +40,9 @@ if (c('Garden.Installed')) {
 
     // Profile settings
     saveToConfig('Garden.Profile.EditPhotos', false);
+
+    // Other Vanilla settings
+    saveToConfig('Vanilla.MaxFollowedCategories', PHP_INT_MAX);
 
     // Add settings for the Topcoder plugin
     if(c('Plugins.Topcoder.BaseApiURL') === false) {

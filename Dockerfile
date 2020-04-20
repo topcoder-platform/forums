@@ -15,5 +15,7 @@ RUN rm -R /vanillapp/plugins/stubcontent
 RUN git clone https://github.com/topcoder-platform/forums-plugins.git /tmp/forums-plugins
 # Copy all plugins to the Vanilla plugins folder
 RUN cp -r /tmp/forums-plugins/. /vanillapp/plugins
-# Copy Vanilla boostrap file
+# Copy Vanilla configuration files
 COPY ./config/vanilla/. /vanillapp/conf/.
+# Copy Topcoder Vanilla files
+COPY ./vanilla/. /vanillapp/.

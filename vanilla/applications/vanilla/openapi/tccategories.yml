@@ -1,0 +1,41 @@
+openapi: 3.0.2
+info:
+paths:
+  '/tc-categories/{id}/follow/{userId}':
+    put:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                properties:
+                  followed:
+                    description: The category-follow status for the user.
+                    type: boolean
+                required:
+                  - followed
+                type: object
+          description: Success
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                followed:
+                  description: The category-follow status for the user.
+                  type: boolean
+              required:
+                - followed
+              type: object
+        required: true
