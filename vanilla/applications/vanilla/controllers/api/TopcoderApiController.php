@@ -3,7 +3,7 @@
 use Garden\Web\Exception\ClientException;
 
 /**
- * API Controller for the `/tc-categories` resource.
+ * API Controller for the `/topcoder` resource.
  */
 class TopcoderApiController extends AbstractApiController{
 
@@ -12,7 +12,7 @@ class TopcoderApiController extends AbstractApiController{
     /** @var UserMetaModel */
     private $categoryModel;
     /**
-     * TcCategoriesApiController constructor.
+     * TopcoderApiController constructor.
      *
      * @param UserMetaModel $userMetaModel
      * @param CategoryModel $categoryModel
@@ -38,7 +38,7 @@ class TopcoderApiController extends AbstractApiController{
     }
 
     /**
-     * Add the "follow" status on a category for the user.
+     * Add the "watch" status on a category for the user.
      *
      * @param int $id The target category's ID.
      * @param $userId The target user's ID.
@@ -61,17 +61,17 @@ class TopcoderApiController extends AbstractApiController{
         $newPopupDiscussionKey = 'Preferences.Popup.NewDiscussion.'.$id;
         $isDiscussionFollowed = count($this->userMetaModel->getUserMeta($userId,$newEmailDiscussionKey)) > 0;
 
-        // Is this a new follow?
+        // Is this a new watch?
         if ($body['watched'] && !$isDiscussionFollowed) {
             $category = $this->category($id);
             $this->permission('Vanilla.Discussions.View', $category['PermissionCategoryID']);
         }
         // null is used to remove data
-        $followed = $body['watched'] ? 1 : null;
-        $this->userMetaModel->setUserMeta($userId, $newEmailCommentKey , $followed);
-        $this->userMetaModel->setUserMeta($userId, $newEmailDiscussionKey, $followed);
-        $this->userMetaModel->setUserMeta($userId, $newPopupCommentKey , $followed);
-        $this->userMetaModel->setUserMeta($userId, $newPopupDiscussionKey , $followed);
+        $watched = $body['watched'] ? 1 : null;
+        $this->userMetaModel->setUserMeta($userId, $newEmailCommentKey , $watched);
+        $this->userMetaModel->setUserMeta($userId, $newEmailDiscussionKey, $watched);
+        $this->userMetaModel->setUserMeta($userId, $newPopupCommentKey , $watched);
+        $this->userMetaModel->setUserMeta($userId, $newPopupDiscussionKey , $watched);
 
         $result = $out->validate([
             'watched' => count($this->userMetaModel->getUserMeta($userId,$newEmailDiscussionKey)) > 0
