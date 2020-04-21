@@ -1380,18 +1380,19 @@ class CommentModel extends Gdn_Model {
         $categoryID = val('CategoryID', $discussion);
 
         // Figure out the category that governs this notification preference.
-        $i = 0;
         $category = CategoryModel::categories($categoryID);
-        if (!$category) {
+        if ($category === null || $category["Archived"]) {
             return;
         }
 
-        while ($category['Depth'] > 2 && $i < 20) {
-            if (!$category || $category['Archived']) {
+        $i = 0;
+        $parentCategory = CategoryModel::categories($category["ParentCategoryID"]);
+        while ($parentCategory && $parentCategory["Depth"] > 0 && $i < 20) {
+            if (!$parentCategory || $parentCategory["Archived"]) {
                 return;
             }
             $i++;
-            $category = CategoryModel::categories($category['ParentCategoryID']);
+            $parentCategory = CategoryModel::categories($parentCategory["ParentCategoryID"]);
         }
 
         // Grab all of the users that need to be notified.

@@ -1,19 +1,19 @@
 openapi: 3.0.2
 info:
   title: Topcoder Categories API
-  description: Topcoder Categories API extends Vanilla Categories API.
+  description: Topcoder API
   version: 1.0.0
 paths:
-  '/tc-categories/{id}/follow/{userId}':
+  '/topcoder/{userId}/watch/{categoryId}/':
     put:
       parameters:
         - in: path
-          name: id
+          name: userId
           required: true
           schema:
             type: integer
         - in: path
-          name: userId
+          name: categoryId
           required: true
           schema:
             type: integer
@@ -23,11 +23,11 @@ paths:
             'application/json':
               schema:
                 properties:
-                  followed:
-                    description: The category-follow status for the user.
+                  watched:
+                    description: The category-watched status for the user.
                     type: boolean
                 required:
-                  - followed
+                  - watched
                 type: object
           description: Success
       requestBody:
@@ -35,10 +35,10 @@ paths:
           application/json:
             schema:
               properties:
-                followed:
-                  description: The category-follow status for the user.
+                watched:
+                  description: The category-watched status for the user.
                   type: boolean
               required:
-                - followed
+                - watched
               type: object
         required: true

@@ -41,9 +41,6 @@ if (c('Garden.Installed')) {
     // Profile settings
     saveToConfig('Garden.Profile.EditPhotos', false);
 
-    // Other Vanilla settings
-    saveToConfig('Vanilla.MaxFollowedCategories', PHP_INT_MAX);
-
     // Add settings for the Topcoder plugin
     if(c('Plugins.Topcoder.BaseApiURL') === false) {
         saveToConfig('Plugins.Topcoder.BaseApiURL', getenv('TOPCODER_PLUGIN_BASE_API_URL'), false);
