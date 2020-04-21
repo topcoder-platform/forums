@@ -3,7 +3,7 @@
 use Garden\Web\Exception\ClientException;
 
 /**
- * API Controller for the `/topcoder` resource.
+ * Topcoder API Controller for the `/topcoder` resource.
  */
 class TopcoderApiController extends AbstractApiController{
 
