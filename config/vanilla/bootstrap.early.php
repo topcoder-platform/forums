@@ -12,6 +12,7 @@ if (c('Garden.Installed')) {
 
     saveToConfig('Garden.Email.SupportName', getenv('MAIL_FROM_NAME'), false);
     saveToConfig('Garden.Email.SupportAddress', getenv('MAIL_FROM_ADDRESS'), false);
+    saveToConfig('Garden.Email.UseSmtp', getenv('MAIL_USE_SMTP'), false);
     saveToConfig('Garden.Email.SmtpHost', getenv('MAIL_SMTP_HOSTNAME'), false);
     saveToConfig('Garden.Email.SmtpUser', getenv('MAIL_SMTP_USERNAME'), false);
     saveToConfig('Garden.Email.SmtpPassword', getenv('MAIL_SMTP_PASSWORD'), false);
