@@ -1,6 +1,7 @@
 version: '3'
 services:
   vanilla-forums:
+    image: vanilla-forums:latest
     container_name: vanilla-forums
     env_file:
       - ./vanilla.env
