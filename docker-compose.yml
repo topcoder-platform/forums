@@ -1,7 +1,7 @@
 version: '3'
 services:
-  vanilla-local:
-    container_name: vanilla-local
+  vanilla-forums:
+    container_name: vanilla-forums
     env_file:
       - ./vanilla.env
     build:
