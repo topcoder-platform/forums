@@ -33,10 +33,10 @@ if (c('Garden.Installed')) {
     saveToConfig('EnabledPlugins.swagger-ui', true);
     saveToConfig('EnabledPlugins.oauth2', true);
 
-    // Set Theme Options
-    saveToConfig('Garden.ThemeOptions.Styles.Key', 'Coral');
-    saveToConfig('Garden.ThemeOptions.Styles.Value', '%s_coral');
-    saveToConfig('Garden.ThemeOptions.Options.panelToLeft',true);
+    // Appearance.
+    saveToConfig('Garden.Theme', 'topcoder-theme');
+    saveToConfig('Garden.MobileTheme', 'topcoder-theme');
+    saveToConfig('Feature.NewFlyouts.Enabled', true);
 
     // Profile settings
     saveToConfig('Garden.Profile.EditPhotos', false);
