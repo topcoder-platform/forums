@@ -10,6 +10,11 @@ if (c('Garden.Installed')) {
     saveToConfig('Database.User', getenv('DB_USERNAME'), false);
     saveToConfig('Database.Password', getenv('DB_PASSWORD'), false);
 
+    // Cache Settings
+    saveToConfig('Cache.Enabled', getenv('CACHE_ENABLED'), true);
+    saveToConfig('Cache.Method', getenv('CACHE_METHOD'), 'dirtycache');
+    saveToConfig('memcached.Store', getenv('MEMCACHED_SERVER'), 'localhost:11211');
+
     saveToConfig('Garden.Email.SupportName', getenv('MAIL_FROM_NAME'), false);
     saveToConfig('Garden.Email.SupportAddress', getenv('MAIL_FROM_ADDRESS'), false);
     saveToConfig('Garden.Email.UseSmtp', getenv('MAIL_USE_SMTP'), false);
