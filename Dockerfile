@@ -19,3 +19,6 @@ RUN cp -r /tmp/forums-plugins/. /vanillapp/plugins
 COPY ./config/vanilla/. /vanillapp/conf/.
 # Copy Topcoder Vanilla files
 COPY ./vanilla/. /vanillapp/.
+
+# Clone the forum-theme repository
+RUN git clone 'https://github.com/topcoder-platform/forums-theme.git' /vanillapp/themes/topcoder-theme
