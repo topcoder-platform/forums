@@ -19,6 +19,8 @@ RUN cp -r /tmp/forums-plugins/. /vanillapp/plugins
 COPY ./config/vanilla/. /vanillapp/conf/.
 # Copy Topcoder Vanilla files
 COPY ./vanilla/. /vanillapp/.
-
+# Set permissions on config file
+RUN chown application:application /vanillapp/conf/config.php
+RUN chmod ug=rwx,o=rx /vanillapp/conf/config.php
 # Clone the forum-theme repository
 RUN git clone 'https://github.com/topcoder-platform/forums-theme.git' /vanillapp/themes/topcoder-theme
