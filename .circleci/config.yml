@@ -29,7 +29,7 @@ builddeploy_steps: &builddeploy_steps
       - run: *install_dependency
       - run: *install_deploysuite
       #- restore_cache: *restore_cache_settings_for_build
-      - run: ./build.sh ${APPNAME}
+      - run: ./build.sh ${APPNAME} ${CI_DEPLOY_TOKEN}
       #- save_cache: *save_cache_settings
       - deploy:
           name: Running MasterScript.
@@ -48,7 +48,8 @@ jobs:
     environment:
       DEPLOY_ENV: "DEV"
       LOGICAL_ENV: "dev"
-      APPNAME: "vanilla-forums"    
+      APPNAME: "vanilla-forums"
+      CI_DEPLOY_TOKEN: $CI_DEPLOY_TOKEN
     steps: *builddeploy_steps
 
   "build-prod":
@@ -56,7 +57,8 @@ jobs:
     environment:
       DEPLOY_ENV: "PROD"
       LOGICAL_ENV: "prod"    
-      APPNAME: "vanilla-forums"  
+      APPNAME: "vanilla-forums"
+      CI_DEPLOY_TOKEN: $CI_DEPLOY_TOKEN
     steps: *builddeploy_steps
 
 workflows:
