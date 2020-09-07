@@ -9,5 +9,6 @@ services:
       context: .
       args:
         - VANILLA_VERSION=3.3
+        - CI_DEPLOY_TOKEN
     ports:
       - 80:80
