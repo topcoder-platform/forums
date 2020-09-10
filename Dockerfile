@@ -22,6 +22,8 @@ RUN git clone https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-gro
 
 # Copy all plugins to the Vanilla plugins folder
 RUN cp -r /tmp/forums-plugins/. /vanillapp/plugins
+# Install Topcoder dependencies
+RUN composer install --working-dir /vanillapp/plugins/Topcoder
 # Install Filestack dependencies
 RUN composer install --working-dir /vanillapp/plugins/Filestack
 # Copy Vanilla configuration files
