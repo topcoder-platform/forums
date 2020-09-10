@@ -16,6 +16,10 @@ RUN rm -R /vanillapp/plugins/stubcontent
 RUN git clone https://github.com/topcoder-platform/forums-plugins.git /tmp/forums-plugins
 # Copy the Filestack plugin
 RUN git clone https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-filestack-plugin /tmp/forums-plugins/Filestack
+
+#Copy the Groups plugin
+RUN git clone https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-groups-plugin /tmp/forums-plugins/Groups
+
 # Copy all plugins to the Vanilla plugins folder
 RUN cp -r /tmp/forums-plugins/. /vanillapp/plugins
 # Install Filestack dependencies
