@@ -28,7 +28,11 @@ $Configuration['EnabledPlugins']['swagger-ui'] = true;
 $Configuration['EnabledPlugins']['oauth2'] = true;
 $Configuration['EnabledPlugins']['Groups'] = true;
 $Configuration['EnabledPlugins']['Filestack'] = true;
+
+// Debug
 $Configuration['Debug'] = TRUE;
+$Configuration['Vanilla']['SSO']['Debug'] = TRUE;
+
 // Feature
 $Configuration['Feature']['NewFlyouts']['Enabled'] = true;
 
