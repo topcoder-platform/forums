@@ -22,6 +22,12 @@ RUN git clone https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-gro
 
 # Copy all plugins to the Vanilla plugins folder
 RUN cp -r /tmp/forums-plugins/. /vanillapp/plugins
+
+#Get the debug bar plugin
+RUN wget https://us.v-cdn.net/5018160/uploads/addons/KSBIPJYMC0F2.zip
+RUN unzip KSBIPJYMC0F2.zip
+RUN cp -r debugbar /vanillapp/plugins
+
 # Install Topcoder dependencies
 RUN composer install --working-dir /vanillapp/plugins/Topcoder
 # Install Filestack dependencies
