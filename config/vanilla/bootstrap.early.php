@@ -29,6 +29,8 @@ if (c('Garden.Installed')) {
 
     //Enable plugins
     saveToConfig('EnabledPlugins.Topcoder', true);
+    saveToConfig('EnabledPlugins.Groups', true);
+    saveToConfig('EnabledPlugins.Filestack', true);
     saveToConfig('EnabledPlugins.rich-editor',true);
     saveToConfig('EnabledPlugins.recaptcha',  true);
     saveToConfig('EnabledPlugins.editor', true);
