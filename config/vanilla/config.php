@@ -10,28 +10,6 @@ $Configuration['Database']['Host'] = getenv('MYSQL_HOST');
 $Configuration['Database']['User'] = getenv('MYSQL_ROOT_USER');
 $Configuration['Database']['Password'] = getenv('MYSQL_ROOT_PASSWORD');
 
-// Topcoder plugin
-$Configuration['Plugins']['Topcoder']['BaseApiURL'] = getenv('TOPCODER_PLUGIN_BASE_API_URL');
-$Configuration['Plugins']['Topcoder']['MemberApiURI'] = getenv('TOPCODER_PLUGIN_MEMBER_API_URI');
-$Configuration['Plugins']['Topcoder']['RoleApiURI'] =  getenv('TOPCODER_PLUGIN_ROLE_API_URI');
-$Configuration['Plugins']['Topcoder']['MemberProfileURL'] = getenv('TOPCODER_PLUGIN_MEMBER_PROFILE_URL');
-$Configuration['Plugins']['Topcoder']['UseTopcoderAuthToken'] = getenv('TOPCODER_PLUGIN_USE_AUTH_TOKEN');
-
-// Topcoder M2M Auth0
-$Configuration['Plugins']['Topcoder']['M2M']['Auth0Audience'] = getenv('AUTH0_AUDIENCE');
-$Configuration['Plugins']['Topcoder']['M2M']['Auth0ClientId'] = getenv('AUTH0_CLIENT_ID');
-$Configuration['Plugins']['Topcoder']['M2M']['Auth0ClientSecret'] = getenv('AUTH0_CLIENT_SECRET');
-$Configuration['Plugins']['Topcoder']['M2M']['Auth0Url'] = getenv('AUTH0_URL');
-$Configuration['Plugins']['Topcoder']['M2M']['Auth0ProxyServerUrl'] = getenv('AUTH0_PROXY_SERVER_URL');
-
-// Topcoder SSO Auth0
-$Configuration['Plugins']['Topcoder']['SSO']['Auth0Domain'] = 'https://topcoder-dev.auth0.com/';
-$Configuration['Plugins']['Topcoder']['SSO']['Auth0Audience'] = 'JFDo7HMkf0q2CkVFHojy3zHWafziprhT';
-$Configuration['Plugins']['Topcoder']['SSO']['Auth0ClientSecret'] = getenv('AUTH0_CLIENT_SECRET');
-
-// Filestack
-$Configuration['Plugins']['Filestack']['ApiKey'] = getenv('FILESTACK_API_KEY');
-
 // EnabledApplications
 $Configuration['EnabledApplications']['Conversations'] = 'conversations';
 $Configuration['EnabledApplications']['Vanilla'] = 'vanilla';

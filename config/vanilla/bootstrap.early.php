@@ -4,12 +4,6 @@ if (c('Garden.Installed')) {
     $Database = Gdn::database();
     $SQL = $Database->sql();
 
-    // DB settings
-    saveToConfig('Database.Host', getenv('DB_HOSTNAME'), false);
-    saveToConfig('Database.Name', getenv('DB_DATABASE'), false);
-    saveToConfig('Database.User', getenv('DB_USERNAME'), false);
-    saveToConfig('Database.Password', getenv('DB_PASSWORD'), false);
-
     // Cache Settings
     saveToConfig('Cache.Enabled', getenv('CACHE_ENABLED'), true);
     saveToConfig('Cache.Method', getenv('CACHE_METHOD'), 'dirtycache');
@@ -23,22 +17,6 @@ if (c('Garden.Installed')) {
     saveToConfig('Garden.Email.SmtpPassword', getenv('MAIL_SMTP_PASSWORD'), false);
     saveToConfig('Garden.Email.SmtpPort', getenv('MAIL_SMTP_PORT'), false);
     saveToConfig('Garden.Email.SmtpSecurity', getenv('MAIL_SMTP_SECURITY'), false);
-
-    //Disable plugins
-    saveToConfig('EnabledPlugins.stubcontent', false);
-
-    //Enable plugins
-    saveToConfig('EnabledPlugins.Topcoder', true);
-    saveToConfig('EnabledPlugins.Groups', true);
-    saveToConfig('EnabledPlugins.Filestack', true);
-    saveToConfig('EnabledPlugins.rich-editor',true);
-    saveToConfig('EnabledPlugins.recaptcha',  true);
-    saveToConfig('EnabledPlugins.editor', true);
-    saveToConfig('EnabledPlugins.emojiextender', true);
-    saveToConfig('EnabledPlugins.GooglePrettify', true);
-    saveToConfig('EnabledPlugins.Quotes', true);
-    saveToConfig('EnabledPlugins.swagger-ui', true);
-    saveToConfig('EnabledPlugins.oauth2', true);
 
     // Appearance
     saveToConfig('Garden.Theme', 'topcoder-theme');
