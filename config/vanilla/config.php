@@ -48,7 +48,7 @@ $Configuration['EnabledPlugins']['GooglePrettify'] = true;
 $Configuration['EnabledPlugins']['Quotes'] = true;
 $Configuration['EnabledPlugins']['swagger-ui'] = true;
 $Configuration['EnabledPlugins']['oauth2'] = true;
-$Configuration['EnabledPlugins']['Groups'] = false;
+//$Configuration['EnabledPlugins']['Groups'] = false;
 $Configuration['EnabledPlugins']['Filestack'] = true;
 
 // Debug
