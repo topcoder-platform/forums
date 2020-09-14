@@ -9,14 +9,14 @@ if (c('Garden.Installed')) {
     saveToConfig('Cache.Method', getenv('CACHE_METHOD'), 'dirtycache');
     saveToConfig('memcached.Store', getenv('MEMCACHED_SERVER'), 'localhost:11211');
 
-    saveToConfig('Garden.Email.SupportName', getenv('MAIL_FROM_NAME'), false);
-    saveToConfig('Garden.Email.SupportAddress', getenv('MAIL_FROM_ADDRESS'), false);
-    saveToConfig('Garden.Email.UseSmtp', getenv('MAIL_USE_SMTP'), false);
-    saveToConfig('Garden.Email.SmtpHost', getenv('MAIL_SMTP_HOSTNAME'), false);
-    saveToConfig('Garden.Email.SmtpUser', getenv('MAIL_SMTP_USERNAME'), false);
-    saveToConfig('Garden.Email.SmtpPassword', getenv('MAIL_SMTP_PASSWORD'), false);
-    saveToConfig('Garden.Email.SmtpPort', getenv('MAIL_SMTP_PORT'), false);
-    saveToConfig('Garden.Email.SmtpSecurity', getenv('MAIL_SMTP_SECURITY'), false);
+    saveToConfig('Garden.Email.SupportName', getenv('MAIL_FROM_NAME') );
+    saveToConfig('Garden.Email.SupportAddress', getenv('MAIL_FROM_ADDRESS'));
+    saveToConfig('Garden.Email.UseSmtp', getenv('MAIL_USE_SMTP'));
+    saveToConfig('Garden.Email.SmtpHost', getenv('MAIL_SMTP_HOSTNAME'));
+    saveToConfig('Garden.Email.SmtpUser', getenv('MAIL_SMTP_USERNAME'));
+    saveToConfig('Garden.Email.SmtpPassword', getenv('MAIL_SMTP_PASSWORD'));
+    saveToConfig('Garden.Email.SmtpPort', getenv('MAIL_SMTP_PORT'));
+    saveToConfig('Garden.Email.SmtpSecurity', getenv('MAIL_SMTP_SECURITY'));
 
     // Appearance
     saveToConfig('Garden.Theme', 'topcoder-theme');
@@ -27,26 +27,26 @@ if (c('Garden.Installed')) {
     saveToConfig('Garden.Profile.EditPhotos', false);
 
     // Add settings for the Topcoder plugin
-    saveToConfig('Plugins.Topcoder.BaseApiURL', getenv('TOPCODER_PLUGIN_BASE_API_URL'), false);
-    saveToConfig('Plugins.Topcoder.MemberApiURI', getenv('TOPCODER_PLUGIN_MEMBER_API_URI'), false);
-    saveToConfig('Plugins.Topcoder.RoleApiURI', getenv('TOPCODER_PLUGIN_ROLE_API_URI'), false);
-    saveToConfig('Plugins.Topcoder.MemberProfileURL', getenv('TOPCODER_PLUGIN_MEMBER_PROFILE_URL'), false);
-    saveToConfig('Plugins.Topcoder.UseTopcoderAuthToken', getenv('TOPCODER_PLUGIN_USE_AUTH_TOKEN'), false);
+    saveToConfig('Plugins.Topcoder.BaseApiURL', getenv('TOPCODER_PLUGIN_BASE_API_URL'));
+    saveToConfig('Plugins.Topcoder.MemberApiURI', getenv('TOPCODER_PLUGIN_MEMBER_API_URI'));
+    saveToConfig('Plugins.Topcoder.RoleApiURI', getenv('TOPCODER_PLUGIN_ROLE_API_URI'));
+    saveToConfig('Plugins.Topcoder.MemberProfileURL', getenv('TOPCODER_PLUGIN_MEMBER_PROFILE_URL'));
+    saveToConfig('Plugins.Topcoder.UseTopcoderAuthToken', getenv('TOPCODER_PLUGIN_USE_AUTH_TOKEN'));
 
     //Add settings for Topcoder M2M Auth0
-    saveToConfig('Plugins.Topcoder.M2M.Auth0Audience', getenv('AUTH0_AUDIENCE'), false);
-    saveToConfig('Plugins.Topcoder.M2M.Auth0ClientId', getenv('AUTH0_CLIENT_ID'), false);
-    saveToConfig('Plugins.Topcoder.M2M.Auth0ClientSecret', getenv('AUTH0_CLIENT_SECRET'), false);
-    saveToConfig('Plugins.Topcoder.M2M.Auth0Url', getenv('AUTH0_URL'), false);
-    saveToConfig('Plugins.Topcoder.M2M.Auth0ProxyServerUrl', getenv('AUTH0_PROXY_SERVER_URL'), false);
+    saveToConfig('Plugins.Topcoder.M2M.Auth0Audience', getenv('AUTH0_AUDIENCE') );
+    saveToConfig('Plugins.Topcoder.M2M.Auth0ClientId', getenv('AUTH0_CLIENT_ID'));
+    saveToConfig('Plugins.Topcoder.M2M.Auth0ClientSecret', getenv('AUTH0_CLIENT_SECRET'));
+    saveToConfig('Plugins.Topcoder.M2M.Auth0Url', getenv('AUTH0_URL'));
+    saveToConfig('Plugins.Topcoder.M2M.Auth0ProxyServerUrl', getenv('AUTH0_PROXY_SERVER_URL'));
 
      //Add settings for Topcoder SSO Auth0
-    saveToConfig('Plugins.Topcoder.SSO.Auth0Domain', 'https://topcoder-dev.auth0.com/', false);
-    saveToConfig('Plugins.Topcoder.SSO.Auth0Audience', 'JFDo7HMkf0q2CkVFHojy3zHWafziprhT', false);
-    saveToConfig('Plugins.Topcoder.SSO.Auth0ClientSecret', getenv('AUTH_SECRET'), false);
+    saveToConfig('Plugins.Topcoder.SSO.Auth0Domain', 'https://topcoder-dev.auth0.com/');
+    saveToConfig('Plugins.Topcoder.SSO.Auth0Audience', 'JFDo7HMkf0q2CkVFHojy3zHWafziprhT');
+    saveToConfig('Plugins.Topcoder.SSO.Auth0ClientSecret', getenv('AUTH_SECRET'));
 
     // Filestack
-    saveToConfig('Plugins.Filestack.ApiKey', getenv('FILESTACK_API_KEY'), false);
+    saveToConfig('Plugins.Filestack.ApiKey', getenv('FILESTACK_API_KEY'));
 
     // Add settings for the Editor plugin
     if(c('Plugins.editor.ForceWysiwyg') === false) {

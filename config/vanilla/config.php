@@ -1,5 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
+$Configuration['Garden']['Installed'] = true;
+
 // Conversations
 $Configuration['Conversations']['Version'] = '3.0';
 $Configuration['Conversations']['Moderation']['Allow'] = true;
@@ -48,7 +50,6 @@ $Configuration['Garden']['UpdateToken'] = 'c3988cd76f721f1a03d2c347ab6655609a548
 $Configuration['Garden']['InputFormatter'] = 'Rich';
 $Configuration['Garden']['Version'] = 'Undefined';
 $Configuration['Garden']['CanProcessImages'] = true;
-$Configuration['Garden']['Installed'] = true;
 $Configuration['Garden']['Theme'] = 'topcoder-theme';
 $Configuration['Garden']['MobileTheme'] = 'topcoder-theme';
 $Configuration['Garden']['Profile']['EditPhotos'] = false;
