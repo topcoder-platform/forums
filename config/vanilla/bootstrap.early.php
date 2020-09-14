@@ -29,6 +29,8 @@ if (c('Garden.Installed')) {
 
     //Enable plugins
     saveToConfig('EnabledPlugins.Topcoder', true);
+    saveToConfig('EnabledPlugins.Groups', true);
+    saveToConfig('EnabledPlugins.Filestack', true);
     saveToConfig('EnabledPlugins.rich-editor',true);
     saveToConfig('EnabledPlugins.recaptcha',  true);
     saveToConfig('EnabledPlugins.editor', true);
@@ -38,7 +40,7 @@ if (c('Garden.Installed')) {
     saveToConfig('EnabledPlugins.swagger-ui', true);
     saveToConfig('EnabledPlugins.oauth2', true);
 
-    // Appearance.
+    // Appearance
     saveToConfig('Garden.Theme', 'topcoder-theme');
     saveToConfig('Garden.MobileTheme', 'topcoder-theme');
     saveToConfig('Feature.NewFlyouts.Enabled', true);
@@ -47,12 +49,26 @@ if (c('Garden.Installed')) {
     saveToConfig('Garden.Profile.EditPhotos', false);
 
     // Add settings for the Topcoder plugin
-    if(c('Plugins.Topcoder.BaseApiURL') === false) {
-        saveToConfig('Plugins.Topcoder.BaseApiURL', getenv('TOPCODER_PLUGIN_BASE_API_URL'), false);
-        saveToConfig('Plugins.Topcoder.MemberApiURI', getenv('TOPCODER_PLUGIN_MEMBER_API_URI'), false);
-        saveToConfig('Plugins.Topcoder.RoleApiURI', getenv('TOPCODER_PLUGIN_ROLE_API_URI'), false);
-        saveToConfig('Plugins.Topcoder.MemberProfileURL', getenv('TOPCODER_PLUGIN_MEMBER_PROFILE_URL'), false);
-    }
+    saveToConfig('Plugins.Topcoder.BaseApiURL', getenv('TOPCODER_PLUGIN_BASE_API_URL'), false);
+    saveToConfig('Plugins.Topcoder.MemberApiURI', getenv('TOPCODER_PLUGIN_MEMBER_API_URI'), false);
+    saveToConfig('Plugins.Topcoder.RoleApiURI', getenv('TOPCODER_PLUGIN_ROLE_API_URI'), false);
+    saveToConfig('Plugins.Topcoder.MemberProfileURL', getenv('TOPCODER_PLUGIN_MEMBER_PROFILE_URL'), false);
+    saveToConfig('Plugins.Topcoder.UseTopcoderAuthToken', getenv('TOPCODER_PLUGIN_USE_AUTH_TOKEN'), false);
+
+    //Add settings for Topcoder M2M Auth0
+    saveToConfig('Plugins.Topcoder.M2M.Auth0Audience', getenv('AUTH0_AUDIENCE'), false);
+    saveToConfig('Plugins.Topcoder.M2M.Auth0ClientId', getenv('AUTH0_CLIENT_ID'), false);
+    saveToConfig('Plugins.Topcoder.M2M.Auth0ClientSecret', getenv('AUTH0_CLIENT_SECRET'), false);
+    saveToConfig('Plugins.Topcoder.M2M.Auth0Url', getenv('AUTH0_URL'), false);
+    saveToConfig('Plugins.Topcoder.M2M.Auth0ProxyServerUrl', getenv('AUTH0_PROXY_SERVER_URL'), false);
+
+     //Add settings for Topcoder SSO Auth0
+    saveToConfig('Plugins.Topcoder.SSO.Auth0Domain', 'https://topcoder-dev.auth0.com/', false);
+    saveToConfig('Plugins.Topcoder.SSO.Auth0Audience', 'JFDo7HMkf0q2CkVFHojy3zHWafziprhT', false);
+    saveToConfig('Plugins.Topcoder.SSO.Auth0ClientSecret', getenv('AUTH0_CLIENT_SECRET'), false);
+
+    // Filestack
+    saveToConfig('Plugins.Filestack.ApiKey', getenv('FILESTACK_API_KEY'), false);
 
     // Add settings for the Editor plugin
     if(c('Plugins.editor.ForceWysiwyg') === false) {
