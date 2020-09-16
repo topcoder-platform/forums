@@ -41,7 +41,7 @@ if (c('Garden.Installed')) {
     saveToConfig('Plugins.Topcoder.M2M.Auth0ProxyServerUrl', getenv('AUTH0_PROXY_SERVER_URL'));
 
      //Add settings for Topcoder SSO Auth0
-    saveToConfig('Plugins.Topcoder.SSO.Auth0Domain', 'https://topcoder-dev.auth0.com/');
+    saveToConfig('Plugins.Topcoder.SSO.Auth0Domain', 'https://api.topcoder-dev.com');
     saveToConfig('Plugins.Topcoder.SSO.Auth0Audience', 'JFDo7HMkf0q2CkVFHojy3zHWafziprhT');
     saveToConfig('Plugins.Topcoder.SSO.Auth0ClientSecret', getenv('AUTH_SECRET'));
 
