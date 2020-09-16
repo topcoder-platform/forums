@@ -27,11 +27,11 @@ if (c('Garden.Installed')) {
     saveToConfig('Garden.Profile.EditPhotos', false);
 
     // Add settings for the Topcoder plugin
-    saveToConfig('Plugins.Topcoder.BaseApiURL', getenv('TOPCODER_PLUGIN_BASE_API_URL'));
-    saveToConfig('Plugins.Topcoder.MemberApiURI', getenv('TOPCODER_PLUGIN_MEMBER_API_URI'));
-    saveToConfig('Plugins.Topcoder.RoleApiURI', getenv('TOPCODER_PLUGIN_ROLE_API_URI'));
-    saveToConfig('Plugins.Topcoder.MemberProfileURL', getenv('TOPCODER_PLUGIN_MEMBER_PROFILE_URL'));
-    saveToConfig('Plugins.Topcoder.UseTopcoderAuthToken', getenv('TOPCODER_PLUGIN_USE_AUTH_TOKEN'));
+    saveToConfig('Plugins.Topcoder.BaseApiURL', getenv('TOPCODER_PLUGIN_BASE_API_URL'),false);
+    saveToConfig('Plugins.Topcoder.MemberApiURI', getenv('TOPCODER_PLUGIN_MEMBER_API_URI'),false);
+    saveToConfig('Plugins.Topcoder.RoleApiURI', getenv('TOPCODER_PLUGIN_ROLE_API_URI'),false);
+    saveToConfig('Plugins.Topcoder.MemberProfileURL', getenv('TOPCODER_PLUGIN_MEMBER_PROFILE_URL'),false);
+    saveToConfig('Plugins.Topcoder.UseTopcoderAuthToken', getenv('TOPCODER_PLUGIN_USE_AUTH_TOKEN'),false);
 
     //Add settings for Topcoder M2M Auth0
     saveToConfig('Plugins.Topcoder.M2M.Auth0Audience', getenv('AUTH0_AUDIENCE') );
@@ -44,9 +44,12 @@ if (c('Garden.Installed')) {
     saveToConfig('Plugins.Topcoder.SSO.Auth0Domain', 'https://api.topcoder-dev.com');
     saveToConfig('Plugins.Topcoder.SSO.Auth0Audience', 'JFDo7HMkf0q2CkVFHojy3zHWafziprhT');
     saveToConfig('Plugins.Topcoder.SSO.Auth0ClientSecret', getenv('AUTH_SECRET'));
+    saveToConfig('Plugins.Topcoder.SSO.CookieName', 'v3jwt',false);
+    saveToConfig('Plugins.Topcoder.SSO.UsernameClaim', 'handle',false);
+
 
     // Filestack
-    saveToConfig('Plugins.Filestack.ApiKey', getenv('FILESTACK_API_KEY'));
+    saveToConfig('Plugins.Filestack.ApiKey', getenv('FILESTACK_API_KEY'),false);
 
     // Add settings for the Editor plugin
     if(c('Plugins.editor.ForceWysiwyg') === false) {
