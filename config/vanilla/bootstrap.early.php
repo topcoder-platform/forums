@@ -42,10 +42,12 @@ if (c('Garden.Installed')) {
 
      //Add settings for Topcoder SSO Auth0
     saveToConfig('Plugins.Topcoder.SSO.Auth0Domain', 'https://api.topcoder-dev.com');
+    saveToConfig('Plugins.Topcoder.SSO.AuthorizationURI', '/v3/authorizations/1');
     saveToConfig('Plugins.Topcoder.SSO.Auth0Audience', 'JFDo7HMkf0q2CkVFHojy3zHWafziprhT');
     saveToConfig('Plugins.Topcoder.SSO.Auth0ClientSecret', getenv('AUTH_SECRET'));
     saveToConfig('Plugins.Topcoder.SSO.CookieName', 'v3jwt',false);
     saveToConfig('Plugins.Topcoder.SSO.UsernameClaim', 'handle',false);
+    saveToConfig('Plugins.Topcoder.SSO.RefreshTokenURL', 'https://accounts-auth0.topcoder-dev.com/',false);
 
 
     // Filestack
