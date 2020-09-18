@@ -81,7 +81,10 @@ if (c('Garden.Installed')) {
 
     // Add Topcoder User Authentication Provider
     if ($SQL->getWhere('UserAuthenticationProvider', ['AuthenticationKey' => 'topcoder'])->numRows() == 0) {
-        $signUrl ='https://accounts-auth0.topcoder-dev.com/?retUrl='.urlencode('https://'.$_SERVER['SERVER_NAME'].'/');
+        $signUrl = getenv('TOPCODER_PLUGIN_SIGNIN_URL');
+        if($signUrl === false) {
+            $signUrl ='https://accounts-auth0.topcoder-dev.com/?retUrl='.urlencode('https://'.$_SERVER['SERVER_NAME'].'/');
+        }
         $SQL->insert('UserAuthenticationProvider', [
             'AuthenticationKey' => 'topcoder',
             'AuthenticationSchemeAlias' => 'topcoder',
