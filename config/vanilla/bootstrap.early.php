@@ -70,32 +70,23 @@ if (c('Garden.Installed')) {
         saveToConfig('Recaptcha.PublicKey', getenv('RECAPTCHA_PLUGIN_PUBLIC_KEY'), false);
     }
 
-    // Add settings for the OAuth 2 SSO plugin
-    if ($SQL->getWhere('UserAuthenticationProvider', ['AuthenticationKey' => 'oauth2'])->numRows() == 0) {
-        $attributes = array(
-            'AssociationKey'=> getenv('TOPCODER_AUTH0_ASSOCIATION_KEY'),
-            'AuthorizeUrl'=> getenv('TOPCODER_AUTH0_AUTHORIZE_URL'),
-            'TokenUrl'=> getenv('TOPCODER_AUTH0_TOKEN_URL'),
-            'AcceptedScope'=> getenv('TOPCODER_AUTH0_ACCEPTED_SCOPE'),
-            'ProfileKeyEmail'=> getenv('TOPCODER_AUTH0_PROFILE_KEY_EMAIL'),
-            'ProfileKeyPhoto'=> getenv('TOPCODER_AUTH0_PROFILE_KEY_PHOTO'),
-            'ProfileKeyName'=> getenv('TOPCODER_AUTH0_PROFILE_KEY_NAME'),
-            'ProfileKeyFullName'=> getenv('TOPCODER_AUTH0_PROFILE_KEY_FULL_NAME'),
-            'ProfileKeyUniqueID'=> getenv('TOPCODER_AUTH0_PROFILE_KEY_UNIQUE_ID'),
-            'Prompt'=> getenv('TOPCODER_AUTH0_PROMPT'),
-            'BearerToken'=> getenv('TOPCODER_AUTH0_BEARER_TOKEN'),
-            'BaseUrl'=> getenv('TOPCODER_AUTH0_BASE_URL')
-        );
+
+    // Fix: OAuth 2 SSO should be inactive and not by default. It should be removed later.
+    if ($SQL->getWhere('UserAuthenticationProvider', ['AuthenticationKey' => 'oauth2'])->numRows() > 0) {
+        $SQL->update('UserAuthenticationProvider')
+            ->set('Active', 0)
+            ->set('IsDefault',0)
+            ->where('AuthenticationKey' , 'oauth2')->put();
+    }
+
+    // Add Topcoder User Authentication Provider
+    if ($SQL->getWhere('UserAuthenticationProvider', ['AuthenticationKey' => 'topcoder'])->numRows() == 0) {
+        $signUrl ='https://accounts-auth0.topcoder-dev.com/?retUrl='.urlencode('https://'.$_SERVER['SERVER_NAME'].'/');
         $SQL->insert('UserAuthenticationProvider', [
-            'AuthenticationKey' => 'oauth2',
-            'AuthenticationSchemeAlias' => 'oauth2',
-            'Name' => 'oauth2',
-            'AssociationSecret' => getenv('TOPCODER_AUTH0_SECRET'),
-            'RegisterUrl' => getenv('TOPCODER_AUTH0_REGISTER_URL'),
-            'SignInUrl' => getenv('TOPCODER_AUTH0_SIGNIN_URL'),
-            'SignOutUrl' => getenv('TOPCODER_AUTH0_SIGNOUT_URL'),
-            'ProfileUrl' => getenv('TOPCODER_AUTH0_PROFILE_URL'),
-            'Attributes' => json_encode($attributes,JSON_UNESCAPED_SLASHES),
+            'AuthenticationKey' => 'topcoder',
+            'AuthenticationSchemeAlias' => 'topcoder',
+            'Name' => 'topcoder',
+            'SignInUrl' => $signUrl,
             'Active' => 1,
             'IsDefault' => 1
         ]);
