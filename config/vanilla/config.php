@@ -2,6 +2,8 @@
 
 $Configuration['Garden']['Installed'] = true;
 
+$Configuration['Garden']['SignIn']['Popup'] = false; // Should the sign-in link pop up or go to it's own page
+
 // Conversations
 $Configuration['Conversations']['Version'] = '3.0';
 $Configuration['Conversations']['Moderation']['Allow'] = true;
@@ -27,7 +29,7 @@ $Configuration['EnabledPlugins']['emojiextender'] = true;
 $Configuration['EnabledPlugins']['GooglePrettify'] = true;
 $Configuration['EnabledPlugins']['Quotes'] = true;
 $Configuration['EnabledPlugins']['swagger-ui'] = true;
-$Configuration['EnabledPlugins']['oauth2'] = true;
+$Configuration['EnabledPlugins']['oauth2'] = false;
 $Configuration['EnabledPlugins']['Groups'] = true;
 $Configuration['EnabledPlugins']['Filestack'] = true;
 
