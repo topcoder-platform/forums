@@ -34,7 +34,7 @@ $Configuration['EnabledPlugins']['Groups'] = true;
 $Configuration['EnabledPlugins']['Filestack'] = true;
 
 // Debug
-$Configuration['Debug'] = TRUE;
+$Configuration['Debug'] = FALSE;
 $Configuration['Vanilla']['SSO']['Debug'] = TRUE;
 
 // Feature
