@@ -19,8 +19,8 @@ if (c('Garden.Installed')) {
     saveToConfig('Garden.Email.SmtpSecurity', getenv('MAIL_SMTP_SECURITY'));
 
     // Appearance
-    saveToConfig('Garden.Theme', 'topcoder-theme');
-    saveToConfig('Garden.MobileTheme', 'topcoder-theme');
+    saveToConfig('Garden.Theme', 'topcoder-theme', false);
+    saveToConfig('Garden.MobileTheme', 'topcoder-theme', false);
     saveToConfig('Feature.NewFlyouts.Enabled', true);
 
     // Profile settings
