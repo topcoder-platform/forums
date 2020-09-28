@@ -31,7 +31,7 @@ $Configuration['EnabledPlugins']['Quotes'] = true;
 $Configuration['EnabledPlugins']['swagger-ui'] = true;
 $Configuration['EnabledPlugins']['oauth2'] = false;
 $Configuration['EnabledPlugins']['Groups'] = true;
-$Configuration['EnabledPlugins']['Filestack'] = false;
+$Configuration['EnabledPlugins']['Filestack'] = true;
 
 // Debug
 $Configuration['Debug'] = FALSE;
