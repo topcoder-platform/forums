@@ -19,8 +19,8 @@ if (c('Garden.Installed')) {
     saveToConfig('Garden.Email.SmtpSecurity', getenv('MAIL_SMTP_SECURITY'));
 
     // Appearance
-    saveToConfig('Garden.Theme', 'topcoder-theme');
-    saveToConfig('Garden.MobileTheme', 'topcoder-theme');
+    saveToConfig('Garden.Theme', 'topcoder-theme', false);
+    saveToConfig('Garden.MobileTheme', 'topcoder-theme', false);
     saveToConfig('Feature.NewFlyouts.Enabled', true);
 
     // Profile settings
@@ -33,6 +33,8 @@ if (c('Garden.Installed')) {
     saveToConfig('Plugins.Topcoder.MemberProfileURL', getenv('TOPCODER_PLUGIN_MEMBER_PROFILE_URL'),false);
     saveToConfig('Plugins.Topcoder.UseTopcoderAuthToken', getenv('TOPCODER_PLUGIN_USE_AUTH_TOKEN'),false);
 
+    saveToConfig('Plugins.Topcoder.ValidIssuers', str_replace(["[", "]", "\\", "\""], '', getenv('VALID_ISSUERS')));
+
     //Add settings for Topcoder M2M Auth0
     saveToConfig('Plugins.Topcoder.M2M.Auth0Audience', getenv('AUTH0_AUDIENCE') );
     saveToConfig('Plugins.Topcoder.M2M.Auth0ClientId', getenv('AUTH0_CLIENT_ID'));
@@ -43,14 +45,24 @@ if (c('Garden.Installed')) {
      //Add settings for Topcoder SSO Auth0
     saveToConfig('Plugins.Topcoder.SSO.Auth0Domain', 'https://api.topcoder-dev.com');
     saveToConfig('Plugins.Topcoder.SSO.AuthorizationURI', '/v3/authorizations/1');
-    saveToConfig('Plugins.Topcoder.SSO.Auth0Audience', 'JFDo7HMkf0q2CkVFHojy3zHWafziprhT');
-    saveToConfig('Plugins.Topcoder.SSO.Auth0ClientSecret', getenv('AUTH_SECRET'));
+    saveToConfig('Plugins.Topcoder.SSO.TopcoderR256ID', 'BXWXUWnilVUPdN01t2Se29Tw2ZYNGZvH');
+    saveToConfig('Plugins.Topcoder.SSO.TopcoderH256ID', 'JFDo7HMkf0q2CkVFHojy3zHWafziprhT');
     saveToConfig('Plugins.Topcoder.SSO.TopcoderH256Secret', getenv('TOPCODER_HS256_SECRET') );
     saveToConfig('Plugins.Topcoder.SSO.CookieName', 'v3jwt',false);
     saveToConfig('Plugins.Topcoder.SSO.UsernameClaim', 'handle',false);
-    saveToConfig('Plugins.Topcoder.SSO.RefreshTokenURL', 'https://accounts-auth0.topcoder-dev.com/',false);
+    $topcoderSSOAuth0Url = 'https://accounts-auth0.topcoder-dev.com/';
+    saveToConfig('Plugins.Topcoder.SSO.RefreshTokenURL', $topcoderSSOAuth0Url,false);
+    $signInUrl = getenv('TOPCODER_PLUGIN_SIGNIN_URL');
+    $signOutUrl = getenv('TOPCODER_PLUGIN_SIGNOUT_URL');
+    if($signInUrl === false) {
+        $signInUrl =$topcoderSSOAuth0Url.'?retUrl='.urlencode('https://'.$_SERVER['SERVER_NAME'].'/');
+    }
+    if($signOutUrl === false) {
+        $signOutUrl =$topcoderSSOAuth0Url.'?logout=true&retUrl='.urlencode('https://'.$_SERVER['SERVER_NAME'].'/');
+    }
+    saveToConfig('Plugins.Topcoder.AuthenticationProvider.SignInUrl', $signInUrl,false);
+    saveToConfig('Plugins.Topcoder.AuthenticationProvider.SignOutUrl', $signOutUrl,false);
 
-   
     // Filestack
     saveToConfig('Plugins.Filestack.ApiKey', getenv('FILESTACK_API_KEY'),false);
 
@@ -82,17 +94,13 @@ if (c('Garden.Installed')) {
             ->where('AuthenticationKey' , 'oauth2')->put();
     }
 
-    // Add Topcoder User Authentication Provider
+    // Add Topcoder User Authentication Provider.
+    // SignInUrl/SignOutUrl should be set in Topcoder plugin's setup; otherwise they couldn't be updated in DB
     if ($SQL->getWhere('UserAuthenticationProvider', ['AuthenticationKey' => 'topcoder'])->numRows() == 0) {
-        $signUrl = getenv('TOPCODER_PLUGIN_SIGNIN_URL');
-        if($signUrl === false) {
-            $signUrl ='https://accounts-auth0.topcoder-dev.com/?retUrl='.urlencode('https://'.$_SERVER['SERVER_NAME'].'/');
-        }
         $SQL->insert('UserAuthenticationProvider', [
             'AuthenticationKey' => 'topcoder',
             'AuthenticationSchemeAlias' => 'topcoder',
             'Name' => 'topcoder',
-            'SignInUrl' => $signUrl,
             'Active' => 1,
             'IsDefault' => 1
         ]);
