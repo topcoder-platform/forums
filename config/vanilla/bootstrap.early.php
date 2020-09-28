@@ -48,9 +48,19 @@ if (c('Garden.Installed')) {
     saveToConfig('Plugins.Topcoder.SSO.TopcoderH256Secret', getenv('TOPCODER_HS256_SECRET') );
     saveToConfig('Plugins.Topcoder.SSO.CookieName', 'v3jwt',false);
     saveToConfig('Plugins.Topcoder.SSO.UsernameClaim', 'handle',false);
-    saveToConfig('Plugins.Topcoder.SSO.RefreshTokenURL', 'https://accounts-auth0.topcoder-dev.com/',false);
+    $topcoderSSOAuth0Url = 'https://accounts-auth0.topcoder-dev.com/';
+    saveToConfig('Plugins.Topcoder.SSO.RefreshTokenURL', $topcoderSSOAuth0Url,false);
+    $signInUrl = getenv('TOPCODER_PLUGIN_SIGNIN_URL');
+    $signOutUrl = getenv('TOPCODER_PLUGIN_SIGNOUT_URL');
+    if($signInUrl === false) {
+        $signInUrl =$topcoderSSOAuth0Url.'?retUrl='.urlencode('https://'.$_SERVER['SERVER_NAME'].'/');
+    }
+    if($signOutUrl === false) {
+        $signOutUrl =$topcoderSSOAuth0Url.'?logout=true&retUrl='.urlencode('https://'.$_SERVER['SERVER_NAME'].'/');
+    }
+    saveToConfig('Plugins.Topcoder.AuthenticationProvider.SignInUrl', $signInUrl,false);
+    saveToConfig('Plugins.Topcoder.AuthenticationProvider.SignOutUrl', $signOutUrl,false);
 
-   
     // Filestack
     saveToConfig('Plugins.Filestack.ApiKey', getenv('FILESTACK_API_KEY'),false);
 
@@ -82,17 +92,13 @@ if (c('Garden.Installed')) {
             ->where('AuthenticationKey' , 'oauth2')->put();
     }
 
-    // Add Topcoder User Authentication Provider
+    // Add Topcoder User Authentication Provider.
+    // SignInUrl/SignOutUrl should be set in Topcoder plugin's setup; otherwise they couldn't be updated in DB
     if ($SQL->getWhere('UserAuthenticationProvider', ['AuthenticationKey' => 'topcoder'])->numRows() == 0) {
-        $signUrl = getenv('TOPCODER_PLUGIN_SIGNIN_URL');
-        if($signUrl === false) {
-            $signUrl ='https://accounts-auth0.topcoder-dev.com/?retUrl='.urlencode('https://'.$_SERVER['SERVER_NAME'].'/');
-        }
         $SQL->insert('UserAuthenticationProvider', [
             'AuthenticationKey' => 'topcoder',
             'AuthenticationSchemeAlias' => 'topcoder',
             'Name' => 'topcoder',
-            'SignInUrl' => $signUrl,
             'Active' => 1,
             'IsDefault' => 1
         ]);
