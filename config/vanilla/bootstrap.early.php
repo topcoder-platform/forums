@@ -33,6 +33,8 @@ if (c('Garden.Installed')) {
     saveToConfig('Plugins.Topcoder.MemberProfileURL', getenv('TOPCODER_PLUGIN_MEMBER_PROFILE_URL'),false);
     saveToConfig('Plugins.Topcoder.UseTopcoderAuthToken', getenv('TOPCODER_PLUGIN_USE_AUTH_TOKEN'),false);
 
+    saveToConfig('Plugins.Topcoder.ValidIssuers', str_replace(["[", "]", "\\", "\""], '', getenv('VALID_ISSUERS')));
+
     //Add settings for Topcoder M2M Auth0
     saveToConfig('Plugins.Topcoder.M2M.Auth0Audience', getenv('AUTH0_AUDIENCE') );
     saveToConfig('Plugins.Topcoder.M2M.Auth0ClientId', getenv('AUTH0_CLIENT_ID'));
@@ -44,7 +46,6 @@ if (c('Garden.Installed')) {
     saveToConfig('Plugins.Topcoder.SSO.Auth0Domain', 'https://api.topcoder-dev.com');
     saveToConfig('Plugins.Topcoder.SSO.AuthorizationURI', '/v3/authorizations/1');
     saveToConfig('Plugins.Topcoder.SSO.Auth0Audience', 'JFDo7HMkf0q2CkVFHojy3zHWafziprhT');
-    saveToConfig('Plugins.Topcoder.SSO.Auth0ClientSecret', getenv('AUTH_SECRET'));
     saveToConfig('Plugins.Topcoder.SSO.TopcoderH256Secret', getenv('TOPCODER_HS256_SECRET') );
     saveToConfig('Plugins.Topcoder.SSO.CookieName', 'v3jwt',false);
     saveToConfig('Plugins.Topcoder.SSO.UsernameClaim', 'handle',false);
