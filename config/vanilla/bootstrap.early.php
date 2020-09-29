@@ -45,11 +45,12 @@ if (c('Garden.Installed')) {
      //Add settings for Topcoder SSO Auth0
     saveToConfig('Plugins.Topcoder.SSO.Auth0Domain', 'https://api.topcoder-dev.com');
     saveToConfig('Plugins.Topcoder.SSO.AuthorizationURI', '/v3/authorizations/1');
-    saveToConfig('Plugins.Topcoder.SSO.TopcoderR256ID', 'BXWXUWnilVUPdN01t2Se29Tw2ZYNGZvH');
-    saveToConfig('Plugins.Topcoder.SSO.TopcoderH256ID', 'JFDo7HMkf0q2CkVFHojy3zHWafziprhT');
-    saveToConfig('Plugins.Topcoder.SSO.TopcoderH256Secret', getenv('TOPCODER_HS256_SECRET') );
     saveToConfig('Plugins.Topcoder.SSO.CookieName', 'v3jwt',false);
-    saveToConfig('Plugins.Topcoder.SSO.UsernameClaim', 'handle',false);
+    saveToConfig('Plugins.Topcoder.SSO.TopcoderRS256.ID', 'BXWXUWnilVUPdN01t2Se29Tw2ZYNGZvH');
+    saveToConfig('Plugins.Topcoder.SSO.TopcoderHS256.ID', 'JFDo7HMkf0q2CkVFHojy3zHWafziprhT');
+    saveToConfig('Plugins.Topcoder.SSO.TopcoderHS256.Secret', getenv('TOPCODER_HS256_SECRET') );
+    saveToConfig('Plugins.Topcoder.SSO.TopcoderRS256.UsernameClaim', 'nickname',false);
+    saveToConfig('Plugins.Topcoder.SSO.TopcoderHS256.UsernameClaim', 'handle',false);
     $topcoderSSOAuth0Url = 'https://accounts-auth0.topcoder-dev.com/';
     saveToConfig('Plugins.Topcoder.SSO.RefreshTokenURL', $topcoderSSOAuth0Url,false);
     $signInUrl = getenv('TOPCODER_PLUGIN_SIGNIN_URL');
