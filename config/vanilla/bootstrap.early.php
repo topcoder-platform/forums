@@ -65,6 +65,7 @@ if (c('Garden.Installed')) {
     }
     saveToConfig('Plugins.Topcoder.AuthenticationProvider.SignInUrl', $signInUrl,false);
     saveToConfig('Plugins.Topcoder.AuthenticationProvider.SignOutUrl', $signOutUrl,false);
+    saveToConfig('Plugins.Topcoder.AuthenticationProvider.RegisterUrl', 'https://www.topcoder-dev.com/user-selection/',false);
 
     // Filestack
     saveToConfig('Plugins.Filestack.ApiKey', getenv('FILESTACK_API_KEY'),false);
