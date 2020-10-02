@@ -38,7 +38,7 @@ if (c('Garden.Installed')) {
     saveToConfig('Plugins.Topcoder.ValidIssuers', str_replace(["[", "]", "\\", "\""], '', getenv('VALID_ISSUERS')));
 
     //Add settings for Topcoder M2M Auth0
-    saveToConfig('Plugins.Topcoder.M2M.Auth0Audience', getenv('AUTH0_AUDIENCE') );
+    saveToConfig('Plugins.Topcoder.M2M.Auth0Audience','https://m2m.topcoder-dev.com/'); // getenv('AUTH0_AUDIENCE')
     saveToConfig('Plugins.Topcoder.M2M.Auth0ClientId', getenv('AUTH0_CLIENT_ID'));
     saveToConfig('Plugins.Topcoder.M2M.Auth0ClientSecret', getenv('AUTH0_CLIENT_SECRET'));
     saveToConfig('Plugins.Topcoder.M2M.Auth0Url', getenv('AUTH0_URL'));
