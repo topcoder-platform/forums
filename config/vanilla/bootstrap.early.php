@@ -110,35 +110,8 @@ if (c('Garden.Installed')) {
         ]);
     }
 
-    // Define Topcoder Member role
-    $topcoderRoleName = 'Topcoder Member';
-    if($SQL->getWhere('Role', ['Name' => $topcoderRoleName])->numRows() == 0) {
-        $roleID = $SQL->insert('Role', [
-            'Name' => $topcoderRoleName,
-            'Type' => 'member',
-            'Deletable' => 0,
-            'CanSession' => 1,
-            'PersonalInfo' => 1,
-            'Description' => 'Topcoder Members can edit Notification Preferences and participate in discussions.'
-        ]);
-
-        // Define the set of permissions to singIn, view Profiles and edit Notification Preferences
-        $SQL->insert('Permission', [
-            'RoleID' => $roleID,
-            '`Garden.SignIn.Allow`' => 1,
-            '`Garden.Profiles.View`' => 1,
-            '`Garden.PersonalInfo.View`' => 1,
-            '`Garden.AdvancedNotifications.Allow`' => 1
-        ]);
-
-        // Define the set of permissions to view categories
-        $SQL->insert('Permission', [
-            'RoleID' => $roleID,
-            'JunctionTable' => 'Category',
-            'JunctionColumn' => 'PermissionCategoryID',
-            'JunctionID' => -1,
-            '`Vanilla.Discussions.View`' => 1
-        ]);
-    }
+    // Fix: Add the 'topcoder' role type in Role Table. It should be removed after upgrading existing DB.
+    // The Topcoder plugin's setup method will upgrade DB during Vanilla installation
+    $SQL->query('alter table GDN_Role modify Type enum(\'topcoder\', \'guest\', \'unconfirmed\', \'applicant\', \'member\', \'moderator\', \'administrator\')');
 
 }
