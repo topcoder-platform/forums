@@ -32,6 +32,7 @@ $Configuration['EnabledPlugins']['swagger-ui'] = true;
 $Configuration['EnabledPlugins']['oauth2'] = false;
 $Configuration['EnabledPlugins']['Groups'] = true;
 $Configuration['EnabledPlugins']['Filestack'] = true;
+$Configuration['EnabledPlugins']['Sumologic'] = true;
 
 // Debug
 $Configuration['Debug'] = FALSE;

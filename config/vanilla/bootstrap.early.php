@@ -70,6 +70,10 @@ if (c('Garden.Installed')) {
     // Filestack
     saveToConfig('Plugins.Filestack.ApiKey', getenv('FILESTACK_API_KEY'),false);
 
+    // SumoLogic
+    saveToConfig('Plugins.Sumologic.HttpSourceURL', '',false);
+    saveToConfig('Plugins.Sumologic.BatchSize', '10',false);
+
     // Add settings for the Editor plugin
     if(c('Plugins.editor.ForceWysiwyg') === false) {
         saveToConfig('Plugins.editor.ForceWysiwyg', false);
