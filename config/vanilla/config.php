@@ -38,6 +38,9 @@ $Configuration['EnabledPlugins']['Sumologic'] = true;
 $Configuration['Debug'] = FALSE;
 $Configuration['Vanilla']['SSO']['Debug'] = TRUE;
 
+// Email contents
+$Configuration['Vanilla']['Activity']['ShowDiscussionBody'] = true;
+
 // Feature
 $Configuration['Feature']['NewFlyouts']['Enabled'] = true;
 
