@@ -257,9 +257,12 @@ if (!function_exists('_formatStringCallback')) {
                             // Store this name separately because of special 'You' case.
                             $name = formatUsername($user, $format, $contextUserID);
                             // Manually build instead of using userAnchor() because of special 'You' case.
-                            if(function_exists('topcoderRatingCssClass')) {
+                            if(function_exists('topcoderRatingCssClass') &&
+                                function_exists('topcoderRoleCssStyles')) {
                                 $ratingCssClass = topcoderRatingCssClass($user->Name);
-                                $result = anchor(htmlspecialchars($name), userUrl($user), $ratingCssClass);
+                                $roleCssClass = topcoderRoleCssStyles($user->Name);
+                                $topcoderStyles =$ratingCssClass.' '.$roleCssClass;
+                                $result = anchor(htmlspecialchars($name), userUrl($user), $topcoderStyles);
                             } else {
                                 $result = anchor(htmlspecialchars($name), userUrl($user));
                             }
