@@ -58,13 +58,32 @@ class CategoriesModule extends Gdn_Module {
             return val('PermsDiscussionsView', $category) && val('Following', $category);
         });
 
-        //check Group Permissions
-        $groupModel = new GroupModel();
-        $displayedCategories = $groupModel->checkGroupCategoryPermissions($categories);
+        $displayedCategories = $this->filterCategories($categories);
         $data = new Gdn_DataSet($displayedCategories, DATASET_TYPE_ARRAY);
         $data->datasetType(DATASET_TYPE_OBJECT);
         $this->Data = $data;
 
+    }
+
+    /**
+     * Filter Categories: hide 'Challenges Forums'
+     * @param $categories
+     * @return array
+     */
+    private function filterCategories($categories) {
+        //check Group Permissions
+        $groupModel = new GroupModel();
+        $challengesForumsCategory = $groupModel->getChallengesForums();
+        $challengesForumsCategoryID = val('CategoryID',$challengesForumsCategory);
+
+        foreach ($categories as &$category) {
+            $categoryID = $category['CategoryID'];
+            $category['isDisplayed'] = $challengesForumsCategoryID != $categoryID;
+        }
+
+        return array_filter($categories, function($e) {
+            return ($e['isDisplayed'] == true);
+        });
     }
 
     public function filterDepth(&$categories, $startDepth, $endDepth) {
