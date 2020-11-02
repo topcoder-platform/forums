@@ -346,6 +346,7 @@ jQuery(document).ready(function($) {
     $(document).on('click', '.Comment .Cancel a, .Comment a.Cancel', function() {
         var btn = this;
         var $container = $(btn).closest('.ItemComment');
+        $(btn).closest('.Comment').find('.MenuItems').attr('style', '');
         $(btn).closest('.Comment').find('div.Message').show();
         $(btn).closest('.CommentForm, .EditCommentForm').remove();
         $container.removeClass('Editing');
