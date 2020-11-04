@@ -32,7 +32,7 @@ if (c('Garden.Installed')) {
     saveToConfig('Plugins.Topcoder.RoleApiURI', getenv('TOPCODER_PLUGIN_ROLE_API_URI'),false);
     saveToConfig('Plugins.Topcoder.ResourceRolesApiURI', '/v5/resource-roles', false);
     saveToConfig('Plugins.Topcoder.ResourcesApiURI', '/v5/resources', false);
-    saveToConfig('Plugins.Topcoder.MemberProfileURL', getenv('TOPCODER_PLUGIN_MEMBER_PROFILE_URL'),false);
+    saveToConfig('Plugins.Topcoder.MemberProfileURL', 'https://www.topcoder-dev.com/members',false); // prod: getenv('TOPCODER_PLUGIN_MEMBER_PROFILE_URL')
     saveToConfig('Plugins.Topcoder.UseTopcoderAuthToken', getenv('TOPCODER_PLUGIN_USE_AUTH_TOKEN'),false);
 
     saveToConfig('Plugins.Topcoder.ValidIssuers', str_replace(["[", "]", "\\", "\"", " "], '', getenv('VALID_ISSUERS')));
