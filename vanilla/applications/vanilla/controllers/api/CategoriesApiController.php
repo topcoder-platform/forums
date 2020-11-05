@@ -30,6 +30,7 @@ class CategoriesApiController extends AbstractApiController {
     /** @var Schema */
     private $idParamSchema;
 
+
     /**
      * CategoriesApiController constructor.
      *
@@ -153,9 +154,9 @@ class CategoriesApiController extends AbstractApiController {
      * @return array
      */
     public function get($id) {
-        $this->permission('Garden.Settings.Manage');
 
-        $in = $this->idParamSchema()->setDescription('Get a category.');
+        $this->permission('Garden.Settings.Manage');
+        $in = $this->idParamSchema()->setDescription('Get a category by ID.');
         $out = $this->schema($this->schemaWithParent(), 'out');
 
         $row = $this->category($id);
@@ -163,6 +164,27 @@ class CategoriesApiController extends AbstractApiController {
 
         $result = $out->validate($row);
         return $result;
+    }
+
+    /**
+     * Get a single category by urlcode.
+     *
+     * @param  string $urlcode The urlcode of the category.
+     * @throws NotFoundException if unable to find the category.
+     * @return array
+     */
+    public function get_urlcode($urlcode) {
+        $this->permission('Garden.Settings.Manage');
+        $in = $this->schema([
+            'urlcode:s' => 'Category urlcode.',
+        ])->setDescription('Get a category by urlcode.');
+
+        $out = $this->schema($this->schemaWithParent(), 'out');
+        $row = $this->category($urlcode);
+        $row = $this->normalizeOutput($row);
+        $result = $out->validate($row);
+        return $result;
+
     }
 
     /**
