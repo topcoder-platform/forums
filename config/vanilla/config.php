@@ -43,6 +43,7 @@ $Configuration['Vanilla']['Activity']['ShowDiscussionBody'] = true;
 
 // Feature
 $Configuration['Feature']['NewFlyouts']['Enabled'] = true;
+$Configuration['Vanilla']['EnableCategorygiFollowing'] = true;
 
 // Garden
 $Configuration['Garden']['Title'] = 'Vanilla';
