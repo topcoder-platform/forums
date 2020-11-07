@@ -490,13 +490,14 @@ class CategoriesApiController extends AbstractApiController {
     public function put_follow($id, array $body) {
         $this->permission('Garden.SignIn.Allow');
 
-        $schema = ['followed:b' => 'The category-follow status for the current user.'];
+        $schema = ['followed:b' => 'The category-follow status for the current user.',
+                   'userID:i?' => 'User ID.'];
         $in = $this->schema($schema, 'in');
         $out = $this->schema($schema, 'out');
 
         $category = $this->category($id);
         $body = $in->validate($body);
-        $userID = $this->getSession()->UserID;
+        $userID = $body['userID'] > 0? $body['userID'] : $this->getSession()->UserID;
         $followed = $this->categoryModel->getFollowed($userID);
 
         // Is this a new follow?

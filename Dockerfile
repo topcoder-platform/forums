@@ -35,6 +35,8 @@ RUN cp -r debugbar /vanillapp/plugins
 RUN composer install --working-dir /vanillapp/plugins/Topcoder
 # Install Filestack dependencies
 RUN composer install --working-dir /vanillapp/plugins/Filestack
+# Install Groups dependencies
+RUN composer install --working-dir /vanillapp/plugins/Groups
 # Copy Vanilla configuration files
 COPY ./config/vanilla/. /vanillapp/conf/.
 # Copy Topcoder Vanilla files
