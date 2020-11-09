@@ -71,7 +71,7 @@ workflows:
           filters:
             branches:
               only:
-                - ci-test
+                - develop
 
       # Production builds are exectuted only on tagged commits to the
       # master branch.
