@@ -370,6 +370,8 @@ jQuery(document).ready(function($) {
                     $(this).remove();
                 });
                 gdn.processTargets(json.Targets);
+                // Let listeners know that the comment was deleted.
+                $(document).trigger('CommentDeleted');
             }
         }
     });
