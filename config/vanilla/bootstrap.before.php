@@ -1,4 +1,8 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+
+use Vanilla\Formatting\DateTimeFormatter;
+
+if (!defined('APPLICATION')) exit();
 
 if (!function_exists('formatString')) {
     /**
@@ -279,6 +283,41 @@ if (!function_exists('_formatStringCallback')) {
                     break;
             }
         }
+        return $result;
+    }
+}
+
+if (!function_exists('dateUpdated')) {
+    /**
+     *
+     * Fixed issues with date format:
+     * package/library/core/functions.render.php
+     *
+     * @param $row
+     * @param null $wrap
+     * @return string
+     */
+    function dateUpdated($row, $wrap = null) {
+        $result = '';
+        $dateUpdated = val('DateUpdated', $row);
+        $updateUserID = val('UpdateUserID', $row);
+
+        if ($dateUpdated) {
+            $updateUser = Gdn::userModel()->getID($updateUserID);
+            $dateUpdatedFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($dateUpdated, false, DateTimeFormatter::FORCE_FULL_FORMAT);
+            if ($updateUser) {
+                $title = sprintf(t('Edited %s by %s.'), $dateUpdatedFormatted, val('Name', $updateUser));
+            } else {
+                $title = sprintf(t('Edited %s.'), $dateUpdatedFormatted);
+            }
+
+            $result = ' <span title="'.htmlspecialchars($title).'" class="DateUpdated">'.
+                sprintf(t('edited %s'), $dateUpdatedFormatted).'</span> ';
+            if ($wrap) {
+                $result = $wrap[0].$result.$wrap[1];
+            }
+        }
+
         return $result;
     }
 }

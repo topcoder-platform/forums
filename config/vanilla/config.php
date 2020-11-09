@@ -33,6 +33,7 @@ $Configuration['EnabledPlugins']['oauth2'] = false;
 $Configuration['EnabledPlugins']['Groups'] = true;
 $Configuration['EnabledPlugins']['Filestack'] = true;
 $Configuration['EnabledPlugins']['Sumologic'] = true;
+// $Configuration['EnabledPlugins']['ReplyTo'] = true; //Uncomment it after upgrading DB
 
 // Debug
 $Configuration['Debug'] = FALSE;
