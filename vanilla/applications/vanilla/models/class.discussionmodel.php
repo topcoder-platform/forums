@@ -500,6 +500,16 @@ class DiscussionModel extends Gdn_Model {
         }
 
         if (is_array($wheres)) {
+            $groupWhereCondition = strtolower(val('Groups', $wheres));
+            if ($groupWhereCondition =='all') {
+                $groupIDs = $wheres['d.GroupID'];
+                $this->SQL->beginWhereGroup()
+                    ->where('d.GroupID is null')
+                    ->orWhere('d.GroupID', $groupIDs) // Make sure that cleared conversations do not show up unless they have new messages added.
+                    ->endWhereGroup();
+                unset($wheres['Groups']);
+                unset($wheres['d.GroupID']);
+            }
             $this->SQL->where($wheres);
         }
 
@@ -757,6 +767,17 @@ class DiscussionModel extends Gdn_Model {
             unset($where['d.Announce']);
         } else {
             $removeAnnouncements = true;
+        }
+
+        $groupWhereCondition = strtolower(val('Groups', $where));
+        if ($groupWhereCondition =='all') {
+            $groupIDs = $where['d.GroupID'];
+            $this->SQL->beginWhereGroup()
+                ->where('d.GroupID is null')
+                ->orWhere('d.GroupID', $groupIDs) // Make sure that cleared conversations do not show up unless they have new messages added.
+                ->endWhereGroup();
+            unset($where['Groups']);
+            unset($where['d.GroupID']);
         }
 
         // Make sure there aren't any ambiguous discussion references.
@@ -1571,6 +1592,17 @@ class DiscussionModel extends Gdn_Model {
         $hasWhere = !empty($wheres);
         $whereOnCategories = $hasWhere && isset($wheres['d.CategoryID']);
         $whereOnCategoriesOnly = $whereOnCategories && count($wheres) === 1;
+
+        $groupWhereCondition = strtolower(val('Groups', $wheres));
+        if ($groupWhereCondition =='all') {
+            $groupIDs = $wheres['d.GroupID'];
+            $this->SQL->beginWhereGroup()
+                ->where('d.GroupID is null')
+                ->orWhere('d.GroupID', $groupIDs) // Make sure that cleared conversations do not show up unless they have new messages added.
+                ->endWhereGroup();
+            unset($wheres['Groups']);
+            unset($wheres['d.GroupID']);
+        }
 
         // We have access to everything and are requesting only by categories. Let's use the cache!
         if ($perms === true && $whereOnCategoriesOnly) {

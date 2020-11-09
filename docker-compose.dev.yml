@@ -8,6 +8,6 @@ services:
     env_file:
       - ./mysql.env
     command: --default-authentication-plugin=mysql_native_password
-  vanilla-local:
+  vanilla-forums:
     links:
       - mysql-local
