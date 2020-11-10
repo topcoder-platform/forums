@@ -4,6 +4,8 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 
+use Vanilla\Formatting\DateTimeFormatter;
+
 if (!defined('APPLICATION')) {
     exit();
 }
@@ -80,11 +82,13 @@ if (!function_exists('writeComment')) :
         }
         // Prep event args
         $cssClass = cssClass($comment, false);
+        $displayBody = true;
         $sender->EventArguments['Comment'] = &$comment;
         $sender->EventArguments['Author'] = &$author;
         $sender->EventArguments['CssClass'] = &$cssClass;
         $sender->EventArguments['CurrentOffset'] = $currentOffset;
         $sender->EventArguments['Permalink'] = $permalink;
+        $sender->EventArguments['DisplayBody'] = &$displayBody;
 
         // Needed in writeCommentOptions()
         if ($sender->data('Discussion', null) === null) {
@@ -140,9 +144,9 @@ if (!function_exists('writeComment')) :
             </span>
                     </div>
                     <div class="Meta CommentMeta CommentInfo">
-            <span class="MItem DateCreated">
-               <?php echo anchor(Gdn_Format::date($comment->DateInserted, 'html'), $permalink, 'Permalink', ['name' => 'Item_'.($currentOffset), 'rel' => 'nofollow']); ?>
-            </span>
+                        <span class="MItem DateCreated">
+                            <?php echo anchor(Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($comment->DateInserted, true, DateTimeFormatter::FORCE_FULL_FORMAT), $permalink, 'Permalink', ['name' => 'Item_'.($currentOffset), 'rel' => 'nofollow']); ?>
+                        </span>
                         <?php
                         echo dateUpdated($comment, ['<span class="MItem">', '</span>']);
                         ?>
@@ -162,14 +166,18 @@ if (!function_exists('writeComment')) :
                     <div class="Item-Body">
                         <div class="Message userContent">
                             <?php
-                            echo formatBody($comment);
+                                if($displayBody == true) {
+                                    echo formatBody($comment);
+                                }
                             ?>
                         </div>
                         <?php
                         $sender->fireEvent('AfterCommentBody');
-                        writeReactions($comment);
-                        if (val('Attachments', $comment)) {
-                            writeAttachments($comment->Attachments);
+                        if($displayBody == true) {
+                            writeReactions($comment);
+                            if (val('Attachments', $comment)) {
+                                writeAttachments($comment->Attachments);
+                            }
                         }
                         ?>
                     </div>
