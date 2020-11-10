@@ -23,6 +23,9 @@ if (c('Garden.Installed')) {
     saveToConfig('Garden.MobileTheme', 'topcoder-theme', false);
     saveToConfig('Feature.NewFlyouts.Enabled', true);
 
+    // Feature
+    saveToConfig('Garden.EditContentTimeout', -1, false);
+
     // Profile settings
     saveToConfig('Garden.Profile.EditPhotos', false);
 

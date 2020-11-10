@@ -45,6 +45,7 @@ $Configuration['Vanilla']['Activity']['ShowDiscussionBody'] = true;
 // Feature
 $Configuration['Feature']['NewFlyouts']['Enabled'] = true;
 $Configuration['Vanilla']['EnableCategoryFollowing'] = true;
+$Configuration['Garden']['EditContentTimeout'] = -1;
 
 // Garden
 $Configuration['Garden']['Title'] = 'Vanilla';
