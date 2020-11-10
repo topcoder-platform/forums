@@ -4,50 +4,75 @@ if (c('Garden.Installed')) {
     $Database = Gdn::database();
     $SQL = $Database->sql();
 
-    // DB settings
-    saveToConfig('Database.Host', getenv('DB_HOSTNAME'), false);
-    saveToConfig('Database.Name', getenv('DB_DATABASE'), false);
-    saveToConfig('Database.User', getenv('DB_USERNAME'), false);
-    saveToConfig('Database.Password', getenv('DB_PASSWORD'), false);
+    // Cache Settings
+    saveToConfig('Cache.Enabled', getenv('CACHE_ENABLED'), true);
+    saveToConfig('Cache.Method', getenv('CACHE_METHOD'), 'dirtycache');
+    saveToConfig('memcached.Store', getenv('MEMCACHED_SERVER'), 'localhost:11211');
 
-    saveToConfig('Garden.Email.SupportName', getenv('MAIL_FROM_NAME'), false);
-    saveToConfig('Garden.Email.SupportAddress', getenv('MAIL_FROM_ADDRESS'), false);
-    saveToConfig('Garden.Email.UseSmtp', getenv('MAIL_USE_SMTP'), false);
-    saveToConfig('Garden.Email.SmtpHost', getenv('MAIL_SMTP_HOSTNAME'), false);
-    saveToConfig('Garden.Email.SmtpUser', getenv('MAIL_SMTP_USERNAME'), false);
-    saveToConfig('Garden.Email.SmtpPassword', getenv('MAIL_SMTP_PASSWORD'), false);
-    saveToConfig('Garden.Email.SmtpPort', getenv('MAIL_SMTP_PORT'), false);
-    saveToConfig('Garden.Email.SmtpSecurity', getenv('MAIL_SMTP_SECURITY'), false);
+    saveToConfig('Garden.Email.SupportName', getenv('MAIL_FROM_NAME') );
+    saveToConfig('Garden.Email.SupportAddress', getenv('MAIL_FROM_ADDRESS'));
+    saveToConfig('Garden.Email.UseSmtp', getenv('MAIL_USE_SMTP'));
+    saveToConfig('Garden.Email.SmtpHost', getenv('MAIL_SMTP_HOSTNAME'));
+    saveToConfig('Garden.Email.SmtpUser', getenv('MAIL_SMTP_USERNAME'));
+    saveToConfig('Garden.Email.SmtpPassword', getenv('MAIL_SMTP_PASSWORD'));
+    saveToConfig('Garden.Email.SmtpPort', getenv('MAIL_SMTP_PORT'));
+    saveToConfig('Garden.Email.SmtpSecurity', getenv('MAIL_SMTP_SECURITY'));
 
-    //Disable plugins
-    saveToConfig('EnabledPlugins.stubcontent', false);
-
-    //Enable plugins
-    saveToConfig('EnabledPlugins.Topcoder', true);
-    saveToConfig('EnabledPlugins.rich-editor',true);
-    saveToConfig('EnabledPlugins.recaptcha',  true);
-    saveToConfig('EnabledPlugins.editor', true);
-    saveToConfig('EnabledPlugins.emojiextender', true);
-    saveToConfig('EnabledPlugins.GooglePrettify', true);
-    saveToConfig('EnabledPlugins.Quotes', true);
-    saveToConfig('EnabledPlugins.swagger-ui', true);
-    saveToConfig('EnabledPlugins.oauth2', true);
-
-    // Set Theme Options
-    saveToConfig('Garden.ThemeOptions.Styles.Key', 'Coral');
-    saveToConfig('Garden.ThemeOptions.Styles.Value', '%s_coral');
-    saveToConfig('Garden.ThemeOptions.Options.panelToLeft',true);
+    // Appearance
+    saveToConfig('Garden.Theme', 'topcoder-theme', false);
+    saveToConfig('Garden.MobileTheme', 'topcoder-theme', false);
+    saveToConfig('Feature.NewFlyouts.Enabled', true);
 
     // Profile settings
     saveToConfig('Garden.Profile.EditPhotos', false);
 
     // Add settings for the Topcoder plugin
-    if(c('Plugins.Topcoder.BaseApiURL') === false) {
-        saveToConfig('Plugins.Topcoder.BaseApiURL', getenv('TOPCODER_PLUGIN_BASE_API_URL'), false);
-        saveToConfig('Plugins.Topcoder.MemberApiURI', getenv('TOPCODER_PLUGIN_MEMBER_API_URI'), false);
-        saveToConfig('Plugins.Topcoder.RoleApiURI', getenv('TOPCODER_PLUGIN_ROLE_API_URI'), false);
-        saveToConfig('Plugins.Topcoder.MemberProfileURL', getenv('TOPCODER_PLUGIN_MEMBER_PROFILE_URL'), false);
+    saveToConfig('Plugins.Topcoder.BaseApiURL', getenv('TOPCODER_PLUGIN_BASE_API_URL'),false);
+    saveToConfig('Plugins.Topcoder.MemberApiURI', getenv('TOPCODER_PLUGIN_MEMBER_API_URI'),false);
+    saveToConfig('Plugins.Topcoder.RoleApiURI', getenv('TOPCODER_PLUGIN_ROLE_API_URI'),false);
+    saveToConfig('Plugins.Topcoder.ResourceRolesApiURI', '/v5/resource-roles', false);
+    saveToConfig('Plugins.Topcoder.ResourcesApiURI', '/v5/resources', false);
+    saveToConfig('Plugins.Topcoder.MemberProfileURL', 'https://www.topcoder-dev.com/members',false); // prod: getenv('TOPCODER_PLUGIN_MEMBER_PROFILE_URL')
+    saveToConfig('Plugins.Topcoder.UseTopcoderAuthToken', getenv('TOPCODER_PLUGIN_USE_AUTH_TOKEN'),false);
+
+    saveToConfig('Plugins.Topcoder.ValidIssuers', str_replace(["[", "]", "\\", "\"", " "], '', getenv('VALID_ISSUERS')));
+
+    //Add settings for Topcoder M2M Auth0
+    saveToConfig('Plugins.Topcoder.M2M.Auth0Audience','https://m2m.topcoder-dev.com/'); // getenv('AUTH0_AUDIENCE')
+    saveToConfig('Plugins.Topcoder.M2M.Auth0ClientId', getenv('AUTH0_CLIENT_ID'));
+    saveToConfig('Plugins.Topcoder.M2M.Auth0ClientSecret', getenv('AUTH0_CLIENT_SECRET'));
+    saveToConfig('Plugins.Topcoder.M2M.Auth0Url', getenv('AUTH0_URL'));
+    saveToConfig('Plugins.Topcoder.M2M.Auth0ProxyServerUrl', getenv('AUTH0_PROXY_SERVER_URL'));
+
+     //Add settings for Topcoder SSO Auth0
+    saveToConfig('Plugins.Topcoder.SSO.Auth0Domain', 'https://api.topcoder-dev.com');
+    saveToConfig('Plugins.Topcoder.SSO.AuthorizationURI', '/v3/authorizations/1');
+    saveToConfig('Plugins.Topcoder.SSO.CookieName', 'v3jwt',false);
+    saveToConfig('Plugins.Topcoder.SSO.TopcoderRS256.ID', 'BXWXUWnilVUPdN01t2Se29Tw2ZYNGZvH');
+    saveToConfig('Plugins.Topcoder.SSO.TopcoderHS256.ID', 'JFDo7HMkf0q2CkVFHojy3zHWafziprhT');
+    saveToConfig('Plugins.Topcoder.SSO.TopcoderHS256.Secret', getenv('TOPCODER_HS256_SECRET') );
+    saveToConfig('Plugins.Topcoder.SSO.TopcoderRS256.UsernameClaim', 'nickname',false);
+    saveToConfig('Plugins.Topcoder.SSO.TopcoderHS256.UsernameClaim', 'handle',false);
+    $topcoderSSOAuth0Url = 'https://accounts-auth0.topcoder-dev.com/';
+    saveToConfig('Plugins.Topcoder.SSO.RefreshTokenURL', $topcoderSSOAuth0Url,false);
+    $signInUrl = getenv('TOPCODER_PLUGIN_SIGNIN_URL');
+    $signOutUrl = getenv('TOPCODER_PLUGIN_SIGNOUT_URL');
+    if($signInUrl === false) {
+        $signInUrl =$topcoderSSOAuth0Url.'?retUrl='.urlencode('https://'.$_SERVER['SERVER_NAME'].'/');
     }
+    if($signOutUrl === false) {
+        $signOutUrl =$topcoderSSOAuth0Url.'?logout=true&retUrl='.urlencode('https://'.$_SERVER['SERVER_NAME'].'/');
+    }
+    saveToConfig('Plugins.Topcoder.AuthenticationProvider.SignInUrl', $signInUrl,false);
+    saveToConfig('Plugins.Topcoder.AuthenticationProvider.SignOutUrl', $signOutUrl,false);
+    saveToConfig('Plugins.Topcoder.AuthenticationProvider.RegisterUrl', 'https://www.topcoder-dev.com/user-selection/',false);
+
+    // Filestack
+    saveToConfig('Plugins.Filestack.ApiKey', getenv('FILESTACK_API_KEY'),false);
+
+    // SumoLogic
+    saveToConfig('Plugins.Sumologic.HttpSourceURL', '',false);
+    saveToConfig('Plugins.Sumologic.BatchSize', '10',false);
 
     // Add settings for the Editor plugin
     if(c('Plugins.editor.ForceWysiwyg') === false) {
@@ -68,66 +93,29 @@ if (c('Garden.Installed')) {
         saveToConfig('Recaptcha.PublicKey', getenv('RECAPTCHA_PLUGIN_PUBLIC_KEY'), false);
     }
 
-    // Add settings for the OAuth 2 SSO plugin
-    if ($SQL->getWhere('UserAuthenticationProvider', ['AuthenticationKey' => 'oauth2'])->numRows() == 0) {
-        $attributes = array(
-            'AssociationKey'=> getenv('TOPCODER_AUTH0_ASSOCIATION_KEY'),
-            'AuthorizeUrl'=> getenv('TOPCODER_AUTH0_AUTHORIZE_URL'),
-            'TokenUrl'=> getenv('TOPCODER_AUTH0_TOKEN_URL'),
-            'AcceptedScope'=> getenv('TOPCODER_AUTH0_ACCEPTED_SCOPE'),
-            'ProfileKeyEmail'=> getenv('TOPCODER_AUTH0_PROFILE_KEY_EMAIL'),
-            'ProfileKeyPhoto'=> getenv('TOPCODER_AUTH0_PROFILE_KEY_PHOTO'),
-            'ProfileKeyName'=> getenv('TOPCODER_AUTH0_PROFILE_KEY_NAME'),
-            'ProfileKeyFullName'=> getenv('TOPCODER_AUTH0_PROFILE_KEY_FULL_NAME'),
-            'ProfileKeyUniqueID'=> getenv('TOPCODER_AUTH0_PROFILE_KEY_UNIQUE_ID'),
-            'Prompt'=> getenv('TOPCODER_AUTH0_PROMPT'),
-            'BearerToken'=> getenv('TOPCODER_AUTH0_BEARER_TOKEN'),
-            'BaseUrl'=> getenv('TOPCODER_AUTH0_BASE_URL')
-        );
+
+    // Fix: OAuth 2 SSO should be inactive and not by default. It should be removed later.
+    if ($SQL->getWhere('UserAuthenticationProvider', ['AuthenticationKey' => 'oauth2'])->numRows() > 0) {
+        $SQL->update('UserAuthenticationProvider')
+            ->set('Active', 0)
+            ->set('IsDefault',0)
+            ->where('AuthenticationKey' , 'oauth2')->put();
+    }
+
+    // Add Topcoder User Authentication Provider.
+    // SignInUrl/SignOutUrl should be set in Topcoder plugin's setup; otherwise they couldn't be updated in DB
+    if ($SQL->getWhere('UserAuthenticationProvider', ['AuthenticationKey' => 'topcoder'])->numRows() == 0) {
         $SQL->insert('UserAuthenticationProvider', [
-            'AuthenticationKey' => 'oauth2',
-            'AuthenticationSchemeAlias' => 'oauth2',
-            'Name' => 'oauth2',
-            'AssociationSecret' => getenv('TOPCODER_AUTH0_SECRET'),
-            'RegisterUrl' => getenv('TOPCODER_AUTH0_REGISTER_URL'),
-            'SignInUrl' => getenv('TOPCODER_AUTH0_SIGNIN_URL'),
-            'SignOutUrl' => getenv('TOPCODER_AUTH0_SIGNOUT_URL'),
-            'ProfileUrl' => getenv('TOPCODER_AUTH0_PROFILE_URL'),
-            'Attributes' => json_encode($attributes,JSON_UNESCAPED_SLASHES),
+            'AuthenticationKey' => 'topcoder',
+            'AuthenticationSchemeAlias' => 'topcoder',
+            'Name' => 'topcoder',
             'Active' => 1,
             'IsDefault' => 1
         ]);
     }
 
-    // Define Topcoder Member role
-    $topcoderRoleName = 'Topcoder Member';
-    if($SQL->getWhere('Role', ['Name' => $topcoderRoleName])->numRows() == 0) {
-        $roleID = $SQL->insert('Role', [
-            'Name' => $topcoderRoleName,
-            'Type' => 'member',
-            'Deletable' => 0,
-            'CanSession' => 1,
-            'PersonalInfo' => 1,
-            'Description' => 'Topcoder Members can edit Notification Preferences and participate in discussions.'
-        ]);
-
-        // Define the set of permissions to singIn, view Profiles and edit Notification Preferences
-        $SQL->insert('Permission', [
-            'RoleID' => $roleID,
-            '`Garden.SignIn.Allow`' => 1,
-            '`Garden.Profiles.View`' => 1,
-            '`Garden.PersonalInfo.View`' => 1,
-            '`Garden.AdvancedNotifications.Allow`' => 1
-        ]);
-
-        // Define the set of permissions to view categories
-        $SQL->insert('Permission', [
-            'RoleID' => $roleID,
-            'JunctionTable' => 'Category',
-            'JunctionColumn' => 'PermissionCategoryID',
-            'JunctionID' => -1,
-            '`Vanilla.Discussions.View`' => 1
-        ]);
-    }
+    // Fix: Add the 'topcoder' role type in Role Table. It should be removed after upgrading existing DB.
+    // The Topcoder plugin's setup method will upgrade DB during Vanilla installation
+    $SQL->query('alter table GDN_Role modify Type enum(\'topcoder\', \'guest\', \'unconfirmed\', \'applicant\', \'member\', \'moderator\', \'administrator\')');
 
 }
