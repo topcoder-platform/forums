@@ -51,8 +51,9 @@ if (c('Garden.Installed')) {
     saveToConfig('Plugins.Topcoder.SSO.Auth0Domain', getenv('TOPCODER_PLUGIN_SSO_AUTH0DOMAIN'));
     saveToConfig('Plugins.Topcoder.SSO.AuthorizationURI', '/v3/authorizations/1');
     saveToConfig('Plugins.Topcoder.SSO.CookieName', 'v3jwt',false);
-    saveToConfig('Plugins.Topcoder.SSO.TopcoderRS256.ID', getenv('TOPCODER_PLUGIN_SSO_TOPCODER_RS256_ID'), 'BXWXUWnilVUPdN01t2Se29Tw2ZYNGZvH');
-    saveToConfig('Plugins.Topcoder.SSO.TopcoderHS256.ID', getenv('TOPCODER_PLUGIN_SSO_TOPCODER_HS256_ID'), 'JFDo7HMkf0q2CkVFHojy3zHWafziprhT');
+    saveToConfig('Plugins.Topcoder.SSO.TopcoderRS256.ID', getenv('TOPCODER_PLUGIN_SSO_TOPCODER_RS256_ID'), false);
+    saveToConfig('Plugins.Topcoder.SSO.TopcoderHS256.ID', getenv('TOPCODER_PLUGIN_SSO_TOPCODER_HS256_ID'), false);
+    
     saveToConfig('Plugins.Topcoder.SSO.TopcoderHS256.Secret', getenv('TOPCODER_HS256_SECRET') );
     saveToConfig('Plugins.Topcoder.SSO.TopcoderRS256.UsernameClaim', 'nickname',false);
     saveToConfig('Plugins.Topcoder.SSO.TopcoderHS256.UsernameClaim', 'handle',false);
