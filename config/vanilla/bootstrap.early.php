@@ -35,28 +35,28 @@ if (c('Garden.Installed')) {
     saveToConfig('Plugins.Topcoder.RoleApiURI', getenv('TOPCODER_PLUGIN_ROLE_API_URI'),false);
     saveToConfig('Plugins.Topcoder.ResourceRolesApiURI', '/v5/resource-roles', false);
     saveToConfig('Plugins.Topcoder.ResourcesApiURI', '/v5/resources', false);
-    saveToConfig('Plugins.Topcoder.MemberProfileURL', 'https://www.topcoder-dev.com/members',false); // prod: getenv('TOPCODER_PLUGIN_MEMBER_PROFILE_URL')
-    saveToConfig('Plugins.Topcoder.UseTopcoderAuthToken', getenv('TOPCODER_PLUGIN_USE_AUTH_TOKEN'),false);
+    saveToConfig('Plugins.Topcoder.MemberProfileURL', getenv('TOPCODER_PLUGIN_MEMBER_PROFILE_URL'), false); // prod: 
+    saveToConfig('Plugins.Topcoder.UseTopcoderAuthToken', getenv('TOPCODER_PLUGIN_USE_AUTH_TOKEN'), false);
 
     saveToConfig('Plugins.Topcoder.ValidIssuers', str_replace(["[", "]", "\\", "\"", " "], '', getenv('VALID_ISSUERS')));
 
     //Add settings for Topcoder M2M Auth0
-    saveToConfig('Plugins.Topcoder.M2M.Auth0Audience','https://m2m.topcoder-dev.com/'); // getenv('AUTH0_AUDIENCE')
+    saveToConfig('Plugins.Topcoder.M2M.Auth0Audience', getenv('AUTH0_AUDIENCE'));
     saveToConfig('Plugins.Topcoder.M2M.Auth0ClientId', getenv('AUTH0_CLIENT_ID'));
     saveToConfig('Plugins.Topcoder.M2M.Auth0ClientSecret', getenv('AUTH0_CLIENT_SECRET'));
     saveToConfig('Plugins.Topcoder.M2M.Auth0Url', getenv('AUTH0_URL'));
     saveToConfig('Plugins.Topcoder.M2M.Auth0ProxyServerUrl', getenv('AUTH0_PROXY_SERVER_URL'));
 
      //Add settings for Topcoder SSO Auth0
-    saveToConfig('Plugins.Topcoder.SSO.Auth0Domain', 'https://api.topcoder-dev.com');
+    saveToConfig('Plugins.Topcoder.SSO.Auth0Domain', getenv('TOPCODER_PLUGIN_SSO_AUTH0DOMAIN'));
     saveToConfig('Plugins.Topcoder.SSO.AuthorizationURI', '/v3/authorizations/1');
     saveToConfig('Plugins.Topcoder.SSO.CookieName', 'v3jwt',false);
-    saveToConfig('Plugins.Topcoder.SSO.TopcoderRS256.ID', 'BXWXUWnilVUPdN01t2Se29Tw2ZYNGZvH');
-    saveToConfig('Plugins.Topcoder.SSO.TopcoderHS256.ID', 'JFDo7HMkf0q2CkVFHojy3zHWafziprhT');
+    saveToConfig('Plugins.Topcoder.SSO.TopcoderRS256.ID', getenv('TOPCODER_PLUGIN_SSO_TOPCODER_RS256_ID'), 'BXWXUWnilVUPdN01t2Se29Tw2ZYNGZvH');
+    saveToConfig('Plugins.Topcoder.SSO.TopcoderHS256.ID', getenv('TOPCODER_PLUGIN_SSO_TOPCODER_HS256_ID'), 'JFDo7HMkf0q2CkVFHojy3zHWafziprhT');
     saveToConfig('Plugins.Topcoder.SSO.TopcoderHS256.Secret', getenv('TOPCODER_HS256_SECRET') );
     saveToConfig('Plugins.Topcoder.SSO.TopcoderRS256.UsernameClaim', 'nickname',false);
     saveToConfig('Plugins.Topcoder.SSO.TopcoderHS256.UsernameClaim', 'handle',false);
-    $topcoderSSOAuth0Url = 'https://accounts-auth0.topcoder-dev.com/';
+    $topcoderSSOAuth0Url = getenv('TOPCODER_PLUGIN_SSO_REFRESHTOKENURL');
     saveToConfig('Plugins.Topcoder.SSO.RefreshTokenURL', $topcoderSSOAuth0Url,false);
     $signInUrl = getenv('TOPCODER_PLUGIN_SIGNIN_URL');
     $signOutUrl = getenv('TOPCODER_PLUGIN_SIGNOUT_URL');
@@ -68,7 +68,7 @@ if (c('Garden.Installed')) {
     }
     saveToConfig('Plugins.Topcoder.AuthenticationProvider.SignInUrl', $signInUrl,false);
     saveToConfig('Plugins.Topcoder.AuthenticationProvider.SignOutUrl', $signOutUrl,false);
-    saveToConfig('Plugins.Topcoder.AuthenticationProvider.RegisterUrl', 'https://www.topcoder-dev.com/user-selection/',false);
+    saveToConfig('Plugins.Topcoder.AuthenticationProvider.RegisterUrl', getenv('TOPCODER_PLUGIN_AUTHENTICATIONPROVIDER_REGISTERURL'),false);
 
     // Filestack
     saveToConfig('Plugins.Filestack.ApiKey', getenv('FILESTACK_API_KEY'),false);
