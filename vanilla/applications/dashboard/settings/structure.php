@@ -35,7 +35,7 @@ $Construct
     ->primaryKey('RoleID')
     ->column('Name', 'varchar(100)')
     ->column('Description', 'varchar(500)', true)
-    ->column('Type', [RoleModel::TYPE_GUEST, RoleModel::TYPE_UNCONFIRMED, RoleModel::TYPE_APPLICANT, RoleModel::TYPE_MEMBER, RoleModel::TYPE_MODERATOR, RoleModel::TYPE_ADMINISTRATOR], true)
+    ->column('Type', [RoleModel::TYPE_TOPCODER, RoleModel::TYPE_GUEST, RoleModel::TYPE_UNCONFIRMED, RoleModel::TYPE_APPLICANT, RoleModel::TYPE_MEMBER, RoleModel::TYPE_MODERATOR, RoleModel::TYPE_ADMINISTRATOR], true)
     ->column('Sort', 'int', true)
     ->column('Deletable', 'tinyint(1)', '1')
     ->column('CanSession', 'tinyint(1)', '1')
@@ -54,7 +54,16 @@ if (!$RoleTableExists || $Drop) {
     $RoleModel->define(['Name' => 'Applicant', 'Type' => RoleModel::TYPE_APPLICANT, 'RoleID' => 4, 'Sort' => $Sort++, 'Deletable' => '0', 'CanSession' => '1', 'Description' => t('Applicant Role Description', 'Users who have applied for membership, but have not yet been accepted. They have the same permissions as guests.')]);
     $RoleModel->define(['Name' => 'Member', 'Type' => RoleModel::TYPE_MEMBER, 'RoleID' => 8, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => t('Member Role Description', 'Members can participate in discussions.')]);
     $RoleModel->define(['Name' => 'Moderator', 'Type' => RoleModel::TYPE_MODERATOR, 'RoleID' => 32, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => t('Moderator Role Description', 'Moderators have permission to edit most content.')]);
-    $RoleModel->define(['Name' => 'Administrator', 'Type' => RoleModel::TYPE_ADMINISTRATOR, 'RoleID' => 16, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => t('Administrator Role Description', 'Administrators have permission to do anything.')]);
+    $RoleModel->define(['Name' => 'VanillaAdmin', 'Type' => RoleModel::TYPE_ADMINISTRATOR, 'RoleID' => 16, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => t('Administrator Role Description', 'Administrators have permission to do anything.')]);
+    $nextRoleId = 33;
+    foreach (RoleModel::TOPCODER_ROLES as $key => $values ) {
+        $RoleModel->define(['Name' => $key, 'Type' => RoleModel::ROLE_TYPE_TOPCODER, 'RoleID' => $nextRoleId++, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Topcoder role']);
+    }
+
+    foreach (RoleModel::TOPCODER_PROJECT_ROLES as $key => $values ) {
+        $RoleModel->define(['Name' => $key, 'Type' => RoleModel::ROLE_TYPE_TOPCODER, 'RoleID' => $nextRoleId++, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => 'Topcoder Project role']);
+    }
+
 }
 
 // User Table
@@ -369,8 +378,8 @@ $PermissionModel->define([
     'Garden.Users.Delete',
     'Garden.Users.Approve',
     'Garden.Activity.Delete',
-    'Garden.Activity.View' => 1,
-    'Garden.Profiles.View' => 1,
+    'Garden.Activity.View'=> 'Garden.SignIn.Allow',
+    'Garden.Profiles.View'=> 'Garden.SignIn.Allow',
     'Garden.Profiles.Edit' => 'Garden.SignIn.Allow',
     'Garden.Curation.Manage' => 'Garden.Moderation.Manage',
     'Garden.Moderation.Manage',
@@ -378,7 +387,11 @@ $PermissionModel->define([
     'Garden.AdvancedNotifications.Allow',
     'Garden.Community.Manage' => 'Garden.Settings.Manage',
     'Garden.Tokens.Add' => 'Garden.Settings.Manage',
-    $uploadPermission => 1
+    'Groups.Group.Add',
+    'Groups.Moderation.Manage',
+    'Groups.EmailInvitations.Add',
+    'Groups.Category.Manage',
+    $uploadPermission => 0
 ]);
 
 $PermissionModel->undefine([
@@ -393,7 +406,7 @@ $PermissionModel->undefine([
 
 // Revoke the new upload permission from existing applicant, unconfirmed and guest roles.
 if ($uploadPermissionExists === false) {
-    $revokeTypes = [RoleModel::TYPE_APPLICANT, RoleModel::TYPE_UNCONFIRMED, RoleModel::TYPE_GUEST];
+    $revokeTypes = [RoleModel::TYPE_APPLICANT, RoleModel::TYPE_UNCONFIRMED, RoleModel::TYPE_GUEST, RoleModel::TYPE_TOPCODER, RoleModel::TYPE_MEMBER];
 
     foreach ($revokeTypes as $revokeType) {
         $revokeRoles = $RoleModel->getByType($revokeType)->resultArray();

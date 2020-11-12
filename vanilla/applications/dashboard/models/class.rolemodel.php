@@ -31,6 +31,53 @@ class RoleModel extends Gdn_Model {
     /** Slug for Administrator role type. */
     const TYPE_ADMINISTRATOR = 'administrator';
 
+    /** Slug for Topcoder role type. */
+    const TYPE_TOPCODER = 'topcoder';
+
+    const ROLE_TYPE_TOPCODER = 'topcoder';
+    const ROLE_TOPCODER_ADMINISTRATOR = 'administrator';
+    const ROLE_TOPCODER_CONNECT_ADMIN = 'Connect Admin';
+
+    const TOPCODER_ROLES = [
+        'administrator' =>  [
+            // all permissions
+        ],
+        'Connect Manager' => [],
+        'Connect Account Manager' => [],
+        'Connect Copilot' => [
+            'Name' => ROLE_TOPCODER_CONNECT_COPILOT,
+            'Type' => ROLE_TYPE_TOPCODER,
+            'Garden.Uploads.Add' => 1
+        ],
+        'Connect Admin' => [
+            // all permissions
+        ],
+        'Connect Copilot Manager' => [],
+        'Business Development Representative' => [],
+        'Presales' => [],
+        'Account Executive' => [],
+        'Program Manager' => [],
+        'Solution Architect'=> [],
+        'Project Manager'=> [],
+        'Topcoder User' => []
+    ];
+
+    const TOPCODER_PROJECT_ROLES = [
+        'manager' => [],
+        'copilot' =>  [
+            'Name' => ROLE_TOPCODER_PROJECT_COPILOT,
+            'Type' => ROLE_TYPE_TOPCODER,
+            'Garden.Uploads.Add' => 1
+        ],
+        'customer' => [],
+        'observer'=> [],
+        'account_manager'=> [],
+        'program_manager'=> [],
+        'account_executive'=> [],
+        'solution_architect'=> [],
+        'project_manager' => []
+    ];
+
     /** @var array|null All roles. */
     public static $Roles = null;
 
@@ -304,7 +351,8 @@ class RoleModel extends Gdn_Model {
             self::TYPE_UNCONFIRMED => self::TYPE_UNCONFIRMED,
             self::TYPE_APPLICANT => self::TYPE_APPLICANT,
             self::TYPE_MODERATOR => self::TYPE_MODERATOR,
-            self::TYPE_ADMINISTRATOR => self::TYPE_ADMINISTRATOR
+            self::TYPE_ADMINISTRATOR => self::TYPE_ADMINISTRATOR,
+            self::TYPE_TOPCODER => self::TYPE_TOPCODER
         ];
         if ($translate) {
             $result = array_map('t', $result);

@@ -464,13 +464,13 @@ class VanillaHooks implements Gdn_IPlugin {
         $sender->addDefault(
             RoleModel::TYPE_GUEST,
             [
-                'Vanilla.Discussions.View' => 1
+                'Vanilla.Discussions.View' => 0
             ]
         );
         $sender->addDefault(
             RoleModel::TYPE_GUEST,
             [
-                'Vanilla.Discussions.View' => 1
+                'Vanilla.Discussions.View' => 0
             ],
             'Category',
             -1
@@ -480,13 +480,13 @@ class VanillaHooks implements Gdn_IPlugin {
         $sender->addDefault(
             RoleModel::TYPE_UNCONFIRMED,
             [
-                'Vanilla.Discussions.View' => 1
+                'Vanilla.Discussions.View' => 0
             ]
         );
         $sender->addDefault(
             RoleModel::TYPE_UNCONFIRMED,
             [
-                'Vanilla.Discussions.View' => 1
+                'Vanilla.Discussions.View' => 0
             ],
             'Category',
             -1
@@ -496,13 +496,13 @@ class VanillaHooks implements Gdn_IPlugin {
         $sender->addDefault(
             RoleModel::TYPE_APPLICANT,
             [
-                'Vanilla.Discussions.View' => 1
+                'Vanilla.Discussions.View' => 0
             ]
         );
         $sender->addDefault(
             RoleModel::TYPE_APPLICANT,
             [
-                'Vanilla.Discussions.View' => 1
+                'Vanilla.Discussions.View' => 0
             ],
             'Category',
             -1
@@ -595,6 +595,15 @@ class VanillaHooks implements Gdn_IPlugin {
             'Category',
             -1
         );
+
+        // Topcoder defaults
+        $sender->addDefault(
+            RoleModel::TYPE_TOPCODER,
+            [  ],
+            'Category',
+            -1
+        );
+
     }
 
     /**

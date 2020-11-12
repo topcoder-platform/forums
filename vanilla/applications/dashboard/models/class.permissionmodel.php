@@ -190,6 +190,13 @@ class PermissionModel extends Gdn_Model {
             ]
         );
 
+        $this->addDefault(
+            RoleModel::TYPE_TOPCODER,
+            [
+                'Garden.SignIn.Allow' => 1,
+            ]
+        );
+
         // Allow the ability for other applications and plug-ins to speak up with their own default permissions.
         $this->fireEvent('DefaultPermissions');
     }
@@ -1468,4 +1475,6 @@ class PermissionModel extends Gdn_Model {
         $namespaces = $this->namespaces;
         return $namespaces;
     }
+
+
 }
