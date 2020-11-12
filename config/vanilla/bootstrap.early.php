@@ -51,8 +51,9 @@ if (c('Garden.Installed')) {
     saveToConfig('Plugins.Topcoder.SSO.Auth0Domain', getenv('TOPCODER_PLUGIN_SSO_AUTH0DOMAIN'));
     saveToConfig('Plugins.Topcoder.SSO.AuthorizationURI', '/v3/authorizations/1');
     saveToConfig('Plugins.Topcoder.SSO.CookieName', 'v3jwt',false);
-    saveToConfig('Plugins.Topcoder.SSO.TopcoderRS256.ID', getenv('TOPCODER_PLUGIN_SSO_TOPCODER_RS256_ID'), 'BXWXUWnilVUPdN01t2Se29Tw2ZYNGZvH');
-    saveToConfig('Plugins.Topcoder.SSO.TopcoderHS256.ID', getenv('TOPCODER_PLUGIN_SSO_TOPCODER_HS256_ID'), 'JFDo7HMkf0q2CkVFHojy3zHWafziprhT');
+    saveToConfig('Plugins.Topcoder.SSO.TopcoderRS256.ID', getenv('TOPCODER_PLUGIN_SSO_TOPCODER_RS256_ID'), false);
+    saveToConfig('Plugins.Topcoder.SSO.TopcoderHS256.ID', getenv('TOPCODER_PLUGIN_SSO_TOPCODER_HS256_ID'), false);
+    
     saveToConfig('Plugins.Topcoder.SSO.TopcoderHS256.Secret', getenv('TOPCODER_HS256_SECRET') );
     saveToConfig('Plugins.Topcoder.SSO.TopcoderRS256.UsernameClaim', 'nickname',false);
     saveToConfig('Plugins.Topcoder.SSO.TopcoderHS256.UsernameClaim', 'handle',false);
@@ -94,27 +95,6 @@ if (c('Garden.Installed')) {
     if(c('Recaptcha.PrivateKey') === false) {
         saveToConfig('Recaptcha.PrivateKey', getenv('RECAPTCHA_PLUGIN_PRIVATE_KEY'), false);
         saveToConfig('Recaptcha.PublicKey', getenv('RECAPTCHA_PLUGIN_PUBLIC_KEY'), false);
-    }
-
-
-    // Fix: OAuth 2 SSO should be inactive and not by default. It should be removed later.
-    if ($SQL->getWhere('UserAuthenticationProvider', ['AuthenticationKey' => 'oauth2'])->numRows() > 0) {
-        $SQL->update('UserAuthenticationProvider')
-            ->set('Active', 0)
-            ->set('IsDefault',0)
-            ->where('AuthenticationKey' , 'oauth2')->put();
-    }
-
-    // Add Topcoder User Authentication Provider.
-    // SignInUrl/SignOutUrl should be set in Topcoder plugin's setup; otherwise they couldn't be updated in DB
-    if ($SQL->getWhere('UserAuthenticationProvider', ['AuthenticationKey' => 'topcoder'])->numRows() == 0) {
-        $SQL->insert('UserAuthenticationProvider', [
-            'AuthenticationKey' => 'topcoder',
-            'AuthenticationSchemeAlias' => 'topcoder',
-            'Name' => 'topcoder',
-            'Active' => 1,
-            'IsDefault' => 1
-        ]);
     }
 
     // Fix: Add the 'topcoder' role type in Role Table. It should be removed after upgrading existing DB.
