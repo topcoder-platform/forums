@@ -97,27 +97,6 @@ if (c('Garden.Installed')) {
         saveToConfig('Recaptcha.PublicKey', getenv('RECAPTCHA_PLUGIN_PUBLIC_KEY'), false);
     }
 
-
-    // Fix: OAuth 2 SSO should be inactive and not by default. It should be removed later.
-    if ($SQL->getWhere('UserAuthenticationProvider', ['AuthenticationKey' => 'oauth2'])->numRows() > 0) {
-        $SQL->update('UserAuthenticationProvider')
-            ->set('Active', 0)
-            ->set('IsDefault',0)
-            ->where('AuthenticationKey' , 'oauth2')->put();
-    }
-
-    // Add Topcoder User Authentication Provider.
-    // SignInUrl/SignOutUrl should be set in Topcoder plugin's setup; otherwise they couldn't be updated in DB
-    if ($SQL->getWhere('UserAuthenticationProvider', ['AuthenticationKey' => 'topcoder'])->numRows() == 0) {
-        $SQL->insert('UserAuthenticationProvider', [
-            'AuthenticationKey' => 'topcoder',
-            'AuthenticationSchemeAlias' => 'topcoder',
-            'Name' => 'topcoder',
-            'Active' => 1,
-            'IsDefault' => 1
-        ]);
-    }
-
     // Fix: Add the 'topcoder' role type in Role Table. It should be removed after upgrading existing DB.
     // The Topcoder plugin's setup method will upgrade DB during Vanilla installation
     $SQL->query('alter table GDN_Role modify Type enum(\'topcoder\', \'guest\', \'unconfirmed\', \'applicant\', \'member\', \'moderator\', \'administrator\')');
