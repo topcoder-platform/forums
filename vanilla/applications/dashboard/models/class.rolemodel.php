@@ -45,14 +45,18 @@ class RoleModel extends Gdn_Model {
         'Connect Manager' => [],
         'Connect Account Manager' => [],
         'Connect Copilot' => [
-            'Name' => ROLE_TOPCODER_CONNECT_COPILOT,
-            'Type' => ROLE_TYPE_TOPCODER,
-            'Garden.Uploads.Add' => 1
+           'Groups.Category.Manage' => 1,
+           'Groups.Moderation.Manage' => 1,
+           'Groups.EmailInvitations.Add' => 1
         ],
         'Connect Admin' => [
             // all permissions
         ],
-        'Connect Copilot Manager' => [],
+        'Connect Copilot Manager' => [
+           'Groups.Category.Manage' => 1,
+           'Groups.Moderation.Manage' => 1,
+           'Groups.EmailInvitations.Add' => 1
+        ],
         'Business Development Representative' => [],
         'Presales' => [],
         'Account Executive' => [],
@@ -63,11 +67,15 @@ class RoleModel extends Gdn_Model {
     ];
 
     const TOPCODER_PROJECT_ROLES = [
-        'manager' => [],
+        'manager' => [
+            'Groups.Category.Manage' => 1,
+            'Groups.Moderation.Manage' => 1,
+            'Groups.EmailInvitations.Add' => 1
+        ],
         'copilot' =>  [
-            'Name' => ROLE_TOPCODER_PROJECT_COPILOT,
-            'Type' => ROLE_TYPE_TOPCODER,
-            'Garden.Uploads.Add' => 1
+            'Groups.Category.Manage' => 1,
+            'Groups.Moderation.Manage' => 1,
+            'Groups.EmailInvitations.Add' => 1
         ],
         'customer' => [],
         'observer'=> [],
