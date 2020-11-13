@@ -930,7 +930,7 @@ class DashboardHooks extends Gdn_Plugin {
                 if ($roleName == RoleModel::ROLE_TOPCODER_CONNECT_ADMIN || $roleName == RoleModel::ROLE_TOPCODER_ADMINISTRATOR) {
                     foreach ($permission as $key => $value) {
                         if ($key != 'PermissionID' && $key != 'RoleID' && $key != 'JunctionTable' && $key != 'JunctionColumn'
-                            && $key !== 'JunctionID') {
+                            && $key != 'JunctionID' && $key != 'Vanilla.Approval.Require') {
                             $permission[$key] = 1;
                         }
                         $PermissionModel->save($permission);
@@ -946,21 +946,12 @@ class DashboardHooks extends Gdn_Plugin {
             foreach ($allPermissions as $permission) {
                 $roleName = $role['Name'];
                 if (array_key_exists($roleName, $topcoderRoles)) {
-                    if ($roleName == RoleModel::ROLE_TOPCODER_CONNECT_ADMIN || $roleName == RoleModel::ROLE_TOPCODER_ADMINISTRATOR) {
-                        foreach ($permission as $key => $value) {
-                            if ($key != 'PermissionID' && $key != 'RoleID' && $key != 'JunctionTable' && $key != 'JunctionColumn'
-                                && $key !== 'JunctionID') {
-                                $permission[$key] = 1;
-                            }
-                        }
-                    } else {
-                        $globalRolePermissions = $topcoderRoles[$roleName];
-                        foreach ($permission as $key => $value) {
-                            if ($key != 'PermissionID' && $key != 'RoleID' && $key != 'JunctionTable' && $key != 'JunctionColumn'
-                                && $key !== 'JunctionID') {
-                                $permission[$key] = array_key_exists($key, $globalRolePermissions) ? $globalRolePermissions[$key] : $value;
-                            }
-                        }
+                    $globalRolePermissions = $topcoderRoles[$roleName];
+                    foreach ($globalRolePermissions as $key => $value) {
+                       // if ($key != 'PermissionID' && $key != 'RoleID' && $key != 'JunctionTable' && $key != 'JunctionColumn'
+                        //    && $key !== 'JunctionID') {
+                            $permission[$key] = $globalRolePermissions[$key];
+                       // }
                     }
                     $PermissionModel->save($permission);
                 }

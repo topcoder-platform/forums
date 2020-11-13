@@ -37,11 +37,50 @@ class RoleModel extends Gdn_Model {
     const ROLE_TYPE_TOPCODER = 'topcoder';
     const ROLE_TOPCODER_ADMINISTRATOR = 'administrator';
     const ROLE_TOPCODER_CONNECT_ADMIN = 'Connect Admin';
-
+    const ALL_VANILLA_PERMISSIONS = [
+        'Garden.Email.View' => 1,
+        'Garden.Settings.Manage' => 1,
+        'Garden.Settings.View' => 1,
+        'Garden.SignIn.Allow' => 1,
+        'Garden.Users.Add' => 1,
+        'Garden.Users.Edit' => 1,
+        'Garden.Users.Delete' => 1,
+        'Garden.Users.Approve' => 1,
+        'Garden.Activity.Delete' => 1,
+        'Garden.Activity.View' => 1,
+        'Garden.Profiles.View' => 1,
+        'Garden.Profiles.Edit' => 1,
+        'Garden.Curation.Manage' => 1,
+        'Garden.Moderation.Manage' => 1,
+        'Garden.PersonalInfo.View' => 1,
+        'Garden.AdvancedNotifications.Allow' => 1,
+        'Garden.Community.Manage' => 1,
+        'Garden.Tokens.Add' => 1,
+        // Groups
+        'Groups.Group.Add' => 1,
+        'Groups.Moderation.Manage' => 1,
+        'Groups.EmailInvitations.Add'  => 1,
+        'Groups.Category.Manage' => 1,
+        'Garden.Uploads.Add' => 1,
+        'Vanilla.Tagging.Add' => 1,
+        'Conversations.Moderation.Manage' => 1,
+        'Conversations.Conversations.Add'=> 1,
+        'Vanilla.Approval.Require' => 0,
+        'Vanilla.Comments.Me' => 1,
+        'Vanilla.Discussions.View' => 1,
+        'Vanilla.Discussions.Add' => 1,
+        'Vanilla.Discussions.Edit' => 1,
+        'Vanilla.Discussions.Announce' => 1,
+        'Vanilla.Discussions.Sink' => 1,
+        'Vanilla.Discussions.Close' => 1,
+        'Vanilla.Discussions.Delete' => 1,
+        'Vanilla.Comments.Add' => 1,
+        'Vanilla.Comments.Edit' => 1,
+        'Vanilla.Comments.Delete' => 1,
+        'Plugins.Attachments.Upload.Allow' => 1
+    ];
     const TOPCODER_ROLES = [
-        'administrator' =>  [
-            // all permissions
-        ],
+        'administrator' => ALL_VANILLA_PERMISSIONS,
         'Connect Manager' => [],
         'Connect Account Manager' => [],
         'Connect Copilot' => [
@@ -49,9 +88,7 @@ class RoleModel extends Gdn_Model {
            'Groups.Moderation.Manage' => 1,
            'Groups.EmailInvitations.Add' => 1
         ],
-        'Connect Admin' => [
-            // all permissions
-        ],
+        'Connect Admin' => ALL_VANILLA_PERMISSIONS,
         'Connect Copilot Manager' => [
            'Groups.Category.Manage' => 1,
            'Groups.Moderation.Manage' => 1,
