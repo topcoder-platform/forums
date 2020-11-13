@@ -912,52 +912,57 @@ class DashboardHooks extends Gdn_Plugin {
         if (!$hasPermissions) {
             PermissionModel::resetAllRoles();
 
-            // TODO: refactor it
-            //create Topocder roles
-
             $RoleModel = new RoleModel();
             $PermissionModel = new PermissionModel();
             // Configure default permission for Topcoder roles
             $allRoles = $RoleModel->getByType(RoleModel::TYPE_TOPCODER)->resultArray();
-            foreach ($allRoles as $role) {
-                $allPermissions = $PermissionModel->getRolePermissions($role['RoleID']);
-                foreach ($allPermissions as $permission) {
-                    $roleName = $role['Name'];
-                    if (array_key_exists($roleName, RoleModel::TOPCODER_ROLES)) {
-                        if ($roleName == RoleModel::ROLE_TOPCODER_CONNECT_ADMIN || $roleName == RoleModel::ROLE_TOPCODER_ADMINISTRATOR) {
-                            foreach ($permission as $key => $value) {
-                                if ($key != 'PermissionID' && $key != 'RoleID' && $key != 'JunctionTable' && $key != 'JunctionColumn'
-                                    && $key !== 'JunctionID') {
-                                    $permission[$key] = 1;
-                                }
-                            }
-                        } else {
-                            $globalRolePermissions = RoleModel::TOPCODER_ROLES[$roleName];
-                            foreach ($permission as $key => $value) {
-                                if ($key != 'PermissionID' && $key != 'RoleID' && $key != 'JunctionTable' && $key != 'JunctionColumn'
-                                    && $key !== 'JunctionID') {
-                                    $permission[$key] = array_key_exists($key, $globalRolePermissions) ? $globalRolePermissions[$key] : $value;
-                                }
-                            }
+            $this->updateTopcoderRolePermissions($PermissionModel, $allRoles, RoleModel::TOPCODER_ROLES);
+            $this->updateTopcoderRolePermissions($PermissionModel, $allRoles, RoleModel::TOPCODER_PROJECT_ROLES);
+            $this->configureDefaultCategoryPermission($PermissionModel, $allRoles, RoleModel::TOPCODER_ROLES);
+
+        }
+    }
+    private function configureDefaultCategoryPermission($PermissionModel, $allRoles) {
+        foreach ($allRoles as $role) {
+            $allPermissions = $PermissionModel->getRolePermissions($role['RoleID'], '', 'Category', 'PermissionCategoryID', -1);
+            foreach ($allPermissions as $permission) {
+                $roleName = $role['Name'];
+                if ($roleName == RoleModel::ROLE_TOPCODER_CONNECT_ADMIN || $roleName == RoleModel::ROLE_TOPCODER_ADMINISTRATOR) {
+                    foreach ($permission as $key => $value) {
+                        if ($key != 'PermissionID' && $key != 'RoleID' && $key != 'JunctionTable' && $key != 'JunctionColumn'
+                            && $key !== 'JunctionID') {
+                            $permission[$key] = 1;
                         }
                         $PermissionModel->save($permission);
                     }
                 }
             }
-            // Configure default category permission for Topcoder roles
-            foreach ($allRoles as $role) {
-                $allPermissions = $PermissionModel->getRolePermissions($role['RoleID'], '', 'Category', 'PermissionCategoryID', -1);
-                foreach ($allPermissions as $permission) {
-                    $roleName = $role['Name'];
+        }
+    }
+
+    private function updateTopcoderRolePermissions($PermissionModel, $allRoles, $topcoderRoles) {
+        foreach ($allRoles as $role) {
+            $allPermissions = $PermissionModel->getRolePermissions($role['RoleID']);
+            foreach ($allPermissions as $permission) {
+                $roleName = $role['Name'];
+                if (array_key_exists($roleName, $topcoderRoles)) {
                     if ($roleName == RoleModel::ROLE_TOPCODER_CONNECT_ADMIN || $roleName == RoleModel::ROLE_TOPCODER_ADMINISTRATOR) {
                         foreach ($permission as $key => $value) {
                             if ($key != 'PermissionID' && $key != 'RoleID' && $key != 'JunctionTable' && $key != 'JunctionColumn'
                                 && $key !== 'JunctionID') {
                                 $permission[$key] = 1;
                             }
-                            $PermissionModel->save($permission);
+                        }
+                    } else {
+                        $globalRolePermissions = $topcoderRoles[$roleName];
+                        foreach ($permission as $key => $value) {
+                            if ($key != 'PermissionID' && $key != 'RoleID' && $key != 'JunctionTable' && $key != 'JunctionColumn'
+                                && $key !== 'JunctionID') {
+                                $permission[$key] = array_key_exists($key, $globalRolePermissions) ? $globalRolePermissions[$key] : $value;
+                            }
                         }
                     }
+                    $PermissionModel->save($permission);
                 }
             }
         }

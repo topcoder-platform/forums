@@ -1,18 +1,19 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$Configuration['Garden']['Installed'] = true;
+$Configuration['Garden']['Installed'] = false;
 
-$Configuration['Garden']['SignIn']['Popup'] = false; // Should the sign-in link pop up or go to it's own page
-
-// Conversations
-$Configuration['Conversations']['Version'] = '3.0';
-$Configuration['Conversations']['Moderation']['Allow'] = true;
-
-// Database
 $Configuration['Database']['Name'] = getenv('MYSQL_DATABASE');
 $Configuration['Database']['Host'] = getenv('MYSQL_HOST');
 $Configuration['Database']['User'] = getenv('MYSQL_ROOT_USER');
 $Configuration['Database']['Password'] = getenv('MYSQL_ROOT_PASSWORD');
+
+// Cache
+$Configuration['Cache']['Enabled'] = getenv('CACHE_ENABLED');
+$Configuration['Cache']['Method'] = getenv('CACHE_METHOD');
+
+// Conversations
+$Configuration['Conversations']['Version'] = '3.0';
+$Configuration['Conversations']['Moderation']['Allow'] = true;
 
 // EnabledApplications
 $Configuration['EnabledApplications']['Conversations'] = 'conversations';
@@ -33,34 +34,38 @@ $Configuration['EnabledPlugins']['oauth2'] = false;
 $Configuration['EnabledPlugins']['Groups'] = true;
 $Configuration['EnabledPlugins']['Filestack'] = true;
 $Configuration['EnabledPlugins']['Sumologic'] = true;
-$Configuration['EnabledPlugins']['ReplyTo'] = true; //Uncomment it after upgrading DB
-
-// Debug
-$Configuration['Debug'] = FALSE;
-$Configuration['Vanilla']['SSO']['Debug'] = TRUE;
-
-// Email contents
-$Configuration['Vanilla']['Activity']['ShowDiscussionBody'] = true;
+$Configuration['EnabledPlugins']['ReplyTo'] = true;
 
 // Feature
 $Configuration['Feature']['NewFlyouts']['Enabled'] = true;
-$Configuration['Vanilla']['EnableCategoryFollowing'] = true;
-$Configuration['Garden']['EditContentTimeout'] = -1;
 
 // Garden
+$Configuration['Garden']['SignIn']['Popup'] = false;
+$Configuration['Garden']['EditContentTimeout'] = -1;
 $Configuration['Garden']['Title'] = 'Vanilla';
 $Configuration['Garden']['Cookie']['Salt'] = 'rLpGSLgZD1AGdJ4n';
 $Configuration['Garden']['Cookie']['Domain'] = '';
 $Configuration['Garden']['Registration']['ConfirmEmail'] = true;
-$Configuration['Garden']['Email']['SupportName'] = 'Vanilla';
+$Configuration['Garden']['Email']['SupportName'] =  getenv('MAIL_FROM_NAME');
 $Configuration['Garden']['Email']['Format'] = 'text';
-$Configuration['Garden']['SystemUserID'] = '1';
-$Configuration['Garden']['UpdateToken'] = 'c3988cd76f721f1a03d2c347ab6655609a548425';
+$Configuration['Garden']['Email']['SupportAddress'] = getenv('MAIL_FROM_ADDRESS');
+$Configuration['Garden']['Email']['UseSmtp'] =  getenv('MAIL_USE_SMTP');
+$Configuration['Garden']['Email']['SmtpHost'] = getenv('MAIL_SMTP_HOSTNAME');
+$Configuration['Garden']['Email']['SmtpUser'] =  getenv('MAIL_SMTP_USERNAME');
+$Configuration['Garden']['Email']['SmtpPassword'] = getenv('MAIL_SMTP_PASSWORD');
+$Configuration['Garden']['Email']['SmtpPort'] = getenv('MAIL_SMTP_PORT');
+$Configuration['Garden']['Email']['SmtpSecurity'] = getenv('MAIL_SMTP_SECURITY');
+$Configuration['Garden']['UpdateToken'] = '105e786dc643fd20143d3c137b593af168560c13';
 $Configuration['Garden']['InputFormatter'] = 'Rich';
 $Configuration['Garden']['Version'] = 'Undefined';
 $Configuration['Garden']['CanProcessImages'] = true;
 $Configuration['Garden']['Theme'] = 'topcoder-theme';
 $Configuration['Garden']['MobileTheme'] = 'topcoder-theme';
+$Configuration['Garden']['Profile']['EditPhotos'] = false;
+$Configuration['Garden']['SystemUserID'] = '1';
+$Configuration['Garden']['MobileInputFormatter'] = 'Rich';
+$Configuration['Garden']['AllowFileUploads'] = true;
+$Configuration['Garden']['EditContentTimeout'] = -1;
 $Configuration['Garden']['Profile']['EditPhotos'] = false;
 
 // Plugins
@@ -71,6 +76,43 @@ $Configuration['Plugins']['GooglePrettify']['UseTabby'] = '';
 $Configuration['Plugins']['GooglePrettify']['Language'] = '';
 $Configuration['Plugins']['GettingStarted']['Dashboard'] = '1';
 $Configuration['Plugins']['GettingStarted']['Plugins'] = '1';
+
+
+$Configuration['Plugins']['Topcoder']['BaseApiURL'] = getenv('TOPCODER_PLUGIN_BASE_API_URL');
+$Configuration['Plugins']['Topcoder']['MemberApiURI'] = getenv('TOPCODER_PLUGIN_MEMBER_API_URI');
+$Configuration['Plugins']['Topcoder']['RoleApiURI'] = getenv('TOPCODER_PLUGIN_ROLE_API_URI');
+$Configuration['Plugins']['Topcoder']['ResourceRolesApiURI'] = '/v5/resource-roles';
+$Configuration['Plugins']['Topcoder']['ResourcesApiURI'] = '/v5/resources';
+$Configuration['Plugins']['Topcoder']['MemberProfileURL'] = getenv('TOPCODER_PLUGIN_MEMBER_PROFILE_URL');
+$Configuration['Plugins']['Topcoder']['UseTopcoderAuthToken'] = getenv('TOPCODER_PLUGIN_USE_AUTH_TOKEN');
+
+
+$Configuration['Plugins']['Topcoder']['ValidIssuers'] = str_replace(["[", "]", "\\", "\"", " "], '', getenv('VALID_ISSUERS'));
+$Configuration['Plugins']['Topcoder']['M2M']['Auth0Audience'] = getenv('AUTH0_AUDIENCE');
+$Configuration['Plugins']['Topcoder']['M2M']['Auth0ClientId'] = getenv('AUTH0_CLIENT_ID');
+$Configuration['Plugins']['Topcoder']['M2M']['Auth0ClientSecret'] = getenv('AUTH0_CLIENT_SECRET');
+$Configuration['Plugins']['Topcoder']['M2M']['Auth0Url'] =  getenv('AUTH0_URL');
+$Configuration['Plugins']['Topcoder']['M2M']['Auth0ProxyServerUrl'] = getenv('AUTH0_PROXY_SERVER_URL');
+$Configuration['Plugins']['Topcoder']['SSO']['Auth0Domain'] = getenv('TOPCODER_PLUGIN_SSO_AUTH0DOMAIN');
+$Configuration['Plugins']['Topcoder']['SSO']['AuthorizationURI'] = '/v3/authorizations/1';
+$Configuration['Plugins']['Topcoder']['SSO']['CookieName'] = 'v3jwt';
+$Configuration['Plugins']['Topcoder']['SSO']['TopcoderRS256']['ID'] =  getenv('TOPCODER_PLUGIN_SSO_TOPCODER_RS256_ID');
+$Configuration['Plugins']['Topcoder']['SSO']['TopcoderHS256']['ID'] =  getenv('TOPCODER_PLUGIN_SSO_TOPCODER_HS256_ID');
+$Configuration['Plugins']['Topcoder']['SSO']['TopcoderHS256']['Secret'] =  getenv('TOPCODER_HS256_SECRET');
+$Configuration['Plugins']['Topcoder']['SSO']['TopcoderRS256']['UsernameClaim'] =  'nickname';
+$Configuration['Plugins']['Topcoder']['SSO']['TopcoderHS256']['UsernameClaim'] =  'handle';
+$Configuration['Plugins']['Topcoder']['SSO']['RefreshTokenURL' ] = getenv('TOPCODER_PLUGIN_SSO_REFRESHTOKENURL');
+
+// Filestack
+$Configuration['Plugins']['Filestack']['ApiKey'] = getenv('FILESTACK_API_KEY');
+
+// SumoLogic
+$Configuration['Plugins']['Sumologic']['HttpSourceURL'] = '';
+$Configuration['Plugins']['Sumologic']['BatchSize'] = 10;
+
+
+// RichEditor
+$Configuration['RichEditor']['Quote']['Enable'] = true;
 
 // Routes
 $Configuration['Routes']['YXBwbGUtdG91Y2gtaWNvbi5wbmc='] = array (
@@ -90,8 +132,18 @@ $Configuration['Routes']['Y29udGFpbmVyLmh0bWw='] = array (
     1 => 'Internal',
 );
 $Configuration['Routes']['DefaultController'] = 'discussions';
+$Configuration['Routes']['XmZpbGVzdGFjaygvLiopPyQ='] = array (
+    0 => 'vanilla/filestack$1',
+    1 => 'Internal',
+);
 
 // Vanilla
+$Configuration['Vanilla']['SSO']['Debug'] = true;
+$Configuration['Vanilla']['Activity']['ShowDiscussionBody'] = true;
+$Configuration['Vanilla']['EnableCategoryFollowing'] = true;
 $Configuration['Vanilla']['Version'] = '3.0';
 
-// Last edited by admin (172.26.0.1) 2020-09-03 13:16:33
+// memcached
+$Configuration['memcached']['Store'] = getenv('MEMCACHED_SERVER');
+
+// Initial setup config
