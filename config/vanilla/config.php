@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$Configuration['Garden']['Installed'] = false;
+$Configuration['Garden']['Installed'] = true;
 
 $Configuration['Database']['Name'] = getenv('MYSQL_DATABASE');
 $Configuration['Database']['Host'] = getenv('MYSQL_HOST');
