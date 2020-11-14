@@ -321,3 +321,39 @@ if (!function_exists('dateUpdated')) {
         return $result;
     }
 }
+
+if (!function_exists('watchButton')) :
+    /**
+     *
+     * Writes the Watch/watching button
+     *
+     * @param int $categoryID
+     * @return string
+     */
+    function watchButton($categoryID) {
+        $output = ' ';
+        $userID = Gdn::session()->UserID;
+        $category = CategoryModel::categories($categoryID);
+
+        if ($userID && $category && $category['DisplayAs'] == 'Discussions') {
+            $categoryModel = new CategoryModel();
+            $hasWatched = $categoryModel->hasWatched($categoryID, $userID);
+            $iconTitle = t('Watch');
+            $icon = <<<EOT
+                <svg xmlns="http://www.w3.org/2000/svg" class="watchButton-icon" viewBox="0 0 16 16" aria-hidden="true">
+                    <title>{$iconTitle}</title>  
+                    <path d="M7.568,14.317a.842.842,0,0,1-1.684,0,4.21,4.21,0,0,0-4.21-4.21h0a.843.843,0,0,1,0-1.685A5.9,5.9,0,0,1,7.568,14.317Zm4.21,0a.842.842,0,0,1-1.684,0A8.421,8.421,0,0,0,1.673,5.9h0a.842.842,0,0,1,0-1.684,10.1,10.1,0,0,1,10.105,10.1Zm4.211,0a.842.842,0,0,1-1.684,0A12.633,12.633,0,0,0,1.673,1.683.842.842,0,0,1,1.673,0,14.315,14.315,0,0,1,15.989,14.315ZM1.673,16a1.684,1.684,0,1,1,1.684-1.684h0A1.684,1.684,0,0,1,1.673,16Z" transform="translate(0.011 0.001)" style="fill: currentColor;"/>
+                </svg>
+EOT;
+
+            $text = $hasWatched ? t('Watching') : t('Watch');
+            $output .= anchor(
+                $icon.$text,
+                $hasWatched? "/category/watched/{$categoryID}/".Gdn::session()->transientKey(): "/category/watch/{$categoryID}/".Gdn::session()->transientKey(),
+                'Hijack watchButton'.($hasWatched ? ' TextColor isWatching' : ''),
+                ['title' => $text, 'aria-pressed' => $hasWatched ? 'true' : 'false', 'role' => 'button', 'tabindex' => '0']
+            );
+        }
+        return $output;
+    }
+endif;
