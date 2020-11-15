@@ -322,7 +322,7 @@ if (!function_exists('dateUpdated')) {
     }
 }
 
-if (!function_exists('watchButton')) :
+if (!function_exists('watchButton')) {
     /**
      *
      * Writes the Watch/watching button
@@ -348,12 +348,50 @@ EOT;
 
             $text = $hasWatched ? t('Watching') : t('Watch');
             $output .= anchor(
-                $icon.$text,
-                $hasWatched? "/category/watched/{$categoryID}/".Gdn::session()->transientKey(): "/category/watch/{$categoryID}/".Gdn::session()->transientKey(),
-                'Hijack watchButton'.($hasWatched ? ' TextColor isWatching' : ''),
+                $icon . $text,
+                $hasWatched ? "/category/watched/{$categoryID}/" . Gdn::session()->transientKey() : "/category/watch/{$categoryID}/" . Gdn::session()->transientKey(),
+                'Hijack watchButton' . ($hasWatched ? ' TextColor isWatching' : ''),
                 ['title' => $text, 'aria-pressed' => $hasWatched ? 'true' : 'false', 'role' => 'button', 'tabindex' => '0']
             );
         }
         return $output;
     }
-endif;
+}
+
+if (!function_exists('checkGroupPermission')) {
+    /**
+     * Check group permission for the current user
+     * @param $groupID
+     * @param null $permission  null - any permission for a group
+     * @param bool $fullMatch
+     * @return bool return true if user has a permission
+     */
+   function checkGroupPermission($groupID,$permission = null, $fullMatch = true) {
+       $groupModel = new GroupModel();
+       return $groupModel->checkPermission(Gdn::session()->UserID,$groupID, $permission, $fullMatch);
+   }
+}
+
+if(!function_exists('updateTopcoderRolePermissions')) {
+
+    function updateTopcoderRolePermissions($topcoderRoles)  {
+        $RoleModel = new RoleModel();
+        $PermissionModel = new PermissionModel();
+        // Configure default permission for Topcoder roles
+        $allRoles = $RoleModel->getByType(RoleModel::TYPE_TOPCODER)->resultArray();
+        foreach ($allRoles as $role) {
+            $allPermissions = $PermissionModel->getRolePermissions($role['RoleID']);
+            foreach ($allPermissions as $permission) {
+                $roleName = $role['Name'];
+                if (array_key_exists($roleName, $topcoderRoles)) {
+                    $globalRolePermissions = $topcoderRoles[$roleName];
+                    foreach ($globalRolePermissions as $key => $value) {
+                        $permission[$key] = $globalRolePermissions[$key];
+                    }
+                    $PermissionModel->save($permission);
+                }
+            }
+        }
+    }
+
+}
