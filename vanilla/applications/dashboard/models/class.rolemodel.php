@@ -35,6 +35,9 @@ class RoleModel extends Gdn_Model {
     const TYPE_TOPCODER = 'topcoder';
 
     const ROLE_TYPE_TOPCODER = 'topcoder';
+    const ROLE_TOPCODER_PROJECT_COPILOT = 'copilot';
+    const ROLE_TOPCODER_PROJECT_MANAGER = 'manager';
+    const ROLE_TOPCODER_PROJECT_OBSERVER = 'observer';
     const ROLE_TOPCODER_ADMINISTRATOR = 'administrator';
     const ROLE_TOPCODER_CONNECT_ADMIN = 'Connect Admin';
     const ALL_VANILLA_PERMISSIONS = [
@@ -61,6 +64,8 @@ class RoleModel extends Gdn_Model {
         'Groups.Moderation.Manage' => 1,
         'Groups.EmailInvitations.Add'  => 1,
         'Groups.Category.Manage' => 1,
+        'Groups.Group.Delete' => 1,
+        'Groups.Group.Edit' => 1,
         'Garden.Uploads.Add' => 1,
         'Vanilla.Tagging.Add' => 1,
         'Conversations.Moderation.Manage' => 1,
@@ -77,10 +82,11 @@ class RoleModel extends Gdn_Model {
         'Vanilla.Comments.Add' => 1,
         'Vanilla.Comments.Edit' => 1,
         'Vanilla.Comments.Delete' => 1,
-        'Plugins.Attachments.Upload.Allow' => 1
+        'Plugins.Attachments.Upload.Allow' => 1,
+
     ];
     const TOPCODER_ROLES = [
-        'administrator' => ALL_VANILLA_PERMISSIONS,
+        'administrator' => self::ALL_VANILLA_PERMISSIONS,
         'Connect Manager' => [],
         'Connect Account Manager' => [],
         'Connect Copilot' => [
@@ -88,7 +94,7 @@ class RoleModel extends Gdn_Model {
            'Groups.Moderation.Manage' => 1,
            'Groups.EmailInvitations.Add' => 1
         ],
-        'Connect Admin' => ALL_VANILLA_PERMISSIONS,
+        'Connect Admin' => self::ALL_VANILLA_PERMISSIONS,
         'Connect Copilot Manager' => [
            'Groups.Category.Manage' => 1,
            'Groups.Moderation.Manage' => 1,
