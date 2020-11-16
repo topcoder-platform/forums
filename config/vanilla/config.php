@@ -147,3 +147,13 @@ $Configuration['Vanilla']['Version'] = '3.0';
 $Configuration['memcached']['Store'] = getenv('MEMCACHED_SERVER');
 
 // Initial setup config
+
+// Email Template settings
+$Configuration['Garden']['Email']['Format']='html';
+$Configuration['Garden']['EmailTemplate']['BackgroundColor']='#ffffff';
+$Configuration['Garden']['EmailTemplate']['ButtonBackgroundColor']='transparent';
+$Configuration['Garden']['EmailTemplate']['ButtonTextColor']='#865827';
+$Configuration['Garden']['EmailTemplate']['Image']='';
+// Email Logo size
+$Configuration['Garden']['EmailTemplate']['ImageMaxWidth']='400';
+$Configuration['Garden']['EmailTemplate']['ImageMaxHeight']='300';
