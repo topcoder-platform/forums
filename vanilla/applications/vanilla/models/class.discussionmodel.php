@@ -2346,7 +2346,16 @@ class DiscussionModel extends Gdn_Model {
             }
         }
 
-        $this->EventArguments["Activity"] = $data;
+        // FIX: https://github.com/topcoder-platform/forums/issues/70
+        // Update $data in hooks before sending notification
+
+        $this->EventArguments["Activity"] = &$data;
+        // Throw an event for users to add their own events.
+        $this->EventArguments["Discussion"] = $discussion;
+        $this->EventArguments["NotifiedUsers"] = array_keys(ActivityModel::$Queue);
+        $this->EventArguments["MentionedUsers"] = $mentions;
+        $this->EventArguments["ActivityModel"] = $activityModel;
+        $this->fireEvent("BeforeNotification");
 
         // Notify everyone that has advanced notifications.
         if (!c("Vanilla.QueueNotifications")) {
@@ -2354,13 +2363,6 @@ class DiscussionModel extends Gdn_Model {
             $advancedActivity["Data"]["Reason"] = "advanced";
             $this->recordAdvancedNotications($activityModel, $advancedActivity, $discussion);
         }
-
-        // Throw an event for users to add their own events.
-        $this->EventArguments["Discussion"] = $discussion;
-        $this->EventArguments["NotifiedUsers"] = array_keys(ActivityModel::$Queue);
-        $this->EventArguments["MentionedUsers"] = $mentions;
-        $this->EventArguments["ActivityModel"] = $activityModel;
-        $this->fireEvent("BeforeNotification");
 
         if (\Vanilla\FeatureFlagHelper::featureEnabled("deferredNotifications")) {
             // Queue sending notifications.
