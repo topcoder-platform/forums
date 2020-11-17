@@ -140,6 +140,7 @@ $Configuration['Routes']['XmZpbGVzdGFjaygvLiopPyQ='] = array (
 // Vanilla
 $Configuration['Vanilla']['SSO']['Debug'] = true;
 $Configuration['Vanilla']['Activity']['ShowDiscussionBody'] = true;
+$Configuration['Vanilla']['Activity']['ShowCommentBody'] = true;
 $Configuration['Vanilla']['EnableCategoryFollowing'] = true;
 $Configuration['Vanilla']['Version'] = '3.0';
 

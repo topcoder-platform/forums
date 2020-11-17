@@ -586,6 +586,11 @@ class CommentModel extends Gdn_Model {
             $data["Format"] = $comment["Format"] ?? null;
         }
 
+        $this->EventArguments["Comment"] = $comment;
+        $this->EventArguments["Activity"] = &$data;
+        $this->EventArguments["Discussion"] = $discussion;
+        $this->fireEvent("BeforeRecordAdvancedNotification");
+
         // Pass generic activity to events.
         $this->EventArguments["Activity"] = $data;
 
