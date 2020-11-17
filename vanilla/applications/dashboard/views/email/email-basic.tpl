@@ -151,7 +151,7 @@
                            target="_blank">All Challenges</a>&nbsp;&nbsp;|&nbsp;&nbsp;
                         <a href="https://arena.topcoder.com/" rel=" noopener noreferrer" style="color: {$email.button.textColor};"
                            target="_blank">Competitive Programming</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-                        <a href="https://www.topcoder.com/community/taas" rel=" noopener noreferrer" style="color: {$email.button.textColor};"
+                        <a href="https://www.topcoder-dev.com/gigs" rel=" noopener noreferrer" style="color: {$email.button.textColor};"
                            target="_blank" >Gig Work</a>
 			        </span>
                     </td>
