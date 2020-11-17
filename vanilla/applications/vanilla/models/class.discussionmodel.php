@@ -2318,6 +2318,10 @@ class DiscussionModel extends Gdn_Model {
             $data["Format"] = $format;
         }
 
+        $this->EventArguments["Activity"] = &$data;
+        $this->EventArguments["Discussion"] = $discussion;
+        $this->fireEvent("BeforeRecordAdvancedNotification");
+
         // Notify all of the users that were mentioned in the discussion.
         $mentions = [];
         if (is_string($body) && is_string($format)) {

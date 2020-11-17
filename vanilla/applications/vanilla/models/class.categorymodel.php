@@ -891,7 +891,6 @@ class CategoryModel extends Gdn_Model {
      * @return bool Returns **true** if the current user has the permission or **false** otherwise.
      */
     public static function checkPermission($category, $permission, $fullMatch = true) {
-
         if (is_numeric($category)) {
             $category = static::categories($category);
         }
@@ -905,19 +904,13 @@ class CategoryModel extends Gdn_Model {
             $groupID = ($category->GroupID ?? false);
         }
 
-        $result = Gdn::session()->checkPermission($permission, $fullMatch, 'Category', $permissionCategoryID)
-            || Gdn::session()->checkPermission($permission, $fullMatch, 'Category', $categoryID);
-
-        if($result && $groupID) {
-              $result = checkGroupPermission($groupID);
+        if($groupID && $groupID > 0) {
+           $result = checkGroupPermission($groupID);
+        } else {
+           $result = Gdn::session()->checkPermission($permission, $fullMatch, 'Category', $permissionCategoryID)
+                    || Gdn::session()->checkPermission($permission, $fullMatch, 'Category', $categoryID);
         }
 
-        Logger::event(
-            'categoryModel',
-            Logger::INFO,
-            ['CategoryModel.checkPermission: CategoryID='.$categoryID],
-            ['result' => $result, 'Category'=> $category, 'permissions' => $permission, 'fullMatch' =>$fullMatch,  'Category.GroupID'=> $groupID]
-        );
         return $result;
     }
 
