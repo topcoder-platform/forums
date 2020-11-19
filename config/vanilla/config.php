@@ -154,7 +154,7 @@ $Configuration['Garden']['Email']['Format']='html';
 $Configuration['Garden']['EmailTemplate']['BackgroundColor']='#ffffff';
 $Configuration['Garden']['EmailTemplate']['ButtonBackgroundColor']='transparent';
 $Configuration['Garden']['EmailTemplate']['ButtonTextColor']='#865827';
-$Configuration['Garden']['EmailTemplate']['Image']='';
+$Configuration['Garden']['EmailTemplate']['Image']='https://www.dropbox.com/s/zddbsvh6f4h308o/e09141aacc790f0f31b80cc0bfd81cb9.png?dl=1';
 // Email Logo size
 $Configuration['Garden']['EmailTemplate']['ImageMaxWidth']='400';
 $Configuration['Garden']['EmailTemplate']['ImageMaxHeight']='300';
