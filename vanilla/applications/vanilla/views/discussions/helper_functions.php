@@ -450,7 +450,7 @@ if (!function_exists('writeFilterTabs')) :
                 }
                 if (($countDiscussions > 0 || $sender->RequestMethod == 'mine') && c('Vanilla.Discussions.ShowMineTab', true)) {
                     ?>
-                    <li<?php echo $sender->RequestMethod == 'mine' ? ' class="Active"' : ''; ?>><?php echo anchor($myDiscussions, '/discussions/mine', 'MyDiscussions TabLink'); ?></li>
+                    <li<?php echo $sender->RequestMethod == 'mine'  && $sender->ControllerName == 'discussionscontroller' ? ' class="Active"' : ''; ?>><?php echo anchor($myDiscussions, '/discussions/mine', 'MyDiscussions TabLink'); ?></li>
                 <?php
                 }
                 if ($countDrafts > 0 || $sender->ControllerName == 'draftscontroller') {

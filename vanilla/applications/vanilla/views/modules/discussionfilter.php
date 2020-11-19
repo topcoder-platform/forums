@@ -57,7 +57,7 @@ if (c('Vanilla.Discussions.ShowCounts', true)) {
         }
         if (($CountDiscussions > 0 || $Controller->RequestMethod == 'mine') && c('Vanilla.Discussions.ShowMineTab', true)) {
             ?>
-            <li class="MyDiscussions<?php echo $Controller->RequestMethod == 'mine' ? ' Active' : ''; ?>"><?php echo anchor(sprite('SpMyDiscussions').' '.$MyDiscussions, '/discussions/mine'); ?></li>
+            <li class="MyDiscussions<?php echo $sender->ControllerName == 'discussionscontroller' && $Controller->RequestMethod == 'mine' ? ' Active' : ''; ?>"><?php echo anchor(sprite('SpMyDiscussions').' '.$MyDiscussions, '/discussions/mine'); ?></li>
             <?php
         }
         if ($CountDrafts > 0 || $Controller->ControllerName == 'draftscontroller') {
