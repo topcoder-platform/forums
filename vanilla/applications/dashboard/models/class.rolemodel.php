@@ -83,6 +83,7 @@ class RoleModel extends Gdn_Model {
         'Vanilla.Comments.Edit' => 1,
         'Vanilla.Comments.Delete' => 1,
         'Plugins.Attachments.Upload.Allow' => 1,
+        'Groups.Group.Archive' => 1
 
     ];
     const TOPCODER_ROLES = [

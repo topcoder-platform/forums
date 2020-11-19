@@ -19,9 +19,10 @@ if (c('Garden.Installed')) {
         'Groups.Group.Edit',
         'Groups.Category.Manage',
         'Groups.Moderation.Manage',
-        'Groups.EmailInvitations.Add']);
+        'Groups.EmailInvitations.Add',
+        'Groups.Group.Archive']);
 
-
+   // TODO: need to be sure that all roles and permissions haven't be changed manually in prod/dev
     updateTopcoderRolePermissions(RoleModel::TOPCODER_ROLES);
-    updateTopcoderRolePermissions(RoleModel::TOPCODER_PROJECT_ROLES);
+   // updateTopcoderRolePermissions(RoleModel::TOPCODER_PROJECT_ROLES);
 }
