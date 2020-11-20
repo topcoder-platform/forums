@@ -499,19 +499,6 @@ class DiscussionModel extends Gdn_Model {
             unset($wheres['Announce']);
         }
 
-        if (is_array($wheres)) {
-            $groupWhereCondition = strtolower(val('Groups', $wheres));
-            if ($groupWhereCondition =='all') {
-                $groupIDs = $wheres['d.GroupID'];
-                $this->SQL->beginWhereGroup()
-                    ->where('d.GroupID is null')
-                    ->orWhere('d.GroupID', $groupIDs) // Make sure that cleared conversations do not show up unless they have new messages added.
-                    ->endWhereGroup();
-                unset($wheres['Groups']);
-                unset($wheres['d.GroupID']);
-            }
-            $this->SQL->where($wheres);
-        }
 
         foreach ($orderBy as $orderField => $direction) {
             $this->SQL->orderBy($this->addFieldPrefix($orderField), $direction);
@@ -769,16 +756,6 @@ class DiscussionModel extends Gdn_Model {
             $removeAnnouncements = true;
         }
 
-        $groupWhereCondition = strtolower(val('Groups', $where));
-        if ($groupWhereCondition =='all') {
-            $groupIDs = $where['d.GroupID'];
-            $this->SQL->beginWhereGroup()
-                ->where('d.GroupID is null')
-                ->orWhere('d.GroupID', $groupIDs) // Make sure that cleared conversations do not show up unless they have new messages added.
-                ->endWhereGroup();
-            unset($where['Groups']);
-            unset($where['d.GroupID']);
-        }
 
         // Make sure there aren't any ambiguous discussion references.
         $safeWheres = [];
@@ -1163,7 +1140,9 @@ class DiscussionModel extends Gdn_Model {
 
     /**
      * Gets announced discussions.
-     *
+     * Options = 'AnnouncePinLocation' = 'all' - show all announcements
+     *           'AnnouncePinLocation' = 'recent' - show only Announce = 1
+     * *         'AnnouncePinLocation' = 'category' - show only with Announce = 2
      * @since 2.0.0
      * @access public
      *
@@ -1172,7 +1151,7 @@ class DiscussionModel extends Gdn_Model {
      * @param int $limit The number of records to limit the query to.
      * @return object SQL result.
      */
-    public function getAnnouncements($wheres = '', $offset = 0, $limit = false) {
+    public function getAnnouncements($wheres = '', $offset = 0, $limit = false, $options = []) {
 
         $wheres = $this->combineWheres($this->getWheres(), $wheres);
         $session = Gdn::session();
@@ -1180,35 +1159,38 @@ class DiscussionModel extends Gdn_Model {
             c('Vanilla.Discussions.PerPage', 30);
         }
         $userID = $session->UserID > 0 ? $session->UserID : 0;
+        // Step 1: get a list of all announcement IDs using '$wheres' condition
+        // Step 2: select data from tables (discussion and others) when discussionID in the list of discussionIDs from step 1
         $categoryID = val('d.CategoryID', $wheres, 0);
-        $groupID = val('d.GroupID', $wheres, 0);
+
         // Get the discussion IDs of the announcements.
         $cacheKey = $this->getAnnouncementCacheKey($categoryID);
-        if ($groupID == 0) {
-            $this->SQL->cache($cacheKey);
-        }
+        $this->SQL->cache($cacheKey);
         $this->SQL->select('d.DiscussionID')
             ->from('Discussion d');
 
         $announceOverride = false;
+        $announceOverrideField = false;
         $whereFields = array_keys($wheres);
         foreach ($whereFields as $field) {
             if (stringBeginsWith($field, 'd.Announce')) {
+                $announceOverrideField = $field;
                 $announceOverride = true;
                 break;
             }
         }
         if (!$announceOverride) {
-            if (!is_array($categoryID) && ($categoryID > 0 || $groupID > 0)) {
+            if (!is_array($categoryID) && ($categoryID > 0)) {
                 $this->SQL->where('d.Announce >', '0');
             } else {
                 $this->SQL->where('d.Announce', 1);
             }
+        } else {
+            // FIX: missing where condition
+            $this->SQL->where($announceOverrideField, $wheres[$announceOverrideField]);
         }
 
-        if ($groupID > 0) {
-            $this->SQL->where('d.GroupID', $groupID);
-        } elseif (is_array($categoryID)) {
+        if (is_array($categoryID)) {
             $this->SQL->whereIn('d.CategoryID', $categoryID);
         } elseif ($categoryID > 0) {
             $this->SQL->where('d.CategoryID', $categoryID);
@@ -1216,6 +1198,13 @@ class DiscussionModel extends Gdn_Model {
 
         $announcementIDs = $this->SQL->get()->resultArray();
         $announcementIDs = array_column($announcementIDs, 'DiscussionID');
+
+        Logger::event(
+            'Discussion_model',
+            Logger::DEBUG
+            ,' getAnnouncements: Step 1 : gettingIDs=',
+            ['found DiscussionIDs' =>  $announcementIDs]
+        );
 
         // Short circuit querying when there are no announcements.
         if (count($announcementIDs) == 0) {
@@ -1242,13 +1231,26 @@ class DiscussionModel extends Gdn_Model {
 
         // Add conditions passed.
         $this->SQL->whereIn('d.DiscussionID', $announcementIDs);
+        Logger::event(
+            'Discussion_model',
+            Logger::DEBUG
+            ,' getAnnouncements',
+            ['found DiscussionIDs: Step2.' =>  $announcementIDs]
+        );
 
-        // If we aren't viewing announcements in a category then only show global announcements.
-        if (empty($wheres) || is_array($categoryID)) {
-            $this->SQL->where('d.Announce', 1);
-        } else {
-            $this->SQL->where('d.Announce >', 0);
-        }
+           // If we aren't viewing announcements in a category then only show global announcements.
+           // FIX: Announcements might be viewed from a group page. We need to return all discussions with Announce  > 0
+            if (empty($wheres)) {
+                    $this->SQL->where('d.Announce', 1);
+            } else if (is_array($categoryID)) {
+                 if($announceOverride) {
+                     $this->SQL->where($announceOverrideField, $wheres[$announceOverrideField]);
+                 } else {
+                     $this->SQL->where('d.Announce', 1);
+                 }
+            } else {
+                $this->SQL->where('d.Announce >', 0);
+            }
 
         // If we allow users to dismiss discussions, skip ones this user dismissed
         if (c('Vanilla.Discussions.Dismiss', 1) && $userID) {
@@ -1592,17 +1594,6 @@ class DiscussionModel extends Gdn_Model {
         $hasWhere = !empty($wheres);
         $whereOnCategories = $hasWhere && isset($wheres['d.CategoryID']);
         $whereOnCategoriesOnly = $whereOnCategories && count($wheres) === 1;
-
-        $groupWhereCondition = strtolower(val('Groups', $wheres));
-        if ($groupWhereCondition =='all') {
-            $groupIDs = $wheres['d.GroupID'];
-            $this->SQL->beginWhereGroup()
-                ->where('d.GroupID is null')
-                ->orWhere('d.GroupID', $groupIDs) // Make sure that cleared conversations do not show up unless they have new messages added.
-                ->endWhereGroup();
-            unset($wheres['Groups']);
-            unset($wheres['d.GroupID']);
-        }
 
         // We have access to everything and are requesting only by categories. Let's use the cache!
         if ($perms === true && $whereOnCategoriesOnly) {
