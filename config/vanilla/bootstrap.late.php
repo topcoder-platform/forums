@@ -22,7 +22,11 @@ if (c('Garden.Installed')) {
         'Groups.EmailInvitations.Add',
         'Groups.Group.Archive']);
 
-   // TODO: need to be sure that all roles and permissions haven't be changed manually in prod/dev
-    updateTopcoderRolePermissions(RoleModel::TOPCODER_ROLES);
-   // updateTopcoderRolePermissions(RoleModel::TOPCODER_PROJECT_ROLES);
+    updateRolePermissions(RoleModel::TYPE_GUEST, RoleModel::VANILLA_GUEST_ROLES);
+
+   // TODO: Role permission might be configured manually in the env
+   // Before uncommenting the next lines:
+   // Check all roles in the env and update all role permissions in RoleModel
+   // updateRolePermissions(RoleModel::TYPE_TOPCODER, RoleModel::TOPCODER_ROLES);
+   // updateTopcoderRolePermissions(RoleModel::TYPE_TOPCODER,RoleModel::TOPCODER_PROJECT_ROLES);
 }

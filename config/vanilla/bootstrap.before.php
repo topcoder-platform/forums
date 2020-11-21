@@ -372,19 +372,24 @@ if (!function_exists('checkGroupPermission')) {
    }
 }
 
-if(!function_exists('updateTopcoderRolePermissions')) {
+if(!function_exists('updateRolePermissions')) {
 
-    function updateTopcoderRolePermissions($topcoderRoles)  {
+    /**
+     * Update role permissions
+     * @param $roleType
+     * @param $roles
+     */
+    function updateRolePermissions($roleType, $roles)  {
         $RoleModel = new RoleModel();
         $PermissionModel = new PermissionModel();
-        // Configure default permission for Topcoder roles
-        $allRoles = $RoleModel->getByType(RoleModel::TYPE_TOPCODER)->resultArray();
+        // Configure default permission for roles
+        $allRoles = $RoleModel->getByType($roleType)->resultArray();
         foreach ($allRoles as $role) {
             $allPermissions = $PermissionModel->getRolePermissions($role['RoleID']);
             foreach ($allPermissions as $permission) {
                 $roleName = $role['Name'];
-                if (array_key_exists($roleName, $topcoderRoles)) {
-                    $globalRolePermissions = $topcoderRoles[$roleName];
+                if (array_key_exists($roleName, $roles)) {
+                    $globalRolePermissions = $roles[$roleName];
                     foreach ($globalRolePermissions as $key => $value) {
                         $permission[$key] = $globalRolePermissions[$key];
                     }
@@ -393,5 +398,4 @@ if(!function_exists('updateTopcoderRolePermissions')) {
             }
         }
     }
-
 }
