@@ -158,3 +158,13 @@ $Configuration['Garden']['EmailTemplate']['Image']='';
 // Email Logo size
 $Configuration['Garden']['EmailTemplate']['ImageMaxWidth']='400';
 $Configuration['Garden']['EmailTemplate']['ImageMaxHeight']='300';
+
+// Profile Configuration
+// Hide/Show the options in User Notification Preferences:
+//    'Email.WallComment' = 'Notify me when people write on my wall.'
+//    'Email.ActivityComment' = 'Notify me when people reply to my wall comments.'
+//    'Popup.WallComment' = 'Notify me when people write on my wall.'
+//    'Popup.ActivityComment' = 'Notify me when people reply to my wall comments.'
+//    'Email.ConversationMessage' = 'Notify me of private messages.'
+//    'Popup.ConversationMessage' = 'Notify me of private messages.'
+$Configuration['Garden']['Profile']['ShowActivities']=false;
