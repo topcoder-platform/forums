@@ -29,7 +29,7 @@ class CategoriesController extends VanillaController {
     public $Category;
 
     /** @var bool Value indicating if the category-following filter should be displayed when rendering a view */
-    public $enableFollowingFilter = false;
+    public $enableFollowingFilter = true;//false;
 
 
     /**
@@ -265,7 +265,8 @@ class CategoriesController extends VanillaController {
         $this->log('index: $categoryIdentifier='.$categoryIdentifier, []);
         if ($this->CategoryModel->followingEnabled()) {
             // Only use the following filter on the root category level.
-            $this->enableFollowingFilter = $categoryIdentifier === '';
+            // Show always
+            $this->enableFollowingFilter = true;//$categoryIdentifier === '';
             $this->fireEvent('EnableFollowingFilter', [
                 'CategoryIdentifier' => $categoryIdentifier,
                 'EnableFollowingFilter' => &$this->enableFollowingFilter
@@ -510,7 +511,7 @@ class CategoriesController extends VanillaController {
      * @access public
      */
     public function all($Category = '', $displayAs = '') {
-       $this->log('all:args($Category='.$Category);
+       $this->log('all:args($Category='.$Category.')');
         // Setup head.
         $this->Menu->highlightRoute('/discussions');
         if (!$this->title()) {
