@@ -64,7 +64,8 @@ class DiscussionModel extends Gdn_Model {
     protected static $allowedSorts = [
         'hot' => ['key' => 'hot', 'name' => 'Hot', 'orderBy' => ['DateLastComment' => 'desc']],
         'top' => ['key' => 'top', 'name' => 'Top', 'orderBy' => ['Score' => 'desc', 'DateInserted' => 'desc']],
-        'new' => ['key' => 'new', 'name' => 'New', 'orderBy' => ['DateInserted' => 'desc']]
+        'new' => ['key' => 'new', 'name' => 'New', 'orderBy' => ['DateInserted' => 'desc']],
+        'old' => ['key' => 'old', 'name' => 'Old', 'orderBy' => ['DateInserted' => 'asc']]
     ];
 
     /**

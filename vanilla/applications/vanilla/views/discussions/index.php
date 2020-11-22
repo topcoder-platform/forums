@@ -45,6 +45,9 @@ echo Gdn_Theme::module('NewDiscussionModule', $this->data('_NewDiscussionPropert
 if ($this->data('EnableFollowingFilter')) {
     echo discussionFilters();
 }
+if($this instanceof CategoriesController) {
+    echo discussionSorts();
+}
 $this->fireEvent('PageControls');
 echo '</div>';
 

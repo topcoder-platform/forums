@@ -399,3 +399,185 @@ if(!function_exists('updateRolePermissions')) {
         }
     }
 }
+
+if (!function_exists('sortsDropDown')) {
+    /**
+     * Returns a sorting drop-down menu.
+     *
+     * @param string $baseUrl Target URL with no query string applied.
+     * @param array $filters A multidimensional array of rows with the following properties:
+     *     ** 'name': Friendly name for the filter.
+     *     ** 'param': URL parameter associated with the filter.
+     *     ** 'value': A value for the URL parameter.
+     * @param string $extraClasses any extra classes you add to the drop down
+     * @param string|null $default The default label for when no filter is active. If `null`, the default label is "All".
+     * @param string|null $defaultURL URL override to return to the default, unfiltered state.
+     * @param string $label Text for the label to attach to the cont
+     * @return string
+     */
+    function sortsDropDown($baseUrl, array $filters = [], $extraClasses = '', $default = null, $defaultUrl = null, $label = 'Sort') {
+        if ($default === null) {
+            $default = t('All');
+        }
+
+        $links = [];
+        $active = paramPreference(
+            'sort',
+            'CategorySort',
+            null,//'Vanilla.SaveCategorySortPreference',
+            null,
+            false
+        );
+        // Translate filters into links.
+        foreach ($filters as $filter) {
+            // Make sure we have the bare minimum: a label and a URL parameter.
+            if (!array_key_exists('name', $filter)) {
+                throw new InvalidArgumentException('Sort does not have a name field.');
+            }
+            if (!array_key_exists('param', $filter)) {
+                throw new InvalidArgumentException('Sort does not have a param field.');
+            }
+
+            // Prepare for consumption by linkDropDown.
+            $query = [$filter['param'] => $filter['value']];
+            if (array_key_exists('extra', $filter) && is_array($filter['extra'])) {
+                $query += $filter['extra'];
+            }
+            $url = url($baseUrl . '?' . http_build_query($query));
+            $link = [
+                'name' => $filter['name'],
+                'url' => $url
+            ];
+
+            // If we don't already have an active link, and this parameter and value match, this is the active link.
+            if ($active === null && Gdn::request()->get($filter['param']) == $filter['value']) {
+                $active = $filter['value'];
+                $link['active'] = true;
+            } else if ($active == $filter['value']){
+                $link['active'] = true;
+                $active = $filter['value'];
+            }
+
+            // Queue up another filter link.
+            $links[] = $link;
+        }
+
+        // Add the default link to the top of the list.
+        array_unshift($links, [
+            'active' => $active === null,
+            'name' => $default,
+            'url' => $defaultUrl ?: $baseUrl
+        ]);
+
+        // Generate the markup for the drop down menu.
+        $output = linkDropDown($links, 'selectBox-following ' . trim($extraClasses), t($label) . ': ');
+        return $output;
+    }
+}
+
+if (!function_exists('categorySorts')) {
+    /**
+     * Returns category sorting.
+     *
+     * @param string $extraClasses any extra classes you add to the drop down
+     * @return string
+     */
+    function categorySorts($extraClasses = '') {
+        if (!Gdn::session()->isValid()) {
+            return;
+        }
+
+        $baseUrl = Gdn::request()->path();
+        $transientKey = Gdn::session()->transientKey();
+        $filters = [
+            [
+                'name' => t('New'),
+                'param' => 'sort',
+                'value' => 'new',
+                'extra' => ['TransientKey' => $transientKey, 'save' => 1]
+            ],
+
+            [
+                'name' => t('Old'),
+                'param' => 'sort',
+                'value' => 'old',
+                'extra' => ['TransientKey' => $transientKey, 'save' => 1]
+            ]
+        ];
+
+        $defaultParams = ['TransientKey' => $transientKey];
+        if (Gdn::request()->get('sort')) {
+            $defaultParams['sort'] = Gdn::request()->get('sort');
+        }
+
+        if (!empty($defaultParams)) {
+            $defaultUrl = $baseUrl.'?'.http_build_query($defaultParams);
+        } else {
+            $defaultUrl = $baseUrl;
+        }
+
+        return sortsDropDown(
+            $baseUrl,
+            $filters,
+            $extraClasses,
+            t('All'),
+            $defaultUrl,
+            'Sort'
+        );
+    }
+}
+
+if (!function_exists('discussionSorts')) {
+    /**
+     * Returns discussions sorting.
+     *
+     * @param string $extraClasses any extra classes you add to the drop down
+     * @return string
+     */
+    function discussionSorts($extraClasses = '') {
+        if (!Gdn::session()->isValid()) {
+            return;
+        }
+
+        $baseUrl = Gdn::request()->path();
+        $transientKey = Gdn::session()->transientKey();
+
+        $filters = [
+            [
+                'name' => t('New'),
+                'param' => 'sort',
+                'value' => 'new',
+                'extra' => ['TransientKey' => $transientKey, 'save' => 1]
+            ],
+            [
+                'name' => t('Old'),
+                'param' => 'sort',
+                'value' => 'old',
+                'extra' => ['TransientKey' => $transientKey, 'save' => 1]
+            ]
+        ];
+
+
+        $defaultParams = ['save' => 1, 'TransientKey' => $transientKey];
+        if (Gdn::request()->get('sort')) {
+            $defaultParams['sort'] = Gdn::request()->get('sort');
+        }
+
+        if (!empty($defaultParams)) {
+            $defaultUrl = $baseUrl.'?'.http_build_query($defaultParams);
+        } else {
+            $defaultUrl = $baseUrl;
+        }
+
+        return sortsDropDown(
+            $baseUrl,
+            $filters,
+            $extraClasses,
+            t('All'),
+            $defaultUrl,
+            'Sort'
+        );
+    }
+}
+
+

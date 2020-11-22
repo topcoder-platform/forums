@@ -31,6 +31,8 @@ class CategoriesController extends VanillaController {
     /** @var bool Value indicating if the category-following filter should be displayed when rendering a view */
     public $enableFollowingFilter = true;//false;
 
+    const SORT_LAST_POST = 'new';
+    const SORT_OLDEST_POST = 'old';
 
     /**
      * @var \Closure $categoriesCompatibilityCallback A backwards-compatible callback to get `$this->data('Categories')`.
@@ -273,6 +275,7 @@ class CategoriesController extends VanillaController {
             ]);
 
             $saveFollowing = Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
+
             $followed = paramPreference(
                 'followed',
                 'FollowedCategories',
@@ -283,8 +286,22 @@ class CategoriesController extends VanillaController {
         } else {
             $this->enableFollowingFilter = $followed = false;
         }
+
         $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
         $this->setData('Followed', $followed);
+
+        $saveSorting =Gdn::request()->get('sort') && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
+
+        $sort = paramPreference(
+            'sort',
+            'CategorySort',
+            null,//'Vanilla.SaveCategorySortPreference',
+            null,
+            $saveSorting
+        );
+
+        $this->log('index: sorts: after', ['$sort' => $sort, '$saveSorting'=>$saveSorting]);
+        $this->setData('CategorySort', $sort);
 
         if ($categoryIdentifier == '') {
             switch ($layout) {
@@ -583,6 +600,24 @@ class CategoriesController extends VanillaController {
                 true,
                 true
             );
+        }
+
+        if($this->data('CategorySort')) {
+            if( $this->data('CategorySort') == self::SORT_OLDEST_POST) {
+                usort($categoryTree, function ($a, $b) {
+                    return  Gdn_Format::toTimestamp($a['LastDateInserted']) - Gdn_Format::toTimestamp($b['LastDateInserted']);
+                });
+
+            } else if( $this->data('CategorySort') == self::SORT_LAST_POST) {
+                usort($categoryTree, function ($a, $b) {
+                    return  Gdn_Format::toTimestamp($b['LastDateInserted']) - Gdn_Format::toTimestamp($a['LastDateInserted']);
+
+                });
+            }
+        } else {
+            usort($categoryTree, function ($a, $b) { // desc
+               return  Gdn_Format::toTimestamp($b['LastDateInserted']) - Gdn_Format::toTimestamp($a['LastDateInserted']);
+            });
         }
 
         $this->setData('CategoryTree', $categoryTree);
