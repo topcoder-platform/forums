@@ -7,9 +7,12 @@ $categoryID = isset($this->Category) ? $this->Category->CategoryID : null;
 <?php
 $this->fireEvent('AfterDescription');
 $this->fireEvent('AfterPageTitle');
+echo '<div class="PageControls Top">';
 if ($this->data('EnableFollowingFilter')) {
-    echo '<div class="PageControls Top">'.categoryFilters().'</div>';
+    echo categoryFilters();
 }
+echo categorySorts();
+echo '</div>';
 $categories = $this->data('CategoryTree');
 writeCategoryTable($categories);
 ?>
