@@ -264,17 +264,18 @@ class CategoriesController extends VanillaController {
     public function index($categoryIdentifier = '', $page = '0') {
         // Figure out which category layout to choose (Defined on "Homepage" settings page).
         $layout = c('Vanilla.Categories.Layout');
-        $this->log('index: $categoryIdentifier='.$categoryIdentifier, []);
-        if ($this->CategoryModel->followingEnabled()) {
+
+        $followingEnabled = true;//$this->CategoryModel->followingEnabled();
+        if ($followingEnabled) {
             // Only use the following filter on the root category level.
-            // Show always
+            // The view filter is shown always
             $this->enableFollowingFilter = true;//$categoryIdentifier === '';
             $this->fireEvent('EnableFollowingFilter', [
                 'CategoryIdentifier' => $categoryIdentifier,
                 'EnableFollowingFilter' => &$this->enableFollowingFilter
             ]);
 
-            $saveFollowing = Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
+            $saveFollowing = Gdn::request()->get('followed') && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
 
             $followed = paramPreference(
                 'followed',
@@ -300,7 +301,6 @@ class CategoriesController extends VanillaController {
             $saveSorting
         );
 
-        $this->log('index: sorts: after', ['$sort' => $sort, '$saveSorting'=>$saveSorting]);
         $this->setData('CategorySort', $sort);
 
         if ($categoryIdentifier == '') {
@@ -528,7 +528,6 @@ class CategoriesController extends VanillaController {
      * @access public
      */
     public function all($Category = '', $displayAs = '') {
-       $this->log('all:args($Category='.$Category.')');
         // Setup head.
         $this->Menu->highlightRoute('/discussions');
         if (!$this->title()) {
