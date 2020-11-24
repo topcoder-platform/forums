@@ -56,4 +56,8 @@ if (c('Garden.Installed')) {
             ->column('Archived', 'tinyint(1)', '0')
             ->set(false, false);
     }
+
+    // Delete the records with UserID=0 (Guests) from UserRole table
+    // FIX: https://github.com/topcoder-platform/forums/issues/108
+    Gdn::sql()->delete('UserRole',['UserID' => 0]);
 }
