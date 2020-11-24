@@ -35,6 +35,9 @@ class RoleModel extends Gdn_Model {
     const TYPE_TOPCODER = 'topcoder';
 
     const ROLE_TYPE_TOPCODER = 'topcoder';
+    const ROLE_TOPCODER_PROJECT_COPILOT = 'copilot';
+    const ROLE_TOPCODER_PROJECT_MANAGER = 'manager';
+    const ROLE_TOPCODER_PROJECT_OBSERVER = 'observer';
     const ROLE_TOPCODER_ADMINISTRATOR = 'administrator';
     const ROLE_TOPCODER_CONNECT_ADMIN = 'Connect Admin';
     const ALL_VANILLA_PERMISSIONS = [
@@ -61,6 +64,9 @@ class RoleModel extends Gdn_Model {
         'Groups.Moderation.Manage' => 1,
         'Groups.EmailInvitations.Add'  => 1,
         'Groups.Category.Manage' => 1,
+        'Groups.Group.Delete' => 1,
+        'Groups.Group.Edit' => 1,
+        'Groups.Group.Archive' => 1,
         'Garden.Uploads.Add' => 1,
         'Vanilla.Tagging.Add' => 1,
         'Conversations.Moderation.Manage' => 1,
@@ -77,18 +83,85 @@ class RoleModel extends Gdn_Model {
         'Vanilla.Comments.Add' => 1,
         'Vanilla.Comments.Edit' => 1,
         'Vanilla.Comments.Delete' => 1,
-        'Plugins.Attachments.Upload.Allow' => 1
+        'Plugins.Attachments.Upload.Allow' => 1,
     ];
+
+    const GUEST_PERMISSIONS = [
+        'Garden.Email.View' => 0,
+        'Garden.Settings.Manage' => 0,
+        'Garden.Settings.View' => 0,
+        'Garden.SignIn.Allow' => 0,
+        'Garden.Users.Add' => 0,
+        'Garden.Users.Edit' => 0,
+        'Garden.Users.Delete' => 0,
+        'Garden.Users.Approve' => 0,
+        'Garden.Activity.Delete' => 0,
+        'Garden.Activity.View' => 0,
+        'Garden.Profiles.View' => 0,
+        'Garden.Profiles.Edit' => 0,
+        'Garden.Curation.Manage' => 0,
+        'Garden.Moderation.Manage' => 0,
+        'Garden.PersonalInfo.View' => 0,
+        'Garden.AdvancedNotifications.Allow' => 0,
+        'Garden.Community.Manage' => 0,
+        'Garden.Tokens.Add' => 0,
+        'Groups.Group.Add' => 0,
+        'Groups.Moderation.Manage' => 0,
+        'Groups.EmailInvitations.Add'  => 0,
+        'Groups.Category.Manage' => 0,
+        'Groups.Group.Delete' => 0,
+        'Groups.Group.Edit' => 0,
+        'Groups.Group.Archive' => 0,
+        'Garden.Uploads.Add' => 0,
+        'Vanilla.Tagging.Add' => 0,
+        'Conversations.Moderation.Manage' => 0,
+        'Conversations.Conversations.Add'=> 0,
+        'Vanilla.Approval.Require' => 1, //
+        'Vanilla.Comments.Me' => 0,
+        'Vanilla.Discussions.View' => 0,
+        'Vanilla.Discussions.Add' => 0,
+        'Vanilla.Discussions.Edit' => 0,
+        'Vanilla.Discussions.Announce' => 0,
+        'Vanilla.Discussions.Sink' => 0,
+        'Vanilla.Discussions.Close' => 0,
+        'Vanilla.Discussions.Delete' => 0,
+        'Vanilla.Comments.Add' => 0,
+        'Vanilla.Comments.Edit' => 0,
+        'Vanilla.Comments.Delete' => 0,
+        'Plugins.Attachments.Upload.Allow' => 0
+    ];
+
+    const VANILLA_GUEST_ROLES = [
+      'Guest' => self::GUEST_PERMISSIONS //The default Vanilla role for Guests
+    ];
+
     const TOPCODER_ROLES = [
-        'administrator' => ALL_VANILLA_PERMISSIONS,
-        'Connect Manager' => [],
+        'administrator' => self::ALL_VANILLA_PERMISSIONS,
+        'Connect Manager' => [
+            'Groups.Category.Manage' => 1,
+        ],
         'Connect Account Manager' => [],
         'Connect Copilot' => [
            'Groups.Category.Manage' => 1,
            'Groups.Moderation.Manage' => 1,
-           'Groups.EmailInvitations.Add' => 1
+           'Groups.EmailInvitations.Add' => 1,
+           'Groups.Category.Manage' => 1,
+           'Groups.Moderation.Manage' => 1,
+           'Groups.EmailInvitations.Add' => 1,
+           'Garden.Uploads.Add' => 1,
+           'Plugins.Attachments.Upload.Allow' => 1,
+           'Vanilla.Discussions.View' => 1,
+           'Vanilla.Discussions.Add' => 1,
+           'Vanilla.Discussions.Edit' => 1,
+           'Vanilla.Discussions.Announce' => 1,
+           'Vanilla.Discussions.Sink' => 1,
+           'Vanilla.Discussions.Close' => 0,
+           'Vanilla.Discussions.Delete' => 1,
+           'Vanilla.Comments.Add' => 1,
+           'Vanilla.Comments.Edit' => 0,
+           'Vanilla.Comments.Delete' => 1,
         ],
-        'Connect Admin' => ALL_VANILLA_PERMISSIONS,
+        'Connect Admin' => self::ALL_VANILLA_PERMISSIONS,
         'Connect Copilot Manager' => [
            'Groups.Category.Manage' => 1,
            'Groups.Moderation.Manage' => 1,
@@ -112,7 +185,16 @@ class RoleModel extends Gdn_Model {
         'copilot' =>  [
             'Groups.Category.Manage' => 1,
             'Groups.Moderation.Manage' => 1,
-            'Groups.EmailInvitations.Add' => 1
+            'Groups.EmailInvitations.Add' => 1,
+            'Garden.Uploads.Add' => 1,
+            'Plugins.Attachments.Upload.Allow' => 1,
+            'Vanilla.Discussions.View' => 1,
+            'Vanilla.Discussions.Add' => 1,
+            'Vanilla.Discussions.Edit' => 1,
+            'Vanilla.Discussions.Announce' => 1,
+            'Vanilla.Discussions.Sink' => 0,
+            'Vanilla.Discussions.Close' => 1,
+            'Vanilla.Discussions.Delete' => 1,
         ],
         'customer' => [],
         'observer'=> [],

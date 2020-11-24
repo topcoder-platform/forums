@@ -24,7 +24,7 @@ $Configuration['EnabledPlugins']['recaptcha'] = true;
 $Configuration['EnabledPlugins']['GettingStarted'] = 'GettingStarted';
 $Configuration['EnabledPlugins']['stubcontent'] = false;
 $Configuration['EnabledPlugins']['Topcoder'] = true;
-$Configuration['EnabledPlugins']['rich-editor'] = true;
+$Configuration['EnabledPlugins']['rich-editor'] = false;
 $Configuration['EnabledPlugins']['editor'] = true;
 $Configuration['EnabledPlugins']['emojiextender'] = true;
 $Configuration['EnabledPlugins']['GooglePrettify'] = true;
@@ -140,6 +140,7 @@ $Configuration['Routes']['XmZpbGVzdGFjaygvLiopPyQ='] = array (
 // Vanilla
 $Configuration['Vanilla']['SSO']['Debug'] = true;
 $Configuration['Vanilla']['Activity']['ShowDiscussionBody'] = true;
+$Configuration['Vanilla']['Activity']['ShowCommentBody'] = true;
 $Configuration['Vanilla']['EnableCategoryFollowing'] = true;
 $Configuration['Vanilla']['Version'] = '3.0';
 
@@ -147,3 +148,23 @@ $Configuration['Vanilla']['Version'] = '3.0';
 $Configuration['memcached']['Store'] = getenv('MEMCACHED_SERVER');
 
 // Initial setup config
+
+// Email Template settings
+$Configuration['Garden']['Email']['Format']='html';
+$Configuration['Garden']['EmailTemplate']['BackgroundColor']='#ffffff';
+$Configuration['Garden']['EmailTemplate']['ButtonBackgroundColor']='transparent';
+$Configuration['Garden']['EmailTemplate']['ButtonTextColor']='#865827';
+$Configuration['Garden']['EmailTemplate']['Image']='https://www.dropbox.com/s/zddbsvh6f4h308o/e09141aacc790f0f31b80cc0bfd81cb9.png?dl=1';
+// Email Logo size
+$Configuration['Garden']['EmailTemplate']['ImageMaxWidth']='400';
+$Configuration['Garden']['EmailTemplate']['ImageMaxHeight']='300';
+
+// Profile Configuration
+// Hide/Show the options in User Notification Preferences:
+//    'Email.WallComment' = 'Notify me when people write on my wall.'
+//    'Email.ActivityComment' = 'Notify me when people reply to my wall comments.'
+//    'Popup.WallComment' = 'Notify me when people write on my wall.'
+//    'Popup.ActivityComment' = 'Notify me when people reply to my wall comments.'
+//    'Email.ConversationMessage' = 'Notify me of private messages.'
+//    'Popup.ConversationMessage' = 'Notify me of private messages.'
+$Configuration['Garden']['Profile']['ShowActivities']=false;

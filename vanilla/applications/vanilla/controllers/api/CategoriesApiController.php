@@ -51,7 +51,7 @@ class CategoriesApiController extends AbstractApiController {
      */
     public function categoryPostSchema($type = '', array $extra = []) {
         if ($this->categoryPostSchema === null) {
-            $fields = ['name', 'parentCategoryID?', 'urlcode', 'displayAs?', 'customPermissions?'];
+            $fields = ['name', 'parentCategoryID?', 'urlcode', 'displayAs?', 'customPermissions?', 'groupID?'];
             $this->categoryPostSchema = $this->schema(
                 Schema::parse(array_merge($fields, $extra))->add($this->schemaWithParent()),
                 'CategoryPost'
@@ -127,6 +127,7 @@ class CategoriesApiController extends AbstractApiController {
                 'minLength' => 0,
             ],
             'parentCategoryID:i|n' => 'Parent category ID.',
+            'groupID:i|n' => 'Group ID.',
             'customPermissions:b' => 'Are custom permissions set for this category?',
             'isArchived:b' => 'The archived state of this category.',
             'urlcode:s' => 'The URL code of the category.',

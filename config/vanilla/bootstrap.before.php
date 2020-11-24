@@ -321,3 +321,456 @@ if (!function_exists('dateUpdated')) {
         return $result;
     }
 }
+
+if (!function_exists('watchButton')) {
+    /**
+     *
+     * Writes the Watch/watching button
+     *
+     * @param int $categoryID
+     * @return string
+     */
+    function watchButton($categoryID) {
+        $output = ' ';
+        $userID = Gdn::session()->UserID;
+        $category = CategoryModel::categories($categoryID);
+
+        if ($userID && $category && $category['DisplayAs'] == 'Discussions') {
+            $categoryModel = new CategoryModel();
+            $hasWatched = $categoryModel->hasWatched($categoryID, $userID);
+            $iconTitle = t('Watch');
+            $icon = <<<EOT
+                <svg xmlns="http://www.w3.org/2000/svg" class="watchButton-icon" viewBox="0 0 16 16" aria-hidden="true">
+                    <title>{$iconTitle}</title>  
+                    <path d="M7.568,14.317a.842.842,0,0,1-1.684,0,4.21,4.21,0,0,0-4.21-4.21h0a.843.843,0,0,1,0-1.685A5.9,5.9,0,0,1,7.568,14.317Zm4.21,0a.842.842,0,0,1-1.684,0A8.421,8.421,0,0,0,1.673,5.9h0a.842.842,0,0,1,0-1.684,10.1,10.1,0,0,1,10.105,10.1Zm4.211,0a.842.842,0,0,1-1.684,0A12.633,12.633,0,0,0,1.673,1.683.842.842,0,0,1,1.673,0,14.315,14.315,0,0,1,15.989,14.315ZM1.673,16a1.684,1.684,0,1,1,1.684-1.684h0A1.684,1.684,0,0,1,1.673,16Z" transform="translate(0.011 0.001)" style="fill: currentColor;"/>
+                </svg>
+EOT;
+
+            $text = $hasWatched ? t('Watching') : t('Watch');
+            $output .= anchor(
+                $icon . $text,
+                $hasWatched ? "/category/watched/{$categoryID}/" . Gdn::session()->transientKey() : "/category/watch/{$categoryID}/" . Gdn::session()->transientKey(),
+                'Hijack watchButton' . ($hasWatched ? ' TextColor isWatching' : ''),
+                ['title' => $text, 'aria-pressed' => $hasWatched ? 'true' : 'false', 'role' => 'button', 'tabindex' => '0']
+            );
+        }
+        return $output;
+    }
+}
+
+if (!function_exists('checkGroupPermission')) {
+    /**
+     * Check group permission for the current user
+     * @param $groupID
+     * @param null $permission  null - any permission for a group
+     * @param bool $fullMatch
+     * @return bool return true if user has a permission
+     */
+   function checkGroupPermission($groupID,$permission = null, $fullMatch = true) {
+       $groupModel = new GroupModel();
+       return $groupModel->checkPermission(Gdn::session()->UserID,$groupID, $permission, $fullMatch);
+   }
+}
+
+if(!function_exists('updateRolePermissions')) {
+
+    /**
+     * Update role permissions
+     * @param $roleType
+     * @param $roles
+     */
+    function updateRolePermissions($roleType, $roles)  {
+        $RoleModel = new RoleModel();
+        $PermissionModel = new PermissionModel();
+        // Configure default permission for roles
+        $allRoles = $RoleModel->getByType($roleType)->resultArray();
+        foreach ($allRoles as $role) {
+            $allPermissions = $PermissionModel->getRolePermissions($role['RoleID']);
+            foreach ($allPermissions as $permission) {
+                $roleName = $role['Name'];
+                if (array_key_exists($roleName, $roles)) {
+                    $globalRolePermissions = $roles[$roleName];
+                    foreach ($globalRolePermissions as $key => $value) {
+                        $permission[$key] = $globalRolePermissions[$key];
+                    }
+                    $PermissionModel->save($permission);
+                }
+            }
+        }
+    }
+}
+
+if (!function_exists('sortsDropDown')) {
+    /**
+     * Returns a sorting drop-down menu.
+     *
+     * @param string $baseUrl Target URL with no query string applied.
+     * @param array $filters A multidimensional array of rows with the following properties:
+     *     ** 'name': Friendly name for the filter.
+     *     ** 'param': URL parameter associated with the filter.
+     *     ** 'value': A value for the URL parameter.
+     * @param string $extraClasses any extra classes you add to the drop down
+     * @param string|null $default The default label for when no filter is active. If `null`, the default label is not added
+     * @param string|null $defaultURL URL override to return to the default, unfiltered state.
+     * @param string $label Text for the label to attach to the cont
+     * @return string
+     */
+    function sortsDropDown($baseUrl, array $filters = [], $extraClasses = '', $default = null, $defaultUrl = null, $label = 'Sort') {
+        $links = [];
+        $active = paramPreference(
+            'sort',
+            'CategorySort',
+            null,
+            null,
+            false
+        );
+        // Translate filters into links.
+        foreach ($filters as $filter) {
+            // Make sure we have the bare minimum: a label and a URL parameter.
+            if (!array_key_exists('name', $filter)) {
+                throw new InvalidArgumentException('Sort does not have a name field.');
+            }
+            if (!array_key_exists('param', $filter)) {
+                throw new InvalidArgumentException('Sort does not have a param field.');
+            }
+
+            // Prepare for consumption by linkDropDown.
+            $query = [$filter['param'] => $filter['value']];
+            if (array_key_exists('extra', $filter) && is_array($filter['extra'])) {
+                $query += $filter['extra'];
+            }
+            $url = url($baseUrl . '?' . http_build_query($query));
+            $link = [
+                'name' => $filter['name'],
+                'url' => $url
+            ];
+
+            // If we don't already have an active link, and this parameter and value match, this is the active link.
+            if ($active === null && Gdn::request()->get($filter['param']) == $filter['value']) {
+                $active = $filter['value'];
+                $link['active'] = true;
+            } else if ($active == $filter['value']){
+                $link['active'] = true;
+                $active = $filter['value'];
+            }
+
+            // Queue up another filter link.
+            $links[] = $link;
+        }
+
+        if ($default !== null) {
+            $default = t('All');
+            // Add the default link to the top of the list.
+            array_unshift($links, [
+                'active' => $active === null,
+                'name' => $default,
+                'url' => $defaultUrl ?: $baseUrl
+            ]);
+        }
+
+        // Generate the markup for the drop down menu.
+        $output = linkDropDown($links, 'selectBox-following ' . trim($extraClasses), t($label) . ': ');
+        return $output;
+    }
+}
+
+if (!function_exists('categorySorts')) {
+    /**
+     * Returns category sorting.
+     *
+     * @param string $extraClasses any extra classes you add to the drop down
+     * @return string
+     */
+    function categorySorts($extraClasses = '') {
+        if (!Gdn::session()->isValid()) {
+            return;
+        }
+
+        $baseUrl = Gdn::request()->getFullPath();
+
+        $transientKey = Gdn::session()->transientKey();
+        $filters = [
+            [
+                'name' => t('New'),
+                'param' => 'sort',
+                'value' => 'new',
+                'extra' => ['TransientKey' => $transientKey, 'save' => 1]
+            ],
+
+            [
+                'name' => t('Old'),
+                'param' => 'sort',
+                'value' => 'old',
+                'extra' => ['TransientKey' => $transientKey, 'save' => 1]
+            ]
+        ];
+
+        $defaultParams = ['TransientKey' => $transientKey];
+        if (Gdn::request()->get('sort')) {
+            $defaultParams['sort'] = Gdn::request()->get('sort');
+        }
+
+        if (!empty($defaultParams)) {
+            $defaultUrl = $baseUrl.'?'.http_build_query($defaultParams);
+        } else {
+            $defaultUrl = $baseUrl;
+        }
+
+        return sortsDropDown(
+            $baseUrl,
+            $filters,
+            $extraClasses,
+            null,
+            $defaultUrl,
+            'Sort'
+        );
+    }
+}
+
+if (!function_exists('discussionSorts')) {
+    /**
+     * Returns discussions sorting.
+     *
+     * @param string $extraClasses any extra classes you add to the drop down
+     * @return string
+     */
+    function discussionSorts($extraClasses = '') {
+        if (!Gdn::session()->isValid()) {
+            return;
+        }
+
+        $baseUrl = Gdn::request()->getFullPath();
+        $transientKey = Gdn::session()->transientKey();
+
+        $filters = [
+            [
+                'name' => t('New'),
+                'param' => 'sort',
+                'value' => 'new',
+                'extra' => ['TransientKey' => $transientKey, 'save' => 1]
+            ],
+            [
+                'name' => t('Old'),
+                'param' => 'sort',
+                'value' => 'old',
+                'extra' => ['TransientKey' => $transientKey, 'save' => 1]
+            ]
+        ];
+
+
+        $defaultParams = ['save' => 1, 'TransientKey' => $transientKey];
+        if (Gdn::request()->get('sort')) {
+            $defaultParams['sort'] = '';
+        }
+
+        if (!empty($defaultParams)) {
+            $defaultUrl = $baseUrl.'?'.http_build_query($defaultParams);
+        } else {
+            $defaultUrl = $baseUrl;
+        }
+
+        return sortsDropDown(
+            $baseUrl,
+            $filters,
+            $extraClasses,
+            null,
+            $defaultUrl,
+            'Sort'
+        );
+    }
+}
+
+if (!function_exists('discussionFilters')) {
+    /**
+     *
+     * FIX: https://github.com/topcoder-platform/forums/issues/226
+     * The source is package/library/core/functions.render.php
+     * Returns discussions filtering.
+     *
+     * @param string $extraClasses any extra classes you add to the drop down
+     * @return string
+     */
+    function discussionFilters($extraClasses = '') {
+        if (!Gdn::session()->isValid()) {
+            return;
+        }
+
+        $baseUrl =  Gdn::request()->getFullPath();
+        $transientKey = Gdn::session()->transientKey();
+        $filters = [
+            [
+                'name' => t('All'),
+                'param' => 'followed',
+                'value' => 0,
+                'extra' => ['save' => 1, 'TransientKey' => $transientKey]
+            ],
+            [
+                'name' => t('Following'),
+                'param' => 'followed',
+                'value' => 1,
+                'extra' => ['save' => 1, 'TransientKey' => $transientKey]
+            ]
+        ];
+
+        $defaultParams = ['save' => 1, 'TransientKey' => $transientKey];
+        if (Gdn::request()->get('followed')) {
+            $defaultParams['followed'] = '';
+        }
+
+        if (!empty($defaultParams)) {
+            $defaultUrl = $baseUrl.'?'.http_build_query($defaultParams);
+        } else {
+            $defaultUrl = $baseUrl;
+        }
+
+        return filtersDropDown(
+            $baseUrl,
+            $filters,
+            $extraClasses,
+            null,
+            $defaultUrl,
+            'View'
+        );
+    }
+}
+
+if (!function_exists('categoryFilters')) {
+    /**
+     *
+     * FIX: https://github.com/topcoder-platform/forums/issues/226
+     * The source is package/library/core/functions.render.php
+     *
+     * Returns category filtering.
+     *
+     * @param string $extraClasses any extra classes you add to the drop down
+     * @return string
+     */
+    function categoryFilters($extraClasses = '') {
+        if (!Gdn::session()->isValid()) {
+            return;
+        }
+
+        $baseUrl = Gdn::request()->getFullPath();
+        $transientKey = Gdn::session()->transientKey();
+        $filters = [
+            [
+                'name' => t('All'),
+                'param' => 'followed',
+                'value' => 0,
+                'extra' => ['save' => 1, 'TransientKey' => $transientKey]
+            ],
+
+            [
+                'name' => t('Following'),
+                'param' => 'followed',
+                'value' => 1,
+                'extra' => ['save' => 1, 'TransientKey' => $transientKey]
+            ]
+        ];
+
+        $defaultParams = ['save' => 1, 'TransientKey' => $transientKey];
+        if (Gdn::request()->get('followed')) {
+            $defaultParams['followed'] = '';
+        }
+
+        if (!empty($defaultParams)) {
+            $defaultUrl = $baseUrl.'?'.http_build_query($defaultParams);
+        } else {
+            $defaultUrl = $baseUrl;
+        }
+
+        return filtersDropDown(
+            $baseUrl,
+            $filters,
+            $extraClasses,
+            null,
+            $defaultUrl,
+            'View'
+        );
+    }
+}
+
+if (!function_exists('filtersDropDown')) {
+    /**
+     * FIX: https://github.com/topcoder-platform/forums/issues/226
+     * The source is package/library/core/functions.render.php
+     *
+     * Returns a filtering drop-down menu.
+     *
+     * @param string $baseUrl Target URL with no query string applied.
+     * @param array $filters A multidimensional array of rows with the following properties:
+     *     ** 'name': Friendly name for the filter.
+     *     ** 'param': URL parameter associated with the filter.
+     *     ** 'value': A value for the URL parameter.
+     * @param string $extraClasses any extra classes you add to the drop down
+     * @param string|null $default The default label for when no filter is active. If `null`, the default label is "All".
+     * @param string|null $defaultURL URL override to return to the default, unfiltered state.
+     * @param string $label Text for the label to attach to the cont
+     * @return string
+     */
+    function filtersDropDown($baseUrl, array $filters = [], $extraClasses = '', $default = null, $defaultUrl = null, $label = 'View') {
+
+        $output = '';
+
+        if (c('Vanilla.EnableCategoryFollowing')) {
+            $links = [];
+            $active = paramPreference(
+                'followed',
+                'FollowedCategories',
+                'Vanilla.SaveFollowingPreference',
+                null,
+                false
+            );
+
+            // Translate filters into links.
+            foreach ($filters as $filter) {
+                // Make sure we have the bare minimum: a label and a URL parameter.
+                if (!array_key_exists('name', $filter)) {
+                    throw new InvalidArgumentException('Filter does not have a name field.');
+                }
+                if (!array_key_exists('param', $filter)) {
+                    throw new InvalidArgumentException('Filter does not have a param field.');
+                }
+
+                // Prepare for consumption by linkDropDown.
+                $value = $filter['value'];
+                $query = [$filter['param'] => $value];
+                if (array_key_exists('extra', $filter) && is_array($filter['extra'])) {
+                    $query += $filter['extra'];
+                }
+                $url = url($baseUrl.'?'.http_build_query($query));
+                $link = [
+                    'name' => $filter['name'],
+                    'url' => $url
+                ];
+
+                // If we don't already have an active link, and this parameter and value match, this is the active link.
+                if ($active === null && Gdn::request()->get($filter['param']) == $filter['value']) {
+                    $active = $filter['value'];
+                    $link['active'] = true;
+                } else if ($active == $filter['value']){
+                    $link['active'] = true;
+                    $active = $filter['value'];
+                }
+
+                // Queue up another filter link.
+                $links[] = $link;
+            }
+
+            if ($default !== null) {
+                $default = t('All');
+
+                // Add the default link to the top of the list.
+                array_unshift($links, [
+                    'active' => $active === null,
+                    'name' => $default,
+                    'url' => $defaultUrl ?: $baseUrl
+                ]);
+            }
+            // Generate the markup for the drop down menu.
+            $output = linkDropDown($links, 'selectBox-following '.trim($extraClasses), t($label).': ');
+        }
+
+        return $output;
+    }
+}

@@ -71,7 +71,7 @@ class CategoriesModule extends Gdn_Module {
      * @return array
      */
     private function filterCategories($categories) {
-        //check Group Permissions
+        //Don't show `Challenges Forums` in the menu
         $groupModel = new GroupModel();
         $challengesForumsCategory = $groupModel->getChallengesForums();
         $challengesForumsCategoryID = val('CategoryID',$challengesForumsCategory);
