@@ -2493,6 +2493,10 @@ class UserModel extends Gdn_Model {
      * @param bool $RecordEvent
      */
     public function saveRoles($UserID, $RoleIDs, $RecordEvent) {
+        if(!$UserID) {
+            throw new Exception(t('UserID is invalid.'), 400);
+        }
+
         if (is_string($RoleIDs) && !is_numeric($RoleIDs)) {
             // The $RoleIDs are a comma delimited list of role names.
             $RoleNames = array_map('trim', explode(',', $RoleIDs));
