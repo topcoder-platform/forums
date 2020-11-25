@@ -1969,6 +1969,7 @@ class DiscussionModel extends Gdn_Model {
     public function save($formPostValues, $settings = false) {
         // Define the primary key in this model's table.
         $this->defineSchema();
+        $sendNewDiscussionNotification = false;
 
         // If the site isn't configured to use categories, don't allow one to be set.
         if (!c('Vanilla.Categories.Use', true)) {
@@ -2223,7 +2224,7 @@ class DiscussionModel extends Gdn_Model {
                     $formPostValues['DiscussionID'] = $discussionID;
 
                     $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
-                    $this->notifyNewDiscussion($discussion);
+                    $sendNewDiscussionNotification = true;
                 }
 
                 // Get CategoryID of this discussion
@@ -2244,7 +2245,18 @@ class DiscussionModel extends Gdn_Model {
                 $this->EventArguments['FormPostValues'] = $formPostValues;
                 $this->EventArguments['Fields'] = $fields;
                 $this->EventArguments['DiscussionID'] = $discussionID;
+                $this->EventArguments['SendNewDiscussionNotification'] = $sendNewDiscussionNotification;
                 $this->fireEvent('AfterSaveDiscussion');
+
+
+                //FIX: https://github.com/topcoder-platform/forums/issues/213
+                // If the plugin is enabled then send notifications after updating MediaTables with discussionID
+                if ($sendNewDiscussionNotification === true) {
+                    if(!c('EnabledPlugins.editor', false)) {
+                        $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
+                        $this->notifyNewDiscussion($discussion);
+                    }
+                }
             }
         }
 
@@ -2288,6 +2300,13 @@ class DiscussionModel extends Gdn_Model {
             $code = "HeadlineFormat.Discussion";
         }
 
+        // FIX: https://github.com/topcoder-platform/forums/issues/213
+        $mediaModel = new MediaModel();
+        $sqlWhere = [
+          'ForeignTable' => 'discussion',
+          'ForeignID' => $discussionID
+        ];
+        $mediaData = $mediaModel->getWhere($sqlWhere)->resultArray();
         $data = [
             "ActivityType" => "Discussion",
             "ActivityUserID" => $insertUserID,
@@ -2301,6 +2320,7 @@ class DiscussionModel extends Gdn_Model {
             "Data" => [
                 "Name" => $name,
                 "Category" => $categoryName,
+                "Media" => $mediaData
             ]
         ];
 

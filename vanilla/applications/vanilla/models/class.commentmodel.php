@@ -541,7 +541,7 @@ class CommentModel extends Gdn_Model {
      * @param array $comment
      * @param array $discussion
      */
-    private function notifyNewComment(?array $comment, ?array $discussion) {
+    public function notifyNewComment(?array $comment, ?array $discussion) {
         if ($comment === null || $discussion === null) {
             return;
         }
@@ -563,6 +563,13 @@ class CommentModel extends Gdn_Model {
         $discussionUserID = $discussion["InsertUserID"] ?? null;
         $format = $comment["Format"] ?? null;
 
+        $mediaModel = new MediaModel();
+        $sqlWhere = [
+            'ForeignTable' => 'comment',
+            'ForeignID' => $commentID
+        ];
+        $mediaData = $mediaModel->getWhere($sqlWhere)->resultArray();
+
         // Prepare the notification queue.
         $data = [
             "ActivityType" => "Comment",
@@ -577,6 +584,7 @@ class CommentModel extends Gdn_Model {
             "Data" => [
                 "Name" => $discussion["Name"] ?? null,
                 "Category" => $category["Name"] ?? null,
+                "Media" => $mediaData
             ]
         ];
 
@@ -1362,10 +1370,12 @@ class CommentModel extends Gdn_Model {
             if ($Discussion->CategoryID > 0) {
                 CategoryModel::instance()->incrementLastComment($Fields);
             }
-            $this->notifyNewComment(
-                $Fields ? (array)$Fields : null,
-                $Discussion ? (array)$Discussion : null
-            );
+            if(!c('EnabledPlugins.editor', false)) {
+                $this->notifyNewComment(
+                    $Fields ? (array)$Fields : null,
+                    $Discussion ? (array)$Discussion : null
+                );
+            }
         }
     }
 

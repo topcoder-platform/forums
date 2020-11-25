@@ -670,8 +670,6 @@ class EditorPlugin extends Gdn_Plugin {
             $sender->setValue('Format', $this->Format);
         }
 
-
-
         // If force Wysiwyg enabled in settings
         $needsConversion = (!in_array($this->Format, ['Wysiwyg']));
         if (c('Garden.InputFormatter', 'Wysiwyg') == 'Wysiwyg' && $this->ForceWysiwyg == true && $needsConversion) {
@@ -1044,17 +1042,35 @@ class EditorPlugin extends Gdn_Plugin {
      * @param object $sender
      * @param array $args
      */
-    public function postController_afterCommentSave_handler($sender, $args) {
-        if (!$args['Comment']) {
-            return;
-        }
+    public function commentModel_afterSaveComment_handler($sender, $args) {
+        $commentID = $args['CommentID'];
 
-        $commentID = $args['Comment']->CommentID;
         if (!$commentID) {
             return;
         }
 
         $this->saveUploads($commentID, 'comment');
+
+        //FIX: See how it works `save2()` method of Comment model
+        //Notify users after Updating MediaTable
+        $commentModel = new CommentModel();
+        $fields = $commentModel->getID($commentID, DATASET_TYPE_ARRAY);
+        // Make a quick check so that only the user making the comment can make the notification.
+        // This check may be used in the future so should not be depended on later in the method.
+        if (Gdn::controller()->deliveryType() === DELIVERY_TYPE_ALL && $fields['InsertUserID'] != GDn::session()->UserID) {
+            return;
+        }
+        $insert = (bool) $args['Insert'];
+        $discussionModel = new DiscussionModel();
+        $discussionID = val('DiscussionID', $fields);
+        $discussion = $discussionModel->getID($discussionID);
+        if($insert) {
+            $commentModel->notifyNewComment(
+                $fields ? (array)$fields : null,
+                $discussion ? (array)$discussion : null
+            );
+        }
+
     }
 
     /**
@@ -1064,7 +1080,7 @@ class EditorPlugin extends Gdn_Plugin {
      * @param object $sender
      * @param array $args
      */
-    public function postController_afterDiscussionSave_handler($sender, $args) {
+    public function discussionModel_afterSaveDiscussion_handler($sender, $args) {
         if (!$args['Discussion']) {
             return;
         }
@@ -1075,7 +1091,14 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
         $this->saveUploads($discussionID, 'discussion');
+
+        $sendNewDiscussionNotification = $args['SendNewDiscussionNotification'];
+        if($sendNewDiscussionNotification === true) {
+            $discussionModel = new DiscussionModel();
+            $discussionModel->notifyNewDiscussion($discussionID);
+        }
     }
+
 
     /**
      * Attach files to a message during save.
