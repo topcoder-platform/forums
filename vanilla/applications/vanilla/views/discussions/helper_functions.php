@@ -129,7 +129,8 @@ if (!function_exists('WriteDiscussion')) :
         $sender->EventArguments['CssClass'] = &$cssClass;
 
         $first = userBuilder($discussion, 'First');
-        $last = userBuilder($discussion, 'Last');
+        $last = userBuilder($discussion, 'LastDiscussionComments');
+        $lastDate = $discussion->LastDiscussionComments;
         $sender->EventArguments['FirstUser'] = &$first;
         $sender->EventArguments['LastUser'] = &$last;
 
@@ -201,9 +202,9 @@ if (!function_exists('WriteDiscussion')) :
 
                     $sender->fireEvent('AfterCountMeta');
 
-                    if ($discussion->LastCommentID != '') {
+                    if ($discussion->LastDiscussionCommentsUserID != '') {
                         echo ' <span class="MItem LastCommentBy">'.sprintf(t('Most recent by %1$s'), userAnchor($last)).'</span> ';
-                        echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($discussion->LastDate, 'html').'</span>';
+                        echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($lastDate, 'html').'</span>';
                     } else {
                         echo ' <span class="MItem LastCommentBy">'.sprintf(t('Started by %1$s'), userAnchor($first)).'</span> ';
                         echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($discussion->FirstDate, 'html');

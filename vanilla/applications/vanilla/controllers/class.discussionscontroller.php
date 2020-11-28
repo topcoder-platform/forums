@@ -126,22 +126,25 @@ class DiscussionsController extends VanillaController {
         //FIX: the module is always enabled to show the view filter
         $followingEnabled = true;//$categoryModel->followingEnabled();
         if ($followingEnabled) {
-            $saveFollowing = Gdn::request()->get('followed') && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
-            $followed = paramPreference(
-                'followed',
-                'FollowedCategories', //FIX: 'FollowedDiscussions' -Use one parameter for discussions/categories
-                'Vanilla.SaveFollowingPreference',
-                null,
-                $saveFollowing
-            );
+            $followed = Gdn::request()->get('followed', null);
+            $saveFollowing =  Gdn::request()->get('followed') !== null && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
+            if($saveFollowing) {
+                Gdn::session()->setPreference('FollowedCategories', $followed);
+            }
             if ($this->SelfUrl === "discussions") {
                 $this->enableFollowingFilter = true;
             }
-        } else {
-            $followed = false;
         }
+
+        $followed = Gdn::session()->getPreference('FollowedCategories', false);
         $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
         $this->setData('Followed', $followed);
+
+        $sort = Gdn::request()->get('sort', null);
+        $saveSorting = $sort !== null && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
+        if($saveSorting) {
+            Gdn::session()->setPreference('CategorySort', $sort);
+        }
 
         // Set criteria & get discussions data
         $this->setData('Category', false, true);
