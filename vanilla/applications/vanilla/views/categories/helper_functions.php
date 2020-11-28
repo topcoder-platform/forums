@@ -97,6 +97,8 @@ if (!function_exists('MostRecentString')):
         if (!$row['LastTitle'])
             return '';
 
+        $last = val('LastDiscussionCommentsUserName', $row);
+        $lastDate = val('LastDiscussionCommentsDate', $row);
         $r = '';
 
         $r .= '<span class="MostRecent">';
@@ -106,21 +108,21 @@ if (!function_exists('MostRecentString')):
             $row['LastUrl'],
             'LatestPostTitle');
 
-        if (val('LastName', $row)) {
+        if ($last) {
             $r .= ' ';
 
             $r .= '<span class="MostRecentBy">'.t('by').' ';
-            $r .= userAnchor($row, 'UserLink', 'Last');
+            $r .= userAnchor($row, 'UserLink', 'LastDiscussionCommentsUser');
             $r .= '</span>';
         }
 
-        if (val('LastDateInserted', $row)) {
+        if ( $lastDate) {
             $r .= ' ';
 
             $r .= '<span class="MostRecentOn">';
             $r .= t('on').' ';
             $r .= anchor(
-                Gdn_Format::date($row['LastDateInserted'], 'html'),
+                Gdn_Format::date( $lastDate, 'html'),
                 $row['LastUrl'],
                 'CommentDate');
             $r .= '</span>';
@@ -212,7 +214,7 @@ if (!function_exists('writeListItem')):
                                 <?php echo mostRecentString($category); ?>
                             </span>
                             <span class="MItem LastCommentDate">
-                                <?php echo Gdn_Format::date(val('LastDateInserted', $category)); ?>
+                                <?php echo Gdn_Format::date(val('LastDiscussionCommentsDate', $category)); ?>
                             </span>
                         <?php endif;
                         if ($writeChildren === 'list'): ?>

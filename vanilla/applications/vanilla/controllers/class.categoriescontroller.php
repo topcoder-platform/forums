@@ -275,32 +275,26 @@ class CategoriesController extends VanillaController {
                 'EnableFollowingFilter' => &$this->enableFollowingFilter
             ]);
 
-            $saveFollowing = Gdn::request()->get('followed') && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
-
-            $followed = paramPreference(
-                'followed',
-                'FollowedCategories',
-                'Vanilla.SaveFollowingPreference',
-                null,
-                $saveFollowing
-            );
+            $followed = Gdn::request()->get('followed', null);
+            $saveFollowing =  $followed !== null && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
+            if($saveFollowing) {
+                $followed = Gdn::request()->get('followed');
+                Gdn::session()->setPreference('FollowedCategories', $followed);
+            }
         } else {
             $this->enableFollowingFilter = $followed = false;
         }
 
+        $followed = Gdn::session()->getPreference('FollowedCategories', false);
         $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
         $this->setData('Followed', $followed);
 
-        $saveSorting =Gdn::request()->get('sort') && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
-
-        $sort = paramPreference(
-            'sort',
-            'CategorySort',
-            null,//'Vanilla.SaveCategorySortPreference',
-            null,
-            $saveSorting
-        );
-
+        $sort = Gdn::request()->get('sort', null);
+        $saveSorting = $sort !== null && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
+        if($saveSorting) {
+            Gdn::session()->setPreference('CategorySort', $sort);
+        }
+        $sort =  Gdn::session()->getPreference('CategorySort', false);
         $this->setData('CategorySort', $sort);
 
         if ($categoryIdentifier == '') {
@@ -412,7 +406,7 @@ class CategoriesController extends VanillaController {
 
             // Get a DiscussionModel
             $discussionModel = new DiscussionModel();
-            $discussionModel->setSort(Gdn::request()->get());
+            $discussionModel->setSort($sort);
             $discussionModel->setFilters(Gdn::request()->get());
             $this->setData('Sort', $discussionModel->getSort());
             $this->setData('Filters', $discussionModel->getFilters());
@@ -604,18 +598,18 @@ class CategoriesController extends VanillaController {
         if($this->data('CategorySort')) {
             if( $this->data('CategorySort') == self::SORT_OLDEST_POST) {
                 usort($categoryTree, function ($a, $b) {
-                    return  Gdn_Format::toTimestamp($a['LastDateInserted']) - Gdn_Format::toTimestamp($b['LastDateInserted']);
+                    return  Gdn_Format::toTimestamp($a['LastDiscussionCommentsDate']) - Gdn_Format::toTimestamp($b['LastDiscussionCommentsDate']);
                 });
 
             } else if( $this->data('CategorySort') == self::SORT_LAST_POST) {
                 usort($categoryTree, function ($a, $b) {
-                    return  Gdn_Format::toTimestamp($b['LastDateInserted']) - Gdn_Format::toTimestamp($a['LastDateInserted']);
+                    return  Gdn_Format::toTimestamp($b['LastDiscussionCommentsDate']) - Gdn_Format::toTimestamp($a['LastDiscussionCommentsDate']);
 
                 });
             }
         } else {
             usort($categoryTree, function ($a, $b) { // desc
-               return  Gdn_Format::toTimestamp($b['LastDateInserted']) - Gdn_Format::toTimestamp($a['LastDateInserted']);
+               return  Gdn_Format::toTimestamp($b['LastDiscussionCommentsDate']) - Gdn_Format::toTimestamp($a['LastDiscussionCommentsDate']);
             });
         }
 
