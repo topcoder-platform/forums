@@ -168,3 +168,17 @@ $Configuration['Garden']['EmailTemplate']['ImageMaxHeight']='300';
 //    'Email.ConversationMessage' = 'Notify me of private messages.'
 //    'Popup.ConversationMessage' = 'Notify me of private messages.'
 $Configuration['Garden']['Profile']['ShowActivities']=false;
+
+// Flood Control
+$Configuration['Vanilla']['Comment']['SpamCount'] = '5';
+$Configuration['Vanilla']['Comment']['SpamTime'] = '60';
+$Configuration['Vanilla']['Comment']['SpamLock'] = '120';
+$Configuration['Vanilla']['Discussion']['SpamCount'] = '3';
+$Configuration['Vanilla']['Discussion']['SpamTime'] = '60';
+$Configuration['Vanilla']['Discussion']['SpamLock'] = '120';
+$Configuration['Vanilla']['Activity']['SpamCount'] = '5';
+$Configuration['Vanilla']['Activity']['SpamTime'] = '60';
+$Configuration['Vanilla']['Activity']['SpamLock'] = '120';
+$Configuration['Vanilla']['ActivityComment']['SpamCount'] = '5';
+$Configuration['Vanilla']['ActivityComment']['SpamTime'] = '60';
+$Configuration['Vanilla']['ActivityComment']['SpamLock'] = '120';
