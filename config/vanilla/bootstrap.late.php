@@ -29,4 +29,30 @@ if (c('Garden.Installed')) {
    // Check all roles in the env and update all role permissions in RoleModel
    // updateRolePermissions(RoleModel::TYPE_TOPCODER, RoleModel::TOPCODER_ROLES);
    // updateTopcoderRolePermissions(RoleModel::TYPE_TOPCODER,RoleModel::TOPCODER_PROJECT_ROLES);
+
+   // FIX: https://github.com/topcoder-platform/forums/issues/218
+   // Create a parent category for Groups if it doesn't exist
+   // Make sure that the UrlCode is unique among categories.
+   $GroupCategoryExists = Gdn::sql()->select('CategoryID')
+        ->from('Category')
+        ->where('UrlCode', 'groups')
+        ->get()->numRows();
+   if($GroupCategoryExists == 0) {
+       $data = [
+           'Name' => 'Groups',
+           'UrlCode' => 'groups',
+           'DisplayAs' => 'categories',
+           'ParentCategoryID' => -1,
+           'AllowDiscussions'=> 0,
+       ];
+       $date = Gdn_Format::toDateTime();
+       $CategoryModel = CategoryModel::instance();
+       Gdn::sql()->insert('Category', ['ParentCategoryID' => -1, 'TreeLeft' => 2, 'TreeRight' => 3, 'Depth' => 1, 'InsertUserID' => 1,
+           'UpdateUserID' => 1, 'DateInserted' => $date, 'DateUpdated' => $date,
+           'Name' => 'Groups', 'UrlCode' => 'groups', 'Description' => '', 'PermissionCategoryID' => -1, 'DisplayAs' => 'Categories',
+           'LastDiscussionCommentsDate' => $date]);
+       $CategoryModel->rebuildTree();
+       $CategoryModel->recalculateTree();
+       unset($CategoryModel);
+    }
 }
