@@ -935,10 +935,10 @@ body {
     color: #555a62;
 }
 .userContent > *:not(.emoji):not(:last-child):not(br) {
-    margin-bottom: 4px;
+    margin-bottom: 0px;
 }
 .userContent > *:not(.emoji):first-child:not(br) {
-    margin-top: -0.1em !important;
+    margin-top: 0px;
 }
 .userContent,
 .userContent h1,
