@@ -1094,13 +1094,15 @@ class UserModel extends Gdn_Model {
                     $user = $users[$iD] ?? false;
                     foreach ($join as $column) {
                         $value = $user[$column];
+                        // This code executes about 0,5 sec per a row
+                        /*
                         if ($column == 'Photo') {
                             if ($value && !isUrl($value)) {
                                 $value = Gdn_Upload::url(changeBasename($value, 'n%s'));
                             } elseif (!$value) {
                                 $value = UserModel::getDefaultAvatarUrl($user);
                             }
-                        }
+                        }*/
                         setValue($px.$column, $row, $value);
                     }
                 } else {

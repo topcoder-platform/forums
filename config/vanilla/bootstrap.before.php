@@ -362,13 +362,15 @@ if (!function_exists('checkGroupPermission')) {
     /**
      * Check group permission for the current user
      * @param $groupID
-     * @param null $permission  null - any permission for a group
+     * @param null $category
+     * @param null $permissionCategoryID
+     * @param null $permission null - any permission for a group
      * @param bool $fullMatch
      * @return bool return true if user has a permission
      */
-   function checkGroupPermission($groupID,$permission = null, $fullMatch = true) {
+   function checkGroupPermission($groupID, $category = null , $permissionCategoryID = null , $permission = null, $fullMatch = true) {
        $groupModel = new GroupModel();
-       return $groupModel->checkPermission(Gdn::session()->UserID,$groupID, $permission, $fullMatch);
+       return $groupModel->checkPermission(Gdn::session()->UserID,$groupID, $category,$permissionCategoryID , $permission, $fullMatch);
    }
 }
 

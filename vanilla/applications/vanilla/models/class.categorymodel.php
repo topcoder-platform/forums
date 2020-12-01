@@ -905,7 +905,7 @@ class CategoryModel extends Gdn_Model {
         }
 
         if($groupID && $groupID > 0) {
-           $result = checkGroupPermission($groupID);
+           $result = checkGroupPermission($groupID, $category, $permissionCategoryID,  $permission, $fullMatch);
         } else {
            $result = Gdn::session()->checkPermission($permission, $fullMatch, 'Category', $permissionCategoryID)
                     || Gdn::session()->checkPermission($permission, $fullMatch, 'Category', $categoryID);
