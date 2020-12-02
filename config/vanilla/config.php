@@ -10,6 +10,7 @@ $Configuration['Database']['Password'] = getenv('MYSQL_ROOT_PASSWORD');
 // Cache
 $Configuration['Cache']['Enabled'] = getenv('CACHE_ENABLED');
 $Configuration['Cache']['Method'] = getenv('CACHE_METHOD');
+$Configuration['Cache']['Memcached']['Store']=[getenv('MEMCACHED_SERVER')];
 
 // Conversations
 $Configuration['Conversations']['Version'] = '3.0';
@@ -144,8 +145,6 @@ $Configuration['Vanilla']['Activity']['ShowCommentBody'] = true;
 $Configuration['Vanilla']['EnableCategoryFollowing'] = true;
 $Configuration['Vanilla']['Version'] = '3.0';
 
-// memcached
-$Configuration['memcached']['Store'] = getenv('MEMCACHED_SERVER');
 
 // Initial setup config
 

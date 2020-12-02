@@ -263,8 +263,8 @@ if (!function_exists('_formatStringCallback')) {
                             // Manually build instead of using userAnchor() because of special 'You' case.
                             if(function_exists('topcoderRatingCssClass') &&
                                 function_exists('topcoderRoleCssStyles')) {
-                                $ratingCssClass = topcoderRatingCssClass($user->Name);
-                                $roleCssClass = topcoderRoleCssStyles($user->Name);
+                                $ratingCssClass = topcoderRatingCssClass($user);
+                                $roleCssClass = topcoderRoleCssStyles($user);
                                 $topcoderStyles =$ratingCssClass.' '.$roleCssClass;
                                 $result = anchor(htmlspecialchars($name), userUrl($user), $topcoderStyles);
                             } else {

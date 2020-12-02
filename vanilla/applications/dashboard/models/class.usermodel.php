@@ -1301,28 +1301,29 @@ class UserModel extends Gdn_Model {
      * @param string $username The username of the user.
      * @return bool|object Returns the user or **false** if they don't exist.
      */
-    public function getByUsername($username) {
+    public function getByUsername($username, $useCache = true) {
         if ($username == '') {
             return false;
         }
 
-        // Check page cache, then memcached
-        $user = $this->getUserFromCache($username, 'name');
-
-        if ($user === Gdn_Cache::CACHEOP_FAILURE) {
+        if($useCache === false ){
             $this->userQuery();
             $user = $this->SQL->where('u.Name', $username)->get()->firstRow(DATASET_TYPE_ARRAY);
-            if ($user) {
-                // If success, cache user
-                $this->userCache($user);
+        } else {
+            // Check page cache, then memcached
+            $user = $this->getUserFromCache($username, 'name');
+            if ($user === Gdn_Cache::CACHEOP_FAILURE) {
+                $this->userQuery();
+                $user = $this->SQL->where('u.Name', $username)->get()->firstRow(DATASET_TYPE_ARRAY);
             }
         }
 
-        // Apply calculated fields
-        $this->setCalculatedFields($user);
-
         // By default, firstRow() gives stdClass
         if ($user !== false) {
+            // If success, cache user
+            $this->userCache($user);
+            // Apply calculated fields
+            $this->setCalculatedFields($user);
             $user = (object)$user;
         }
 
