@@ -130,7 +130,7 @@ if (!function_exists('WriteDiscussion')) :
 
         $first = userBuilder($discussion, 'First');
         $last = userBuilder($discussion, 'LastDiscussionComments');
-        $lastDate = $discussion->LastDiscussionComments;
+        $lastDate = val('LastDiscussionComments', $discussion);
         $sender->EventArguments['FirstUser'] = &$first;
         $sender->EventArguments['LastUser'] = &$last;
 

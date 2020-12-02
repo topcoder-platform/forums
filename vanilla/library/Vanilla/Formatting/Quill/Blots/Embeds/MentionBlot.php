@@ -59,7 +59,7 @@ class MentionBlot extends AbstractInlineEmbedBlot {
         $sanitizedName = htmlspecialchars($name);
         $url = $this->getMentionUrl($name);
 
-        $topcoderCssStyles = topcoderRatingCssClass($name).' '. topcoderRoleCssStyles($name) ;
+        $topcoderCssStyles = topcoderRatingCssClass($userID).' '. topcoderRoleCssStyles($userID);
 
         return [
             "class" => "atMention ".$topcoderCssStyles,

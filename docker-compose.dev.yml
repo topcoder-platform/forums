@@ -13,3 +13,9 @@ services:
   vanilla-forums:
     links:
       - mysql-local
+      - memcached-local
+  memcached-local:
+    image: memcached:1.5
+    container_name: memcached-local
+    ports:
+      - "11211:11211"
