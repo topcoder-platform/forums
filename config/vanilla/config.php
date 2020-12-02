@@ -8,7 +8,7 @@ $Configuration['Database']['User'] = getenv('MYSQL_ROOT_USER');
 $Configuration['Database']['Password'] = getenv('MYSQL_ROOT_PASSWORD');
 
 // Cache
-$Configuration['Cache']['Enabled'] = getenv('CACHE_ENABLED');
+$Configuration['Cache']['Enabled'] = strtolower(getenv('CACHE_ENABLED')) === "true";
 $Configuration['Cache']['Method'] = getenv('CACHE_METHOD');
 $Configuration['Cache']['Memcached']['Store']=[getenv('MEMCACHED_SERVER')];
 
