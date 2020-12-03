@@ -264,29 +264,14 @@ class CategoriesController extends VanillaController {
     public function index($categoryIdentifier = '', $page = '0') {
         // Figure out which category layout to choose (Defined on "Homepage" settings page).
         $layout = c('Vanilla.Categories.Layout');
-
-        $followingEnabled = true;//$this->CategoryModel->followingEnabled();
-        if ($followingEnabled) {
-            // Only use the following filter on the root category level.
-            // The view filter is shown always
-            $this->enableFollowingFilter = true;//$categoryIdentifier === '';
-            $this->fireEvent('EnableFollowingFilter', [
-                'CategoryIdentifier' => $categoryIdentifier,
-                'EnableFollowingFilter' => &$this->enableFollowingFilter
-            ]);
-
-            $followed = Gdn::request()->get('followed', null);
-            $saveFollowing =  $followed !== null && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
-            if($saveFollowing) {
-                $followed = Gdn::request()->get('followed');
-                Gdn::session()->setPreference('FollowedCategories', $followed);
-            }
-        } else {
-            $this->enableFollowingFilter = $followed = false;
+        $followed = Gdn::request()->get('followed', null);
+        $saveFollowing =  $followed !== null && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
+        if($saveFollowing) {
+            $followed = Gdn::request()->get('followed');
+            Gdn::session()->setPreference('FollowedCategories', $followed);
         }
 
         $followed = Gdn::session()->getPreference('FollowedCategories', false);
-        $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
         $this->setData('Followed', $followed);
 
         $sort = Gdn::request()->get('sort', null);
@@ -298,6 +283,12 @@ class CategoriesController extends VanillaController {
         $this->setData('CategorySort', $sort);
 
         if ($categoryIdentifier == '') {
+            $this->enableFollowingFilter = true;
+            $this->fireEvent('EnableFollowingFilter', [
+                'CategoryIdentifier' => $categoryIdentifier,
+                'EnableFollowingFilter' => &$this->enableFollowingFilter
+            ]);
+            $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
             switch ($layout) {
                 case 'mixed':
                     $this->View = 'discussions';
@@ -325,10 +316,18 @@ class CategoriesController extends VanillaController {
 
             Gdn_Theme::section($category->CssClass);
 
+            // The view filter is shown always if category type != 'discussions'
+            $this->enableFollowingFilter = strtolower( val('DisplayAs', $category, '')) != 'discussions';
+            $this->fireEvent('EnableFollowingFilter', [
+                'CategoryIdentifier' => $categoryIdentifier,
+                'EnableFollowingFilter' => &$this->enableFollowingFilter
+            ]);
+
             // Load the breadcrumbs.
             $this->setData('Breadcrumbs', CategoryModel::getAncestors(val('CategoryID', $category)));
 
             $this->setData('Category', $category, true);
+            $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
 
             $this->title(htmlspecialchars(val('Name', $category, '')));
             $this->description(val('Description', $category), true);
@@ -575,6 +574,7 @@ class CategoriesController extends VanillaController {
 
         if ($this->data('Followed')) {
             if ($Category) {
+                // It also returns the selected category
                 $ancestor = CategoryModel::categories($Category);
                 if (empty($ancestor)) {
                     throw new Gdn_UserException("Invalid category ID: {$Category}");
@@ -585,7 +585,14 @@ class CategoriesController extends VanillaController {
             } else {
                 $filterIDs = null;
             }
-            $categoryTree = $this->getFollowed(true, $filterIDs);
+
+            // FIX: Show all followed nested categories only
+            // https://github.com/topcoder-platform/forums/issues/177
+            if($filterIDs && count($filterIDs) > 0) {
+                $categoryTree = $this->getFollowed(true, $filterIDs);
+            } else {
+                $categoryTree = [];
+            }
         } else {
             $categoryTree = $this->getCategoryTree(
                 $Category ?: -1,
