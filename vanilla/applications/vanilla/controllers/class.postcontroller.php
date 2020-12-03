@@ -182,11 +182,11 @@ class PostController extends VanillaController {
             $this->Form->removeFormValue('DiscussionID');
             // Make sure a group discussion doesn't get announced outside the groups category.
             $formAnnounce = $this->Form->_FormValues['Announce'];
-            if (isset($formAnnounce) && $formAnnounce === '1') {
-                if (isset($this->Data['Group'])) {
-                    $this->Form->setFormValue('Announce', '2');
-                }
-            }
+            // if (isset($formAnnounce) && $formAnnounce === '1') {
+            // if (isset($this->Data['Group'])) {
+            //     $this->Form->setFormValue('Announce', '2');
+            // }
+            // }
             // Permission to add.
             if ($this->Category) {
                 $this->categoryPermission($this->Category, 'Vanilla.Discussions.Add');
@@ -410,7 +410,9 @@ class PostController extends VanillaController {
 
         $this->setData('Breadcrumbs', $breadcrumbs);
 
-        $this->setData('_AnnounceOptions', $this->announceOptions());
+        // FIX: Hide Announce options
+        // https://github.com/topcoder-platform/forums/issues/124
+        // $this->setData('_AnnounceOptions', $this->announceOptions());
 
         // Render view (posts/discussion.php or post/preview.php)
         $this->render();
