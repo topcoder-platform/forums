@@ -1172,8 +1172,12 @@ class DiscussionModel extends Gdn_Model {
         $categoryID = val('d.CategoryID', $wheres, 0);
 
         // Get the discussion IDs of the announcements.
-        $cacheKey = $this->getAnnouncementCacheKey($categoryID);
-        $this->SQL->cache($cacheKey);
+        // Vanilla caches announcement for one category only
+        // FIX: https://github.com/topcoder-platform/forums/issues/258
+        if( !is_array($categoryID) && $categoryID > 0) {
+            $cacheKey = $this->getAnnouncementCacheKey($categoryID);
+            $this->SQL->cache($cacheKey);
+        }
         $this->SQL->select('d.DiscussionID')
             ->from('Discussion d');
 
