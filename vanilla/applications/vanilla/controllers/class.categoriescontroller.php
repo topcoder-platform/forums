@@ -574,6 +574,7 @@ class CategoriesController extends VanillaController {
 
         if ($this->data('Followed')) {
             if ($Category) {
+                // It also returns the selected category
                 $ancestor = CategoryModel::categories($Category);
                 if (empty($ancestor)) {
                     throw new Gdn_UserException("Invalid category ID: {$Category}");
@@ -584,7 +585,14 @@ class CategoriesController extends VanillaController {
             } else {
                 $filterIDs = null;
             }
-            $categoryTree = $this->getFollowed(true, $filterIDs);
+
+            // FIX: Show all followed nested categories only
+            // https://github.com/topcoder-platform/forums/issues/177
+            if($filterIDs && count($filterIDs) > 0) {
+                $categoryTree = $this->getFollowed(true, $filterIDs);
+            } else {
+                $categoryTree = [];
+            }
         } else {
             $categoryTree = $this->getCategoryTree(
                 $Category ?: -1,
