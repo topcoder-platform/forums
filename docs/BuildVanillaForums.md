@@ -37,7 +37,10 @@ Install composer:
 1.Clone or download a repo. Go to the root folder: 
 cd `Vanilla_3.3`
 
-2.Run the command to install dependencies and build:
+2.The 'forum' repo overrides Vanilla files. 
+Copy 'forums/vanilla' to `Vanilla_3.3`.
+
+3.Run the command to install dependencies and build:
 `composer install or php composer.phar install`
 
 You should see output 
@@ -45,7 +48,7 @@ You should see output
 ![./images/build.png](./images/build.png)
 
 
-3.Copy all files from the 'dist' folder to 'forums/vanilla/dist' (the 'forums' repo). 
+4.Copy all files from the 'dist' folder to 'forums/vanilla/dist' (the 'forums' repo). 
 
 Notes:
 The first time you run this, it may take a while. Subsequent runs should be faster, but if you are constantly 
