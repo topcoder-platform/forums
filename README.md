@@ -29,3 +29,7 @@ installation.These variables are mandatory.
 ## Setup Vanilla Forums 
 
 Go to [Setup Vanilla Forums](./docs/SetupVanillaForums.md) to complete installation.
+
+## Build Vanilla Forums
+
+Go to [Build Vanilla Forums](./docs/BuildVanillaForums.md) to install dependencies and build assets. 
