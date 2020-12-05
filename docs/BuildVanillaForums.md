@@ -2,7 +2,9 @@
 
 Vanilla Forums has pre-built frontend assets (js, css and addons assets).
 
-The full source code is https://github.com/vanilla/vanilla/tree/Vanilla_3.3.
+The full source code of Vanilla  Forums is available as a Git repository:
+
+https://github.com/vanilla/vanilla/tree/Vanilla_3.3.
 
 ## Requirements
 
