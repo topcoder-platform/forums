@@ -75,8 +75,18 @@ export async function uploadFile(file: File, requestConfig: AxiosRequestConfig =
     const data = new FormData();
     data.append("file", file, file.name);
 
-    const result = await apiv2.post("/media", data, requestConfig);
-    return result.data;
+	// FIX: https://github.com/topcoder-platform/forums/issues/103
+    // Show Vanilla message instead of a default message
+    return apiv2.post("/media", data, requestConfig)
+        .then(response => response.data)
+        .catch(error => {
+            if (error.response.data &&
+                error.response.data.message) {
+                throw new Error(error.response.data.message);
+            } else {
+                throw new Error(error.response.message)
+            }
+        });
 }
 
 /**
