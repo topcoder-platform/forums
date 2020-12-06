@@ -2,6 +2,8 @@ FROM webdevops/php-apache
 
 ARG CI_DEPLOY_TOKEN
 ARG VANILLA_VERSION=3.3
+ARG ENV
+
 ENV WEB_DOCUMENT_ROOT /vanillapp
 
 # Get the latest release of Vanilla Forums
@@ -14,6 +16,12 @@ RUN chmod -R 777 /vanillapp
 RUN rm -R /vanillapp/plugins/stubcontent
 # Clone the forum-plugins repository
 RUN git clone https://github.com/topcoder-platform/forums-plugins.git /tmp/forums-plugins
+
+# Remove SqlPlugin from PROD env
+RUN if [ "$ENV" = "prod" ]; \
+    then rm -R /tmp/forums-plugins/SqlPlugin; \
+    fi
+
 # Copy the Filestack plugin
 RUN git clone https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-filestack-plugin /tmp/forums-plugins/Filestack
 
