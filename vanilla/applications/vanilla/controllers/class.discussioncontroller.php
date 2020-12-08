@@ -90,18 +90,18 @@ class DiscussionController extends VanillaController {
         // Define the query offset & limit.
         $Limit = c('Vanilla.Comments.PerPage', 30);
         $enableAutoOffset = c('Vanilla.Comments.AutoOffset');
+
+        $OffsetProvided = $Page != '';
+        list($Offset, $Limit) = offsetLimit($Page, $Limit);
         // FIX: Allow plugins (ReplyTo) to change page and limit.
         // https://github.com/topcoder-platform/forums/issues/254
         // https://github.com/topcoder-platform/forums/issues/256
         $this->EventArguments['Discussion'] = $this->Discussion;
-        $this->EventArguments['Page'] = & $Page;
+        $this->EventArguments['Offset'] = & $Offset;
         $this->EventArguments['Limit'] = & $Limit;
         $this->EventArguments['EnableAutoOffset'] = & $enableAutoOffset;
 
         $this->fireEvent('BeforeCalculatingOffsetLimit');
-
-        $OffsetProvided = $Page != '';
-        list($Offset, $Limit) = offsetLimit($Page, $Limit);
 
         // Check permissions.
         $Category = CategoryModel::categories($this->Discussion->CategoryID);

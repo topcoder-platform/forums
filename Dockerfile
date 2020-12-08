@@ -19,7 +19,7 @@ RUN git clone https://github.com/topcoder-platform/forums-plugins.git /tmp/forum
 
 # Remove SqlPlugin from PROD env
 RUN if [ "$ENV" = "prod" ]; \
-    then rm -R /tmp/forums-plugins/SqlPlugin; \
+    then rm -R /tmp/forums-plugins/DebugPlugin; \
     fi
 
 # Copy the Filestack plugin
