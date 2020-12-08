@@ -359,7 +359,7 @@ class CategoryModel extends Gdn_Model {
         if (!is_array($category)) {
             throw new InvalidArgumentException('Category not found.');
         } elseif ($category['DisplayAs'] !== 'Discussions' && !$isFollowed) {
-            throw new InvalidArgumentException('Category not configured to display as discussions.');
+           // throw new InvalidArgumentException('Category not configured to display as discussions.');
         }
 
         $this->SQL->replace(
