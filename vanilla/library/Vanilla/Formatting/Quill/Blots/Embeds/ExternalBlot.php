@@ -7,6 +7,7 @@
 namespace Vanilla\Formatting\Quill\Blots\Embeds;
 
 use Gdn;
+use Gdn_Upload;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
@@ -113,6 +114,14 @@ class ExternalBlot extends AbstractBlot {
                 } else {
                     return "<p><a href=\"$sanitizedUrl\">$sanitizedUrl</a></p>";
                 }
+            } elseif ($embedType == 'file') {
+                $fileName = $data['name'] ?? "";
+                $size = $data['size'] ?? "";
+                if($fileName && $size) {
+                    $formattedSize = Gdn_Upload::formatFileSize($size,2);
+                    return "<p><a href=\"$sanitizedUrl\">$fileName($formattedSize)</a></p>";
+                }
+
             }
 
             return "<p><a href=\"$sanitizedUrl\">$sanitizedUrl</a></p>";
