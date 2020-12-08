@@ -119,7 +119,7 @@ class ExternalBlot extends AbstractBlot {
                 $size = $data['size'] ?? "";
                 if($fileName && $size) {
                     $formattedSize = Gdn_Upload::formatFileSize($size,2);
-                    return "<p><a href=\"$sanitizedUrl\">$fileName($formattedSize)</a></p>";
+                    return "<p><a href=\"$sanitizedUrl\">$fileName ($formattedSize)</a></p>";
                 }
 
             }
