@@ -121,7 +121,11 @@ class ExternalBlot extends AbstractBlot {
                     $formattedSize = Gdn_Upload::formatFileSize($size,2);
                     return "<p><a href=\"$sanitizedUrl\">$fileName ($formattedSize)</a></p>";
                 }
-
+            } else if($embedType == 'image'){
+                $fileName = $data['name'] ?? "";
+                $height = $data['height'] ? "height=\"".$data['height']."\"":"";
+                $width = $data['width'] ? "width=\"".$data['width']."\"":"";
+                return "<p><a href=\"$sanitizedUrl\"><img $height $width src=\"$sanitizedUrl\" alt=\"$fileName\"></a></p>";
             }
 
             return "<p><a href=\"$sanitizedUrl\">$sanitizedUrl</a></p>";
