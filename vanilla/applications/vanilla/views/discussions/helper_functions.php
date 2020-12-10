@@ -334,11 +334,11 @@ if (!function_exists('NewComments')) :
         if ($discussion->CountUnreadComments === TRUE) {
             $title = htmlspecialchars(t("You haven't read this yet."));
 
-            return ' <strong class="HasNew JustNew NewCommentCount" title="'.$title.'">'.t('new discussion', 'new').'</strong>';
+            return ' <span class="MItem"><strong class="HasNew JustNew NewCommentCount" title="'.$title.'">'.t('new discussion', 'new').'</strong></span>';
         } elseif ($discussion->CountUnreadComments > 0) {
             $title = htmlspecialchars(plural($discussion->CountUnreadComments, "%s new comment since you last read this.", "%s new comments since you last read this."));
 
-            return ' <strong class="HasNew NewCommentCount" title="'.$title.'">'.plural($discussion->CountUnreadComments, '%s new', '%s new plural', bigPlural($discussion->CountUnreadComments, '%s new', '%s new plural')).'</strong>';
+            return ' <span class="MItem"><strong class="HasNew NewCommentCount" title="'.$title.'">'.plural($discussion->CountUnreadComments, '%s new', '%s new plural', bigPlural($discussion->CountUnreadComments, '%s new', '%s new plural')).'</strong><span>';
         }
         return '';
     }

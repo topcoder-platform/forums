@@ -367,7 +367,8 @@ class CategoryModel extends Gdn_Model {
             ['Followed' => $followed],
             ['UserID' => $userID, 'CategoryID' => $categoryID]
         );
-        static::clearUserCache();
+
+        static::clearUserCache($userID);
         Gdn::cache()->remove("Follow_{$userID}");
 
         $result = $this->isFollowed($userID, $categoryID);
