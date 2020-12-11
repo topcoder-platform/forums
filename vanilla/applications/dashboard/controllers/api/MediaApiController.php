@@ -116,7 +116,7 @@ class MediaApiController extends AbstractApiController {
 
         $ext = pathinfo(strtolower($upload->getClientFilename()), PATHINFO_EXTENSION);
         $destination = $this->generateUploadPath($ext, true);
-        $uploadResult = $this->saveUpload($upload, $destination);
+        $uploadResult = $this->saveUpload($upload, $destination, '%s', false , [ 'ClientFileName' => $upload->getClientFilename()]);
         $media['Path'] = $uploadResult['SaveName'];
 
         $id = $this->mediaModel->save($media);
