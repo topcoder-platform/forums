@@ -117,6 +117,9 @@ class ExternalBlot extends AbstractBlot {
             } elseif ($embedType == 'file') {
                 $fileName = $data['name'] ?? "";
                 $size = $data['size'] ?? "";
+                if (function_exists('file_embed_process_url')) {
+                    $sanitizedUrl = file_embed_process_url($sanitizedUrl);
+                }
                 if($fileName && $size) {
                     $formattedSize = Gdn_Upload::formatFileSize($size,2);
                     return "<p><a href=\"$sanitizedUrl\">$fileName ($formattedSize)</a></p>";
