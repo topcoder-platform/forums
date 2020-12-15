@@ -27,25 +27,10 @@ $this->fireEvent('AfterDiscussionTitle');
 $this->fireEvent('AfterPageTitle');
 
 // Write the initial discussion.
-if ($this->data('Page') == 1) {
-    include $this->fetchViewLocation('discussion', 'discussion');
-    echo '</div>'; // close discussion wrap
+include $this->fetchViewLocation('discussion', 'discussion');
+echo '</div>'; // close discussion wrap
+$this->fireEvent('AfterDiscussion');
 
-    $this->fireEvent('AfterDiscussion');
-} else {
-    ?>
-    <div class="Item ItemDiscussion">
-        <div class="Item-BodyWrap">
-            <div class="Item-Body">
-                <?php
-                    Gdn::controller()->fireEvent('Replies');
-                ?>
-            </div>
-        </div>
-    </div>
-    <?php
-        echo '</div>'; // close discussion wrap
-}
 
 echo '<div class="CommentsWrap">';
 

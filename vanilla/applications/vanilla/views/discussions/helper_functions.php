@@ -122,7 +122,8 @@ if (!function_exists('WriteDiscussion')) :
         $category = CategoryModel::categories($discussion->CategoryID);
 
         if ($session->UserID) {
-            $discussionUrl .= '#latest';
+           // FIX: don't navigate to an editor
+           // $discussionUrl .= '#latest';
         }
         $sender->EventArguments['DiscussionUrl'] = &$discussionUrl;
         $sender->EventArguments['Discussion'] = &$discussion;
