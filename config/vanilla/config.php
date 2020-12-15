@@ -181,3 +181,6 @@ $Configuration['Vanilla']['Activity']['SpamLock'] = '120';
 $Configuration['Vanilla']['ActivityComment']['SpamCount'] = '5';
 $Configuration['Vanilla']['ActivityComment']['SpamTime'] = '60';
 $Configuration['Vanilla']['ActivityComment']['SpamLock'] = '120';
+
+// Should users be automatically pushed to the last comment they read in a discussion?
+$Configuration['Vanilla']['Comments']['AutoOffset'] = false;
