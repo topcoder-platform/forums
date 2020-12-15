@@ -181,3 +181,11 @@ $Configuration['Vanilla']['Activity']['SpamLock'] = '120';
 $Configuration['Vanilla']['ActivityComment']['SpamCount'] = '5';
 $Configuration['Vanilla']['ActivityComment']['SpamTime'] = '60';
 $Configuration['Vanilla']['ActivityComment']['SpamLock'] = '120';
+
+// Posting Settings:
+//    Should users be automatically pushed to the last comment they read in a discussion?
+$Configuration['Vanilla']['Comments']['AutoOffset'] = false;
+//    Maximum number of characters allowed in a comment
+$Configuration['Vanilla']['Comment']['MaxLength'] = 16000;
+//    Minimum comment length to discourage short comments
+$Configuration['Vanilla']['Comment']['MinLength'] = 2;

@@ -507,6 +507,9 @@ class DiscussionModel extends Gdn_Model {
             unset($wheres['Announce']);
         }
 
+        if (is_array($wheres)) {
+            $this->SQL->where($wheres);
+        }
 
         foreach ($orderBy as $orderField => $direction) {
             $this->SQL->orderBy($this->addFieldPrefix($orderField), $direction);
