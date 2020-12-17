@@ -785,7 +785,7 @@ if (!function_exists('myDraftsMenuItem')) {
     /**
      *
      *
-     * @param $CountBookmarks
+     * @param $CountDrafts
      * @return string
      */
     function myDraftsMenuItem($CountDrafts) {
