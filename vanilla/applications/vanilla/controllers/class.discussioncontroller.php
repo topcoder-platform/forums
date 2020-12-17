@@ -508,7 +508,8 @@ class DiscussionController extends VanillaController {
 
         // Update the user's bookmark count
         $CountBookmarks = $this->DiscussionModel->setUserBookmarkCount($UserID);
-        $this->jsonTarget('.User-CountBookmarks', (string)$CountBookmarks);
+        $CountBookmarksHtml = myBookmarksMenuItem($CountBookmarks);
+        $this->jsonTarget('#MyBookmarks', $CountBookmarksHtml, 'ReplaceWith');
 
         //  Short circuit if this is an api call.
         if ($this->deliveryType() === DELIVERY_TYPE_DATA) {

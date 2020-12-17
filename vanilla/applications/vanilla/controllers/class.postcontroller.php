@@ -369,6 +369,12 @@ class PostController extends VanillaController {
                 $this->setJson('DiscussionID', $discussionID);
                 $this->setJson('DraftID', $draftID);
 
+                // And update the draft count
+                $DraftModel = new DraftModel();
+                $CountDrafts =  $DraftModel->getCountByUser($session->UserID);
+                $this->setJson('CountDrafts', $CountDrafts);
+                $this->setJson('MyDrafts', t('My Drafts'));
+
                 if (!$preview) {
                     // If the discussion was not a draft
                     if (!$draft) {
@@ -897,8 +903,8 @@ class PostController extends VanillaController {
                         $this->informMessage(sprintf(t('Draft saved at %s'), Gdn_Format::date()));
                     }
                     // And update the draft count
-                    $UserModel = Gdn::userModel();
-                    $CountDrafts = $UserModel->getAttribute($Session->UserID, 'CountDrafts', 0);
+                    $DraftModel = new DraftModel();
+                    $CountDrafts =  $DraftModel->getCountByUser($Session->UserID);
                     $this->setJson('MyDrafts', t('My Drafts'));
                     $this->setJson('CountDrafts', $CountDrafts);
                 }
