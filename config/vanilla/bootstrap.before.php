@@ -746,3 +746,57 @@ if (!function_exists('filtersDropDown')) {
         return $output;
     }
 }
+
+if (!function_exists('filterCountString')) {
+    /**
+     * This function was moved from 'vanilla/applications/vanilla/views/modules/discussionfilter.php'
+     * @param $count
+     * @param string $url
+     * @param array $options
+     * @return string
+     */
+    function filterCountString($count, $url = '', $options = []) {
+        $count = countString($count, $url, $options);
+        return $count != '' ? '<span class="Aside">'.$count.'</span>' : '';
+    }
+}
+
+if (!function_exists('myBookmarksMenuItem')) {
+    /**
+     *
+     *
+     * @param $CountBookmarks
+     * @return string
+     */
+    function myBookmarksMenuItem($CountBookmarks) {
+        if (!Gdn::session()->isValid()) {
+            return '';
+        }
+        $Bookmarked = t('My Bookmarks');
+        $Bookmarked .= FilterCountString($CountBookmarks, '/discussions/UserBookmarkCount');
+        $cssClass = 'MyBookmarks';
+        $cssClass .= Gdn::controller()->RequestMethod == 'bookmarked' ? ' Active' : '';
+        $cssClass .= $CountBookmarks == 0 && Gdn::controller()->RequestMethod != 'bookmarked' ? ' hidden': '';
+        return sprintf('<li id="MyBookmarks" class="%s">%s</li>', $cssClass, anchor(sprite('SpBookmarks').$Bookmarked, '/discussions/bookmarked'));
+    }
+}
+
+if (!function_exists('myDraftsMenuItem')) {
+    /**
+     *
+     *
+     * @param $CountBookmarks
+     * @return string
+     */
+    function myDraftsMenuItem($CountDrafts) {
+        if (!Gdn::session()->isValid()) {
+            return '';
+        }
+        $Drafts = t('My Drafts');
+        $Drafts .= FilterCountString($CountDrafts, '/drafts');
+        $cssClass = 'MyDrafts';
+        $cssClass .= Gdn::controller()->ControllerName == 'draftscontroller' ? ' Active' : '';
+        $cssClass .= $CountDrafts == 0 ? ' hidden': '';
+        return sprintf('<li id="MyDrafts" class="%s">%s</li>', $cssClass, anchor(sprite('SpMyDrafts').$Drafts, '/drafts'));
+    }
+}
