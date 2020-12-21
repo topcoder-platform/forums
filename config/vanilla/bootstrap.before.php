@@ -263,8 +263,8 @@ if (!function_exists('_formatStringCallback')) {
                             // Manually build instead of using userAnchor() because of special 'You' case.
                             if(function_exists('topcoderRatingCssClass') &&
                                 function_exists('topcoderRoleCssStyles')) {
-                                $ratingCssClass = topcoderRatingCssClass($user->Name);
-                                $roleCssClass = topcoderRoleCssStyles($user->Name);
+                                $ratingCssClass = topcoderRatingCssClass($user);
+                                $roleCssClass = topcoderRoleCssStyles($user);
                                 $topcoderStyles =$ratingCssClass.' '.$roleCssClass;
                                 $result = anchor(htmlspecialchars($name), userUrl($user), $topcoderStyles);
                             } else {
@@ -362,13 +362,15 @@ if (!function_exists('checkGroupPermission')) {
     /**
      * Check group permission for the current user
      * @param $groupID
-     * @param null $permission  null - any permission for a group
+     * @param null $category
+     * @param null $permissionCategoryID
+     * @param null $permission null - any permission for a group
      * @param bool $fullMatch
      * @return bool return true if user has a permission
      */
-   function checkGroupPermission($groupID,$permission = null, $fullMatch = true) {
+   function checkGroupPermission($groupID, $category = null , $permissionCategoryID = null , $permission = null, $fullMatch = true) {
        $groupModel = new GroupModel();
-       return $groupModel->checkPermission(Gdn::session()->UserID,$groupID, $permission, $fullMatch);
+       return $groupModel->checkPermission(Gdn::session()->UserID,$groupID, $category,$permissionCategoryID , $permission, $fullMatch);
    }
 }
 
@@ -742,5 +744,59 @@ if (!function_exists('filtersDropDown')) {
         }
 
         return $output;
+    }
+}
+
+if (!function_exists('filterCountString')) {
+    /**
+     * This function was moved from 'vanilla/applications/vanilla/views/modules/discussionfilter.php'
+     * @param $count
+     * @param string $url
+     * @param array $options
+     * @return string
+     */
+    function filterCountString($count, $url = '', $options = []) {
+        $count = countString($count, $url, $options);
+        return $count != '' ? '<span class="Aside">'.$count.'</span>' : '';
+    }
+}
+
+if (!function_exists('myBookmarksMenuItem')) {
+    /**
+     *
+     *
+     * @param $CountBookmarks
+     * @return string
+     */
+    function myBookmarksMenuItem($CountBookmarks) {
+        if (!Gdn::session()->isValid()) {
+            return '';
+        }
+        $Bookmarked = t('My Bookmarks');
+        $Bookmarked .= FilterCountString($CountBookmarks, '/discussions/UserBookmarkCount');
+        $cssClass = 'MyBookmarks';
+        $cssClass .= Gdn::controller()->RequestMethod == 'bookmarked' ? ' Active' : '';
+        $cssClass .= $CountBookmarks == 0 && Gdn::controller()->RequestMethod != 'bookmarked' ? ' hidden': '';
+        return sprintf('<li id="MyBookmarks" class="%s">%s</li>', $cssClass, anchor(sprite('SpBookmarks').$Bookmarked, '/discussions/bookmarked'));
+    }
+}
+
+if (!function_exists('myDraftsMenuItem')) {
+    /**
+     *
+     *
+     * @param $CountDrafts
+     * @return string
+     */
+    function myDraftsMenuItem($CountDrafts) {
+        if (!Gdn::session()->isValid()) {
+            return '';
+        }
+        $Drafts = t('My Drafts');
+        $Drafts .= FilterCountString($CountDrafts, '/drafts');
+        $cssClass = 'MyDrafts';
+        $cssClass .= Gdn::controller()->ControllerName == 'draftscontroller' ? ' Active' : '';
+        $cssClass .= $CountDrafts == 0 ? ' hidden': '';
+        return sprintf('<li id="MyDrafts" class="%s">%s</li>', $cssClass, anchor(sprite('SpMyDrafts').$Drafts, '/drafts'));
     }
 }

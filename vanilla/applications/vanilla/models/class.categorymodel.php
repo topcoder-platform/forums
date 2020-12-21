@@ -359,7 +359,7 @@ class CategoryModel extends Gdn_Model {
         if (!is_array($category)) {
             throw new InvalidArgumentException('Category not found.');
         } elseif ($category['DisplayAs'] !== 'Discussions' && !$isFollowed) {
-            throw new InvalidArgumentException('Category not configured to display as discussions.');
+           // throw new InvalidArgumentException('Category not configured to display as discussions.');
         }
 
         $this->SQL->replace(
@@ -367,7 +367,8 @@ class CategoryModel extends Gdn_Model {
             ['Followed' => $followed],
             ['UserID' => $userID, 'CategoryID' => $categoryID]
         );
-        static::clearUserCache();
+
+        static::clearUserCache($userID);
         Gdn::cache()->remove("Follow_{$userID}");
 
         $result = $this->isFollowed($userID, $categoryID);
@@ -905,7 +906,7 @@ class CategoryModel extends Gdn_Model {
         }
 
         if($groupID && $groupID > 0) {
-           $result = checkGroupPermission($groupID);
+           $result = checkGroupPermission($groupID, $category, $permissionCategoryID,  $permission, $fullMatch);
         } else {
            $result = Gdn::session()->checkPermission($permission, $fullMatch, 'Category', $permissionCategoryID)
                     || Gdn::session()->checkPermission($permission, $fullMatch, 'Category', $categoryID);

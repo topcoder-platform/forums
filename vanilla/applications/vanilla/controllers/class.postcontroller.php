@@ -182,11 +182,11 @@ class PostController extends VanillaController {
             $this->Form->removeFormValue('DiscussionID');
             // Make sure a group discussion doesn't get announced outside the groups category.
             $formAnnounce = $this->Form->_FormValues['Announce'];
-            if (isset($formAnnounce) && $formAnnounce === '1') {
-                if (isset($this->Data['Group'])) {
-                    $this->Form->setFormValue('Announce', '2');
-                }
-            }
+            // if (isset($formAnnounce) && $formAnnounce === '1') {
+            // if (isset($this->Data['Group'])) {
+            //     $this->Form->setFormValue('Announce', '2');
+            // }
+            // }
             // Permission to add.
             if ($this->Category) {
                 $this->categoryPermission($this->Category, 'Vanilla.Discussions.Add');
@@ -369,6 +369,12 @@ class PostController extends VanillaController {
                 $this->setJson('DiscussionID', $discussionID);
                 $this->setJson('DraftID', $draftID);
 
+                // And update the draft count
+                $DraftModel = new DraftModel();
+                $CountDrafts =  $DraftModel->getCountByUser($session->UserID);
+                $this->setJson('CountDrafts', $CountDrafts);
+                $this->setJson('MyDrafts', t('My Drafts'));
+
                 if (!$preview) {
                     // If the discussion was not a draft
                     if (!$draft) {
@@ -410,7 +416,9 @@ class PostController extends VanillaController {
 
         $this->setData('Breadcrumbs', $breadcrumbs);
 
-        $this->setData('_AnnounceOptions', $this->announceOptions());
+        // FIX: Hide Announce options
+        // https://github.com/topcoder-platform/forums/issues/124
+        // $this->setData('_AnnounceOptions', $this->announceOptions());
 
         // Render view (posts/discussion.php or post/preview.php)
         $this->render();
@@ -895,8 +903,8 @@ class PostController extends VanillaController {
                         $this->informMessage(sprintf(t('Draft saved at %s'), Gdn_Format::date()));
                     }
                     // And update the draft count
-                    $UserModel = Gdn::userModel();
-                    $CountDrafts = $UserModel->getAttribute($Session->UserID, 'CountDrafts', 0);
+                    $DraftModel = new DraftModel();
+                    $CountDrafts =  $DraftModel->getCountByUser($Session->UserID);
                     $this->setJson('MyDrafts', t('My Drafts'));
                     $this->setJson('CountDrafts', $CountDrafts);
                 }

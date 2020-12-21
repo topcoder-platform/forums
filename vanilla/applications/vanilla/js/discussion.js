@@ -144,11 +144,15 @@ jQuery(document).ready(function($) {
                 if (json.DraftID != null && json.DraftID != '')
                     $(inpDraftID).val(json.DraftID);
 
-                if (json.MyDrafts != null) {
-                    if (json.CountDrafts != null && json.CountDrafts > 0)
-                        json.MyDrafts += '<span>' + json.CountDrafts + '</span>';
-
-                    $('ul#Menu li.MyDrafts a').html(json.MyDrafts);
+                if (json.MyDrafts != null && json.CountDrafts != null) {
+                    var countMyDraftsHtml = '<span aria-hidden="true" class="Sprite SpMyDrafts"></span> My Drafts';
+                    if(json.CountDrafts > 0) {
+                       countMyDraftsHtml += '<span class="Aside"><span class="Count">' + json.CountDrafts + '</span></span>';
+                       $('li#MyDrafts').removeClass('hidden');
+                    } else {
+                       $('li#MyDrafts').addClass('hidden');
+                    }
+                    $('li#MyDrafts a').html(countMyDraftsHtml);
                 }
 
                 // Remove any old errors from the form

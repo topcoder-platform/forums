@@ -18,15 +18,10 @@ if ($Session->isValid()) {
     $CountDiscussions = $Session->User->CountDiscussions;
     $CountDrafts = $Session->User->CountDrafts;
 }
+// function_exists('filterCountString') was moved to 'bootstrap.before.php' to re-use it
 
-if (!function_exists('FilterCountString')) {
-    function filterCountString($count, $url = '') {
-        $count = countString($count, $url);
-        return $count != '' ? '<span class="Aside">'.$count.'</span>' : '';
-    }
-}
 if (c('Vanilla.Discussions.ShowCounts', true)) {
-    $Bookmarked .= filterCountString($CountBookmarks, '/discussions/UserBookmarkCount');
+    //$Bookmarked .= filterCountString($CountBookmarks, '/discussions/UserBookmarkCount', ['cssclass' => 'User-CountBookmarks']);
     $MyDiscussions .= filterCountString($CountDiscussions);
     $MyDrafts .= filterCountString($CountDrafts);
 }
@@ -50,21 +45,14 @@ if (c('Vanilla.Discussions.ShowCounts', true)) {
             echo '<li class="'.$CssClass.'">'.anchor(sprite('SpAllCategories').' '.t('All Categories', 'Categories'), '/categories').'</li> ';
         }
         ?>
-        <li class="Discussions<?php echo strtolower($Controller->ControllerName) == 'discussionscontroller' && strtolower($Controller->RequestMethod) == 'index' ? ' Active' : ''; ?>"><?php echo Gdn_Theme::link('forumroot', sprite('SpDiscussions').' '.t('Recent Discussions')); ?></li>
-        <?php if ($CountBookmarks > 0 || $Controller->RequestMethod == 'bookmarked') { ?>
-            <li class="MyBookmarks<?php echo $Controller->RequestMethod == 'bookmarked' ? ' Active' : ''; ?>"><?php echo anchor(sprite('SpBookmarks').' '.$Bookmarked, '/discussions/bookmarked'); ?></li>
-            <?php
-        }
-        if (($CountDiscussions > 0 || $Controller->RequestMethod == 'mine') && c('Vanilla.Discussions.ShowMineTab', true)) {
+        <li id="RecentDiscussions" class="Discussions<?php echo strtolower($Controller->ControllerName) == 'discussionscontroller' && strtolower($Controller->RequestMethod) == 'index' ? ' Active' : ''; ?>"><?php echo Gdn_Theme::link('forumroot', sprite('SpDiscussions').' '.t('Recent Discussions')); ?></li>
+        <?php echo myBookmarksMenuItem($CountBookmarks); ?>
+        <?php if (($CountDiscussions > 0 || $Controller->RequestMethod == 'mine') && c('Vanilla.Discussions.ShowMineTab', true)) {
             ?>
             <li class="MyDiscussions<?php echo $Controller->ControllerName == 'discussionscontroller' && $Controller->RequestMethod == 'mine' ? ' Active' : ''; ?>"><?php echo anchor(sprite('SpMyDiscussions').' '.$MyDiscussions, '/discussions/mine'); ?></li>
             <?php
         }
-        if ($CountDrafts > 0 || $Controller->ControllerName == 'draftscontroller') {
-            ?>
-            <li class="MyDrafts<?php echo $Controller->ControllerName == 'draftscontroller' ? ' Active' : ''; ?>"><?php echo anchor(sprite('SpMyDrafts').' '.$MyDrafts, '/drafts'); ?></li>
-            <?php
-        }
+        echo myDraftsMenuItem($CountDrafts);
         $Controller->fireEvent('AfterDiscussionFilters');
         ?>
     </ul>

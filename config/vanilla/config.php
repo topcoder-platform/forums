@@ -8,8 +8,9 @@ $Configuration['Database']['User'] = getenv('MYSQL_ROOT_USER');
 $Configuration['Database']['Password'] = getenv('MYSQL_ROOT_PASSWORD');
 
 // Cache
-$Configuration['Cache']['Enabled'] = getenv('CACHE_ENABLED');
+$Configuration['Cache']['Enabled'] = strtolower(getenv('CACHE_ENABLED')) === "true";
 $Configuration['Cache']['Method'] = getenv('CACHE_METHOD');
+$Configuration['Cache']['Memcached']['Store']=[getenv('MEMCACHED_SERVER')];
 
 // Conversations
 $Configuration['Conversations']['Version'] = '3.0';
@@ -56,14 +57,14 @@ $Configuration['Garden']['Email']['SmtpPassword'] = getenv('MAIL_SMTP_PASSWORD')
 $Configuration['Garden']['Email']['SmtpPort'] = getenv('MAIL_SMTP_PORT');
 $Configuration['Garden']['Email']['SmtpSecurity'] = getenv('MAIL_SMTP_SECURITY');
 $Configuration['Garden']['UpdateToken'] = '105e786dc643fd20143d3c137b593af168560c13';
-$Configuration['Garden']['InputFormatter'] = 'Markdown';
+$Configuration['Garden']['InputFormatter'] = 'Rich';
 $Configuration['Garden']['Version'] = 'Undefined';
 $Configuration['Garden']['CanProcessImages'] = true;
-$Configuration['Garden']['Theme'] = 'topcoder-theme';
-$Configuration['Garden']['MobileTheme'] = 'topcoder-theme';
+$Configuration['Garden']['Theme'] = 'topcoder';
+$Configuration['Garden']['MobileTheme'] = 'topcoder';
 $Configuration['Garden']['Profile']['EditPhotos'] = false;
 $Configuration['Garden']['SystemUserID'] = '1';
-$Configuration['Garden']['MobileInputFormatter'] = 'Markdown';
+$Configuration['Garden']['MobileInputFormatter'] = 'Rich';
 $Configuration['Garden']['AllowFileUploads'] = true;
 $Configuration['Garden']['EditContentTimeout'] = -1;
 $Configuration['Garden']['Profile']['EditPhotos'] = false;
@@ -144,8 +145,6 @@ $Configuration['Vanilla']['Activity']['ShowCommentBody'] = true;
 $Configuration['Vanilla']['EnableCategoryFollowing'] = true;
 $Configuration['Vanilla']['Version'] = '3.0';
 
-// memcached
-$Configuration['memcached']['Store'] = getenv('MEMCACHED_SERVER');
 
 // Initial setup config
 
@@ -182,3 +181,11 @@ $Configuration['Vanilla']['Activity']['SpamLock'] = '120';
 $Configuration['Vanilla']['ActivityComment']['SpamCount'] = '5';
 $Configuration['Vanilla']['ActivityComment']['SpamTime'] = '60';
 $Configuration['Vanilla']['ActivityComment']['SpamLock'] = '120';
+
+// Posting Settings:
+//    Should users be automatically pushed to the last comment they read in a discussion?
+$Configuration['Vanilla']['Comments']['AutoOffset'] = false;
+//    Maximum number of characters allowed in a comment
+$Configuration['Vanilla']['Comment']['MaxLength'] = 16000;
+//    Minimum comment length to discourage short comments
+$Configuration['Vanilla']['Comment']['MinLength'] = 2;
