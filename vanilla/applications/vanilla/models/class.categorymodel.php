@@ -1313,6 +1313,11 @@ class CategoryModel extends Gdn_Model {
                 'CommentID' => $category['LastCommentID']
             ];
 
+            $result["{$category['LastDiscussionCommentsDiscussionID']}"]= [
+                'DiscussionID' => $category['LastDiscussionCommentsDiscussionID'],
+                'UserID' => $category['LastDiscussionCommentsUserID']
+            ];
+
             if (!empty($category['Children'])) {
                 $this->gatherLastIDs($category['Children'], $result);
             }
@@ -1457,6 +1462,191 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Update the latest post info for a category and its ancestors.
+     *
+     * @param int|array|object $discussion
+     * @param int|array|object $comment
+     */
+    public static function updateModifiedDiscussion($discussion) {
+        // Make sure we at least have a discussion to work with.
+        if (is_numeric($discussion)) {
+            $discussion = DiscussionModel::instance()->getID($discussion);
+        }
+        if (!$discussion) {
+            return;
+        }
+        $categoryID = val('CategoryID', $discussion);
+
+        // Discussion-related field values.
+        $cache = static::modifiedDiscussionCacheFields($discussion);
+        $db = static::modifiedDiscussionDBFields($discussion);
+
+        $categories = self::instance()->collection->getAncestors($categoryID, true);
+        foreach ($categories as $row) {
+            $currentCategoryID = val('CategoryID', $row);
+            self::instance()->setField($currentCategoryID, $db);
+            CategoryModel::setCache($currentCategoryID, $cache);
+        }
+    }
+
+    /**
+     * Update the latest post info for a category and its ancestors.
+     *
+     * @param int|array|object $discussion
+     * @param int|array|object $comment
+     */
+    public static function updateModifiedComment($comment) {
+        // Should we attempt to fetch a comment?
+        if (is_numeric($comment)) {
+            $comment = CommentModel::instance()->getID($comment);
+        }
+        $discussionID = val('DiscussionID', $comment);
+        if(!$discussionID) {
+            return;
+        }
+        $discussionModel = new DiscussionModel();
+        $discussion = $discussionModel->getID($discussionID);
+        $categoryID = val('CategoryID', $discussion);
+        // Discussion-related field values.
+        $cache = static::modifiedCommentCacheFields($comment);
+        $db = static::modifiedCommentDBFields($comment);
+
+        $categories = self::instance()->collection->getAncestors($categoryID, true);
+        foreach ($categories as $row) {
+            $currentCategoryID = val('CategoryID', $row);
+            self::instance()->setField($currentCategoryID, $db);
+            CategoryModel::setCache($currentCategoryID, $cache);
+        }
+    }
+
+    /**
+     * Use only for editing a discussion
+     * Build the cached category fields related to recent posts.
+     *
+     * @param array|object $discussion
+     * @param array|object $comment
+     * @return array
+     */
+    private static function modifiedDiscussionCacheFields($discussion)
+    {
+        $result = [
+            'LastDiscussionCommentsUserID' => null,
+            'LastDiscussionCommentsDiscussionID' => null,
+            'LastDiscussionCommentsDate' => null
+        ];
+
+        if ($discussion) {
+            if(val('UpdateUserID', $discussion)) {
+                // Discussion-related field values.
+                $result['LastDiscussionCommentsUserID'] = val('UpdateUserID', $discussion);;
+                $result['LastDiscussionCommentsDiscussionID'] = val('DiscussionID', $discussion);;;
+                $result['LastDiscussionCommentsDate'] = val('DateUpdated', $discussion);;
+            } else {
+                // Discussion-related field values.
+                $result['LastDiscussionCommentsUserID'] = val('InsertUserID', $discussion);;
+                $result['LastDiscussionCommentsDiscussionID'] = val('DiscussionID', $discussion);;;
+                $result['LastDiscussionCommentsDate'] = val('DateInserted', $discussion);;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Use only for a discussion
+     * Build the cached category fields related to recent posts.
+     *
+     * @param array|object $discussion
+     * @param array|object $comment
+     * @return array
+     */
+    private static function modifiedDiscussionDBFields($discussion)
+    {
+        $result = [
+            'LastDiscussionCommentsUserID' => null,
+            'LastDiscussionCommentsDiscussionID' => null,
+            'LastDiscussionCommentsDate' => null
+        ];
+
+        if ($discussion) {
+            if(val('UpdateUserID', $discussion)) {
+                // Discussion-related field values.
+                $result['LastDiscussionCommentsUserID'] = val('UpdateUserID', $discussion);;
+                $result['LastDiscussionCommentsDiscussionID'] = val('DiscussionID', $discussion);;;
+                $result['LastDiscussionCommentsDate'] = val('DateUpdated', $discussion);;
+            } else {
+                // Discussion-related field values.
+                $result['LastDiscussionCommentsUserID'] = val('InsertUserID', $discussion);;
+                $result['LastDiscussionCommentsDiscussionID'] = val('DiscussionID', $discussion);;;
+                $result['LastDiscussionCommentsDate'] = val('DateInserted', $discussion);;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Use only for a comment
+     * Build the cached category fields related to recent comments.
+     *
+     * @param array|object $discussion
+     * @param array|object $comment
+     * @return array
+     */
+    private static function modifiedCommentDBFields($comment)
+    {
+        $result = [
+            'LastDiscussionCommentsUserID' => null,
+            'LastDiscussionCommentsDiscussionID' => null,
+            'LastDiscussionCommentsDate' => null
+        ];
+        if ($comment) {
+            if(val('UpdateUserID', $comment)) {
+                $result['LastDiscussionCommentsUserID'] = val('UpdateUserID', $comment);
+                $result['LastDiscussionCommentsDiscussionID'] = val('DiscussionID', $comment);
+                $result['LastDiscussionCommentsDate'] = val('DateUpdated', $comment);;
+            } else {
+                $result['LastDiscussionCommentsUserID'] = val('InsertUserID', $comment);
+                $result['LastDiscussionCommentsDiscussionID'] = val('DiscussionID', $comment);
+                $result['LastDiscussionCommentsDate'] = val('DateInserted', $comment);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Use only for a comment
+     * Build the cached category fields related to recent posts.
+     *
+     * @param array|object $discussion
+     * @param array|object $comment
+     * @return array
+     */
+    private static function modifiedCommentCacheFields(array $comment)
+    {
+        $result = [
+            'LastDiscussionCommentsUserID' => null,
+            'LastDiscussionCommentsDiscussionID' => null,
+            'LastDiscussionCommentsDate' => null
+        ];
+
+        if ($comment) {
+            if(val('UpdateUserID', $comment)) {
+                $result['LastDiscussionCommentsUserID'] = val('UpdateUserID', $comment);
+                $result['LastDiscussionCommentsDiscussionID'] = val('DiscussionID', $$comment);
+                $result['LastDiscussionCommentsDate'] = val('DateUpdated', $comment);
+            } else {
+                $result['LastDiscussionCommentsUserID'] = val('InsertUserID', $comment);
+                $result['LastDiscussionCommentsDiscussionID'] = val('DiscussionID', $comment);
+                $result['LastDiscussionCommentsDate'] = val('DateInserted', $comment);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Build the cached category fields related to recent posts.
      *
      * @param array|object $discussion
@@ -1489,6 +1679,7 @@ class CategoryModel extends Gdn_Model {
 
     /**
      * Build the database category fields related to recent posts.
+     * Used after inserting a post
      *
      * @param array|object $discussion
      * @param array|object $comment
@@ -1526,6 +1717,7 @@ class CategoryModel extends Gdn_Model {
         $this->gatherLastIDs($categoryTree, $ids);
         $discussionIDs = array_unique(array_column($ids, 'DiscussionID'));
         $commentIDs = array_filter(array_unique(array_column($ids, 'CommentID')));
+        $userIDs = array_filter(array_unique(array_column($ids, 'UserID')));
 
         if (!empty($discussionIDs)) {
             $discussions = $this->SQL->getWhere('Discussion', ['DiscussionID' => $discussionIDs])->resultArray();
@@ -1541,7 +1733,7 @@ class CategoryModel extends Gdn_Model {
             $comments = [];
         }
 
-        $userIDs = [];
+       // $userIDs = [];
         foreach ($ids as $row) {
             if (!empty($row['CommentID']) && !empty($comments[$row['CommentID']]['InsertUserID'])) {
                 $userIDs[] = $comments[$row['CommentID']]['InsertUserID'];
@@ -1549,6 +1741,8 @@ class CategoryModel extends Gdn_Model {
                 $userIDs[] = $discussions[$row['DiscussionID']]['InsertUserID'];
             }
         }
+
+        $userIDs[] = '';
         // Just gather the users into the local cache.
         Gdn::userModel()->getIDs($userIDs);
 
@@ -1564,10 +1758,15 @@ class CategoryModel extends Gdn_Model {
      */
     private function joinRecentInternal(&$categoryTree, $discussions, $comments) {
         foreach ($categoryTree as &$category) {
+            $lastDiscussionCommentsDiscussion = val($category['LastDiscussionCommentsDiscussionID'], $discussions, null);
             $discussion = val($category['LastDiscussionID'], $discussions, null);
             $comment = val($category['LastCommentID'], $comments, null);
 
-            if (!empty($discussion)) {
+            if (!empty($lastDiscussionCommentsDiscussion)) {
+                $category['LastTitle'] = $lastDiscussionCommentsDiscussion['Name'];
+                $category['LastUrl'] = discussionUrl($lastDiscussionCommentsDiscussion, false, '/').'#latest';
+                $category['LastDiscussionUserID'] = $category['LastDiscussionCommentsUserID'];
+            } else if(!empty($discussion)) { //TODO Should be removed later
                 $category['LastTitle'] = $discussion['Name'];
                 $category['LastUrl'] = discussionUrl($discussion, false, '/').'#latest';
                 $category['LastDiscussionUserID'] = $discussion['InsertUserID'];
@@ -1585,6 +1784,11 @@ class CategoryModel extends Gdn_Model {
                 foreach (['Name', 'Email', 'Photo'] as $field) {
                     $category['Last'.$field] = val($field, $user);
                 }
+
+            $lastDiscussionCommentsUser = Gdn::userModel()->getID($category['LastDiscussionCommentsUserID']);
+            foreach (['Name', 'Email', 'Photo'] as $field) {
+                $category['LastDiscussionCommentsUser'.$field] = val($field, $lastDiscussionCommentsUser);
+            }
 
             if (!empty($category['Children'])) {
                 $this->joinRecentInternal($category['Children'], $discussions, $comments);

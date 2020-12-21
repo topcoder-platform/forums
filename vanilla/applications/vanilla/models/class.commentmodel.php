@@ -541,7 +541,7 @@ class CommentModel extends Gdn_Model {
      * @param array $comment
      * @param array $discussion
      */
-    private function notifyNewComment(?array $comment, ?array $discussion) {
+    public function notifyNewComment(?array $comment, ?array $discussion) {
         if ($comment === null || $discussion === null) {
             return;
         }
@@ -563,6 +563,13 @@ class CommentModel extends Gdn_Model {
         $discussionUserID = $discussion["InsertUserID"] ?? null;
         $format = $comment["Format"] ?? null;
 
+        $mediaModel = new MediaModel();
+        $sqlWhere = [
+            'ForeignTable' => 'comment',
+            'ForeignID' => $commentID
+        ];
+        $mediaData = $mediaModel->getWhere($sqlWhere)->resultArray();
+
         // Prepare the notification queue.
         $data = [
             "ActivityType" => "Comment",
@@ -577,6 +584,7 @@ class CommentModel extends Gdn_Model {
             "Data" => [
                 "Name" => $discussion["Name"] ?? null,
                 "Category" => $category["Name"] ?? null,
+                "Media" => $mediaData
             ]
         ];
 
@@ -1357,15 +1365,21 @@ class CommentModel extends Gdn_Model {
             ['DiscussionID' => $DiscussionID, 'UserID' => val('InsertUserID', $Fields)]
         );
 
+        // Update cached modified column info for a category.
+        CategoryModel::updateModifiedComment($Fields);
+
         if ($Insert) {
             // UPDATE COUNT AND LAST COMMENT ON CATEGORY TABLE
             if ($Discussion->CategoryID > 0) {
                 CategoryModel::instance()->incrementLastComment($Fields);
             }
-            $this->notifyNewComment(
-                $Fields ? (array)$Fields : null,
-                $Discussion ? (array)$Discussion : null
-            );
+
+            if(!c('EnabledPlugins.editor', false)) {
+                $this->notifyNewComment(
+                    $Fields ? (array)$Fields : null,
+                    $Discussion ? (array)$Discussion : null
+                );
+            }
         }
     }
 
@@ -1482,6 +1496,20 @@ class CommentModel extends Gdn_Model {
             ->where('c.DiscussionID', $discussionID)
             ->get()->firstRow(DATASET_TYPE_ARRAY);
 
+        $greatestDate = $this->SQL->query(sprintf("select greatest(coalesce(max(c.DateInserted), 0),
+            coalesce(max(c.DateUpdated), 0), coalesce(p.DateUpdated, 0), coalesce(p.DateInserted,0)) as GreatestDate
+            from GDN_Discussion p left join GDN_Comment c on c.DiscussionID = p.DiscussionID where p.DiscussionID = %d",$discussionID))->
+        value('GreatestDate');
+
+        // If comments exist get last user ID taking account DateInserted and DateUpdated
+        $lastUserID = $this->SQL->query(sprintf("SELECT case
+            when coalesce(p.DateUpdated,p.DateInserted) > coalesce(c.DateUpdated,c.DateInserted) then
+                coalesce(p.UpdateUserID, p.InsertUserID)
+            else coalesce(c.UpdateUserID,c.InsertUserID) end as LastUserID from GDN_Comment c
+            join GDN_Discussion p on p.DiscussionID = c.DiscussionID
+            where  c.DiscussionID = %d order by c.DateUpdated desc,c.DateInserted LIMIT 1", $discussionID))->value('LastUserID', false);
+
+
         $this->EventArguments['Discussion'] =& $discussion;
         $this->EventArguments['Counts'] =& $data;
         $this->fireEvent('BeforeUpdateCommentCount');
@@ -1498,6 +1526,8 @@ class CommentModel extends Gdn_Model {
                     ->set('FirstCommentID', $data['FirstCommentID'])
                     ->set('LastCommentID', $data['LastCommentID'])
                     ->set('CountComments', $data['CountComments'])
+                    ->set('LastDiscussionCommentsDate', $greatestDate)
+                    ->set('LastDiscussionCommentsUserID', $lastUserID)
                     ->where('DiscussionID', $discussionID)
                     ->put();
 
@@ -1511,6 +1541,7 @@ class CommentModel extends Gdn_Model {
                     ->put();
             } else {
                 // Update the discussion with null counts.
+                // LastDiscussionCommentsUserID is not changed
                 $this->SQL
                     ->update('Discussion')
                     ->set('CountComments', 0)
@@ -1518,6 +1549,7 @@ class CommentModel extends Gdn_Model {
                     ->set('LastCommentID', null)
                     ->set('DateLastComment', 'DateInserted', false, false)
                     ->set('LastCommentUserID', null)
+                    ->set('LastDiscussionCommentsDate', $greatestDate)
                     ->where('DiscussionID', $discussionID)
                     ->put();
             }

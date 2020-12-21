@@ -60,4 +60,81 @@ if (c('Garden.Installed')) {
     // Delete the records with UserID=0 (Guests) from UserRole table
     // FIX: https://github.com/topcoder-platform/forums/issues/108
     Gdn::sql()->delete('UserRole',['UserID' => 0]);
+
+    // FIX: https://github.com/topcoder-platform/forums/issues/227
+    // Sorting discussions by last date.
+    // The last date can be any of  InsertedDate(discussion), UpdatedDate(discussion), InsertedDate(comment) or UpdatedDate(comment).
+    // The new columns will be added to keep the last date and who made changes.
+    // By default Vanilla uses only DateInserted in calculated columns.
+    // Moreover, the calculated columns (LastCommentID, LastDiscussionID and others) are used in calculations/aggregations.
+    // Don't modified default Vanilla calculated columns.
+    if(!Gdn::structure()->table('Discussion')->columnExists('LastDiscussionCommentsDate')) {
+        Gdn::structure()->table('Discussion')
+            ->column('LastDiscussionCommentsDate', 'datetime', true, ['index', 'index.CategoryPages'])
+            ->column('LastDiscussionCommentsUserID', 'int', true)
+            ->set(false, false);
+        // Step 1. Calculate the last date for discussions.
+        $query = "UPDATE GDN_Discussion p
+            SET p.LastDiscussionCommentsDate = (SELECT greatest(COALESCE(MAX(c.DateInserted), 0), COALESCE(MAX(c.DateUpdated), 0), COALESCE(p.DateUpdated, 0), COALESCE(p.DateInserted,0))
+            FROM GDN_Comment c WHERE p.DiscussionID = c.DiscussionID)";
+        Gdn::sql()->query($query);
+
+        // Step 2. Update discussions with comments.
+        $query = "UPDATE GDN_Discussion p
+            SET p.LastDiscussionCommentsUserID = (
+                SELECT CASE
+                           WHEN COALESCE(p.DateUpdated,p.DateInserted) > COALESCE(c.DateUpdated,c.DateInserted) THEN
+                               COALESCE(p.UpdateUserID, p.InsertUserID)
+                           ELSE COALESCE(c.UpdateUserID,c.InsertUserID) END AS LastUserID FROM GDN_Comment c
+                WHERE  c.DiscussionID =  p.DiscussionID ORDER BY  c.DateUpdated DESC,c.DateInserted DESC LIMIT 1)";
+        Gdn::sql()->query($query);
+
+        // Step 3. Update discussions without comments.
+        $query ="UPDATE GDN_Discussion p
+            SET p.LastDiscussionCommentsUserID = COALESCE(p.UpdateUserID,p.InsertUserID)
+            WHERE  p.LastDiscussionCommentsUserID IS NULL";
+        Gdn::sql()->query($query);
+    }
+
+    // Sorting categories by the last date
+    // https://github.com/topcoder-platform/forums/issues/227
+    if(!Gdn::structure()->table('Category')->columnExists('LastDiscussionCommentsUserID')) {
+        Gdn::structure()->table('Category')
+            ->column('LastDiscussionCommentsUserID', 'int', true)
+            ->column('LastDiscussionCommentsDiscussionID', 'int', true)
+            ->column('LastDiscussionCommentsDate', 'datetime', true)
+            ->set(false, false);
+
+        // Step1. Update categories with type 'discussions':
+        $query = "UPDATE GDN_Category c
+            SET c.LastDiscussionCommentsDate = (SELECT MAX(d.LastDiscussionCommentsDate)FROM GDN_Discussion d WHERE  d.CategoryID =  c.CategoryID),
+            c.LastDiscussionCommentsUserID = (SELECT d.LastDiscussionCommentsUserID FROM GDN_Discussion d
+            WHERE  d.CategoryID =  c.CategoryID ORDER BY  d.LastDiscussionCommentsDate DESC limit 1),
+            c.LastDiscussionCommentsDiscussionID = (SELECT d.DiscussionID FROM GDN_Discussion d
+            WHERE  d.CategoryID =  c.CategoryID ORDER BY  d.LastDiscussionCommentsDate DESC limit 1)";
+        Gdn::sql()->query($query);
+
+
+        // Step2. Update all ancestor categories.
+        // The MAX category depth is 4 for challenges
+        $ancestorQuery = "UPDATE GDN_Category pc, (
+            SELECT  c1.ParentCategoryID AS ParentCategoryID, c1.LastDiscussionCommentsDate, c1.LastDiscussionCommentsUserID, c1.LastDiscussionCommentsDiscussionID 
+            FROM GDN_Category c1 inner join (SELECT c.ParentCategoryID, MAX(c.LastDiscussionCommentsDate) AS LastDiscussionCommentsDate FROM GDN_Category c 
+            GROUP BY c.ParentCategoryID) c2 on c1.ParentCategoryID = c2.ParentCategoryID AND c1.LastDiscussionCommentsDate = c2.LastDiscussionCommentsDate) c3
+            SET pc.LastDiscussionCommentsDiscussionID = c3.LastDiscussionCommentsDiscussionID, pc.LastDiscussionCommentsUserID = c3.LastDiscussionCommentsUserID,
+            pc.LastDiscussionCommentsDate = c3.LastDiscussionCommentsDate
+            WHERE pc.CategoryID = c3.ParentCategoryID AND pc.Depth = %d";
+
+        for ($i = 3; $i > -1; $i--) {
+            Gdn::sql()->query(sprintf($ancestorQuery, $i));
+        }
+
+        //Step 3. Update categories without discussions.
+        $emptyAncestorQuery = "UPDATE GDN_Category p
+            SET p.LastDiscussionCommentsDate = COALESCE(p.DateUpdated, p.DateInserted)
+            WHERE p.LastDiscussionCommentsDate IS NULL && p.LastDiscussionCommentsUserID IS NULL  &&
+            p.LastDiscussionCommentsDiscussionID IS NULL";
+        Gdn::sql()->query($emptyAncestorQuery);
+    }
+
 }

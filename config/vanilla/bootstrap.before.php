@@ -417,13 +417,7 @@ if (!function_exists('sortsDropDown')) {
      */
     function sortsDropDown($baseUrl, array $filters = [], $extraClasses = '', $default = null, $defaultUrl = null, $label = 'Sort') {
         $links = [];
-        $active = paramPreference(
-            'sort',
-            'CategorySort',
-            null,
-            null,
-            false
-        );
+        $active =  Gdn::session()->getPreference('CategorySort', null);
         // Translate filters into links.
         foreach ($filters as $filter) {
             // Make sure we have the bare minimum: a label and a URL parameter.
@@ -486,8 +480,7 @@ if (!function_exists('categorySorts')) {
             return;
         }
 
-        $baseUrl = Gdn::request()->getFullPath();
-
+        $baseUrl = preg_replace('/\?.*/', '',  Gdn::request()->getFullPath());
         $transientKey = Gdn::session()->transientKey();
         $filters = [
             [
@@ -505,11 +498,7 @@ if (!function_exists('categorySorts')) {
             ]
         ];
 
-        $defaultParams = ['TransientKey' => $transientKey];
-        if (Gdn::request()->get('sort')) {
-            $defaultParams['sort'] = Gdn::request()->get('sort');
-        }
-
+        $defaultParams = [];
         if (!empty($defaultParams)) {
             $defaultUrl = $baseUrl.'?'.http_build_query($defaultParams);
         } else {
@@ -539,9 +528,8 @@ if (!function_exists('discussionSorts')) {
             return;
         }
 
-        $baseUrl = Gdn::request()->getFullPath();
+        $baseUrl = preg_replace('/\?.*/', '',  Gdn::request()->getFullPath());
         $transientKey = Gdn::session()->transientKey();
-
         $filters = [
             [
                 'name' => t('New'),
@@ -558,11 +546,7 @@ if (!function_exists('discussionSorts')) {
         ];
 
 
-        $defaultParams = ['save' => 1, 'TransientKey' => $transientKey];
-        if (Gdn::request()->get('sort')) {
-            $defaultParams['sort'] = '';
-        }
-
+        $defaultParams = [];
         if (!empty($defaultParams)) {
             $defaultUrl = $baseUrl.'?'.http_build_query($defaultParams);
         } else {
@@ -595,7 +579,7 @@ if (!function_exists('discussionFilters')) {
             return;
         }
 
-        $baseUrl =  Gdn::request()->getFullPath();
+        $baseUrl = preg_replace('/\?.*/', '',  Gdn::request()->getFullPath());
         $transientKey = Gdn::session()->transientKey();
         $filters = [
             [
@@ -612,11 +596,7 @@ if (!function_exists('discussionFilters')) {
             ]
         ];
 
-        $defaultParams = ['save' => 1, 'TransientKey' => $transientKey];
-        if (Gdn::request()->get('followed')) {
-            $defaultParams['followed'] = '';
-        }
-
+        $defaultParams = [];
         if (!empty($defaultParams)) {
             $defaultUrl = $baseUrl.'?'.http_build_query($defaultParams);
         } else {
@@ -650,7 +630,7 @@ if (!function_exists('categoryFilters')) {
             return;
         }
 
-        $baseUrl = Gdn::request()->getFullPath();
+        $baseUrl = preg_replace('/\?.*/', '',  Gdn::request()->getFullPath());
         $transientKey = Gdn::session()->transientKey();
         $filters = [
             [
@@ -668,11 +648,7 @@ if (!function_exists('categoryFilters')) {
             ]
         ];
 
-        $defaultParams = ['save' => 1, 'TransientKey' => $transientKey];
-        if (Gdn::request()->get('followed')) {
-            $defaultParams['followed'] = '';
-        }
-
+        $defaultParams = [];
         if (!empty($defaultParams)) {
             $defaultUrl = $baseUrl.'?'.http_build_query($defaultParams);
         } else {
@@ -714,13 +690,7 @@ if (!function_exists('filtersDropDown')) {
 
         if (c('Vanilla.EnableCategoryFollowing')) {
             $links = [];
-            $active = paramPreference(
-                'followed',
-                'FollowedCategories',
-                'Vanilla.SaveFollowingPreference',
-                null,
-                false
-            );
+            $active = Gdn::session()->getPreference('FollowedCategories', null);
 
             // Translate filters into links.
             foreach ($filters as $filter) {

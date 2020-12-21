@@ -26,7 +26,7 @@ class DiscussionModel extends Gdn_Model {
     const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
 
     /** @var string Default column to order by. */
-    const DEFAULT_ORDER_BY_FIELD = 'DateLastComment';
+    const DEFAULT_ORDER_BY_FIELD = 'LastDiscussionCommentsDate';
 
     /** @var string The filter key for clearing-type filters. */
     const EMPTY_FILTER_KEY = 'none';
@@ -64,8 +64,8 @@ class DiscussionModel extends Gdn_Model {
     protected static $allowedSorts = [
         'hot' => ['key' => 'hot', 'name' => 'Hot', 'orderBy' => ['DateLastComment' => 'desc']],
         'top' => ['key' => 'top', 'name' => 'Top', 'orderBy' => ['Score' => 'desc', 'DateInserted' => 'desc']],
-        'new' => ['key' => 'new', 'name' => 'New', 'orderBy' => ['DateInserted' => 'desc']],
-        'old' => ['key' => 'old', 'name' => 'Old', 'orderBy' => ['DateInserted' => 'asc']]
+        'new' => ['key' => 'new', 'name' => 'New', 'orderBy' => ['LastDiscussionCommentsDate' => 'desc']],
+        'old' => ['key' => 'old', 'name' => 'Old', 'orderBy' => ['LastDiscussionCommentsDate' => 'asc']]
     ];
 
     /**
@@ -379,6 +379,8 @@ class DiscussionModel extends Gdn_Model {
             ->select('d.InsertUserID', '', 'FirstUserID')
             ->select('d.DateInserted', '', 'FirstDate')
             ->select('d.DateLastComment', '', 'LastDate')
+            ->select('d.LastDiscussionCommentsDate', '', 'LastDiscussionCommentsDate')
+            ->select('d.LastDiscussionCommentsUserID', '', 'LastDiscussionCommentsUserID')
             ->select('d.LastCommentUserID', '', 'LastUserID')
             ->from('Discussion d');
 
@@ -392,7 +394,12 @@ class DiscussionModel extends Gdn_Model {
                 ->select('lcu.Name', '', 'LastName')
                 ->select('lcu.Photo', '', 'LastPhoto')
                 ->select('lcu.Email', '', 'LastEmail')
-                ->join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left')// Last comment user
+                ->join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left')// Last comment inserted by user
+
+                ->select('lcu1.Name', '', 'LastDiscussionCommentsUserName')
+                ->select('lcu1.Photo', '', 'LastDiscussionCommentsUserPhoto')
+                ->select('lcu1.Email', '', 'LastDiscussionCommentsUserEmail')
+                ->join('User lcu1', 'd.LastDiscussionCommentsUserID = lcu1.UserID', 'left')// Last post/comment inserted/edited by user
 
                 ->select('ca.Name', '', 'Category')
                 ->select('ca.UrlCode', '', 'CategoryUrlCode')
@@ -519,7 +526,7 @@ class DiscussionModel extends Gdn_Model {
         $this->addDiscussionColumns($data);
 
         // Join in the users.
-        Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID']);
+        Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID', 'LastDiscussionCommentsUserID']);
         CategoryModel::joinCategories($data);
 
         if (c('Vanilla.Views.Denormalize', false)) {
@@ -787,7 +794,7 @@ class DiscussionModel extends Gdn_Model {
 
         // Join in users and categories.
         if ($expand) {
-            Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID']);
+            Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID', 'LastDiscussionCommentsUserID']);
             CategoryModel::joinCategories($data);
         }
 
@@ -872,7 +879,7 @@ class DiscussionModel extends Gdn_Model {
 
         $this->SQL->limit($limit, $offset);
 
-        $this->EventArguments['SortField'] = c('Vanilla.Discussions.SortField', 'd.DateLastComment');
+        $this->EventArguments['SortField'] = c('Vanilla.Discussions.SortField', 'd.LastDiscussionCommentsDate');
         $this->EventArguments['SortDirection'] = c('Vanilla.Discussions.SortDirection', 'desc');
         $this->EventArguments['Wheres'] = &$wheres;
         $this->fireEvent('BeforeGetUnread'); // @see 'BeforeGetCount' for consistency in results vs. counts
@@ -889,7 +896,7 @@ class DiscussionModel extends Gdn_Model {
 
         // Get sorting options from config
         $sortField = $this->EventArguments['SortField'];
-        if (!in_array($sortField, ['d.DiscussionID', 'd.DateLastComment', 'd.DateInserted'])) {
+        if (!in_array($sortField, ['d.DiscussionID', 'd.LastDiscussionCommentsDate', 'd.DateInserted'])) {
             trigger_error("You are sorting discussions by a possibly sub-optimal column.", E_USER_NOTICE);
         }
 
@@ -914,7 +921,7 @@ class DiscussionModel extends Gdn_Model {
         $this->addDiscussionColumns($data);
 
         // Join in the users.
-        Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID']);
+        Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID', 'LastDiscussionCommentsUserID']);
         CategoryModel::joinCategories($data);
 
         if (c('Vanilla.Views.Denormalize', false)) {
@@ -1041,7 +1048,7 @@ class DiscussionModel extends Gdn_Model {
         }
 
         // Allow for discussions to be archived
-        $dateLastCommentTimestamp = Gdn_Format::toTimestamp($discussion->DateLastComment);
+        $dateLastCommentTimestamp = Gdn_Format::toTimestamp($discussion->LastDiscussionCommentsDate);
         if ($dateLastCommentTimestamp && $dateLastCommentTimestamp <= $archiveTimestamp) {
             $discussion->Closed = '1';
             if ($discussion->CountCommentWatch) {
@@ -1061,7 +1068,7 @@ class DiscussionModel extends Gdn_Model {
             $discussion->Read = !(bool)$discussion->CountUnreadComments;
             if ($category && !is_null($category['DateMarkedRead'])) {
                 // If the category was marked explicitly read at some point, see if that applies here
-                if ($category['DateMarkedRead'] > $discussion->DateLastComment) {
+                if ($category['DateMarkedRead'] > $discussion->LastDiscussionCommentsDate) {
                     $discussion->Read = true;
                 }
 
@@ -1133,7 +1140,7 @@ class DiscussionModel extends Gdn_Model {
         if ($exclude) {
             $archiveDate = Gdn::config('Vanilla.Archive.Date');
             if ($archiveDate) {
-                $sql->where('d.DateLastComment >', $archiveDate);
+                $sql->where('d.LastDiscussionCommentsDate >', $archiveDate);
             }
         }
     }
@@ -1283,7 +1290,7 @@ class DiscussionModel extends Gdn_Model {
             $this->addDenormalizedViews($data);
         }
 
-        Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID']);
+        Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID', 'LastDiscussionCommentsUserID']);
         CategoryModel::joinCategories($data);
 
         // Prep and fire event
@@ -1358,7 +1365,9 @@ class DiscussionModel extends Gdn_Model {
             ->select('d2.InsertUserID', '', 'FirstUserID')
             ->select('d2.DateInserted', '', 'FirstDate')
             ->select('d2.DateLastComment', '', 'LastDate')
+            ->select('d2.LastDiscussionCommentsDate', '', 'LastDiscussionCommentsDate')
             ->select('d2.LastCommentUserID', '', 'LastUserID')
+            ->select('d2.LastDiscussionCommentsUserID', '', 'LastDiscussionCommentsUserID')
             ->from('Discussion d')
             ->join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
             ->where('d.InsertUserID', $userID)
@@ -1427,7 +1436,7 @@ class DiscussionModel extends Gdn_Model {
         $this->addDiscussionColumns($data);
 
         // Join in the users.
-        Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID']);
+        Gdn::userModel()->joinUsers($data, ['FirstUserID', 'LastUserID', 'LastDiscussionCommentsUserID']);
         CategoryModel::joinCategories($data);
 
         if (c('Vanilla.Views.Denormalize', false)) {
@@ -1735,8 +1744,11 @@ class DiscussionModel extends Gdn_Model {
             ->select('w.CountComments', '', 'CountCommentWatch')
             ->select('w.Participated')
             ->select('d.DateLastComment', '', 'LastDate')
+            ->select('d.LastDiscussionCommentsDate', '', 'LastDiscussionCommentsDate')
+            ->select('d.LastDiscussionCommentsUserID', '', 'LastDiscussionCommentsUserID')
             ->select('d.LastCommentUserID', '', 'LastUserID')
             ->select('lcu.Name', '', 'LastName')
+            ->select('ldcu.Name', '', 'LastDiscussionCommentsUserName')
             ->select('iu.Name', '', 'InsertName')
             ->select('iu.Photo', '', 'InsertPhoto')
             ->from('Discussion d')
@@ -1745,6 +1757,7 @@ class DiscussionModel extends Gdn_Model {
             ->join('User iu', 'd.InsertUserID = iu.UserID', 'left')// Insert user
             ->join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left')// Last comment
             ->join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left')// Last comment user
+            ->join('User ldcu', 'ca.LastDiscussionCommentsUserID = ldcu.UserID', 'left')// Last discussion/comment user
             ->where('d.ForeignID', $hash);
 
         if ($type != '') {
@@ -1782,6 +1795,8 @@ class DiscussionModel extends Gdn_Model {
             ->select('w.CountComments', '', 'CountCommentWatch')
             ->select('w.Participated')
             ->select('d.DateLastComment', '', 'LastDate')
+            ->select('d.LastDiscussionCommentsDate', '', 'LastDiscussionCommentsDate')
+            ->select('d.LastDiscussionCommentsUserID', '', 'LastDiscussionCommentsUserID')
             ->select('d.LastCommentUserID', '', 'LastUserID')
             ->from('Discussion d')
             ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$session->UserID, 'left')
@@ -1797,7 +1812,7 @@ class DiscussionModel extends Gdn_Model {
 
         // Join in the users.
         $discussion = [$discussion];
-        Gdn::userModel()->joinUsers($discussion, ['LastUserID', 'InsertUserID']);
+        Gdn::userModel()->joinUsers($discussion, ['LastUserID', 'InsertUserID', 'LastDiscussionCommentsUserID']);
         $discussion = $discussion[0];
 
         if (c('Vanilla.Views.Denormalize', false)) {
@@ -1826,8 +1841,11 @@ class DiscussionModel extends Gdn_Model {
             ->select('w.CountComments', '', 'CountCommentWatch')
             ->select('w.Participated')
             ->select('d.DateLastComment', '', 'LastDate')
+            ->select('d.LastDiscussionCommentsDate', '', 'LastDiscussionCommentsDate')
+            ->select('d.LastDiscussionCommentsUserID', '', 'LastDiscussionCommentsUserID')
             ->select('d.LastCommentUserID', '', 'LastUserID')
             ->select('lcu.Name', '', 'LastName')
+            ->select('ldcu.Name', '', 'LastDiscussionCommentsUserName')
             ->select('iu.Name', '', 'InsertName')
             ->select('iu.Photo', '', 'InsertPhoto')
             ->from('Discussion d')
@@ -1836,6 +1854,7 @@ class DiscussionModel extends Gdn_Model {
             ->join('User iu', 'd.InsertUserID = iu.UserID', 'left')// Insert user
             ->join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left')// Last comment
             ->join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left')// Last comment user
+            ->join('User ldcu', 'ca.LastDiscussionCommentsUserID = ldcu.UserID', 'left')// Last comment user
             ->whereIn('d.DiscussionID', $discussionIDs)
             ->get();
 
@@ -1854,7 +1873,7 @@ class DiscussionModel extends Gdn_Model {
      */
     public static function getSortField() {
         deprecated("getSortField", "getOrderBy");
-        $sortField = c('Vanilla.Discussions.SortField', 'd.DateLastComment');
+        $sortField = c('Vanilla.Discussions.SortField', 'd.LastDiscussionCommentsDate');
         if (c('Vanilla.Discussions.UserSortField')) {
             $sortField = Gdn::session()->getPreference('Discussions.SortField', $sortField);
         }
@@ -1969,6 +1988,7 @@ class DiscussionModel extends Gdn_Model {
     public function save($formPostValues, $settings = false) {
         // Define the primary key in this model's table.
         $this->defineSchema();
+        $sendNewDiscussionNotification = false;
 
         // If the site isn't configured to use categories, don't allow one to be set.
         if (!c('Vanilla.Categories.Use', true)) {
@@ -2039,9 +2059,13 @@ class DiscussionModel extends Gdn_Model {
 
             // $FormPostValues['LastCommentUserID'] = $Session->UserID;
             $formPostValues['DateLastComment'] = $formPostValues['DateInserted'];
+            $formPostValues['LastDiscussionCommentsDate'] = $formPostValues['DateInserted'];
+            $formPostValues['LastDiscussionCommentsUserID'] = $formPostValues['InsertUserID'];
         } else {
             // Add the update fields.
             $this->addUpdateFields($formPostValues);
+            $formPostValues['LastDiscussionCommentsDate'] = $formPostValues['DateUpdated'];
+            $formPostValues['LastDiscussionCommentsUserID'] = $formPostValues['UpdateUserID'];
         }
 
         // Pinned-to-Announce translation
@@ -2223,7 +2247,7 @@ class DiscussionModel extends Gdn_Model {
                     $formPostValues['DiscussionID'] = $discussionID;
 
                     $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
-                    $this->notifyNewDiscussion($discussion);
+                    $sendNewDiscussionNotification = true;
                 }
 
                 // Get CategoryID of this discussion
@@ -2238,13 +2262,27 @@ class DiscussionModel extends Gdn_Model {
                     $this->updateDiscussionCount($storedCategoryID);
                 }
 
+                // Update cached modified discussion info for a category.
+                CategoryModel::updateModifiedDiscussion($discussion);
+
                 $this->calculateMediaAttachments($discussionID, !$insert);
 
                 // Fire an event that the discussion was saved.
                 $this->EventArguments['FormPostValues'] = $formPostValues;
                 $this->EventArguments['Fields'] = $fields;
                 $this->EventArguments['DiscussionID'] = $discussionID;
+                $this->EventArguments['SendNewDiscussionNotification'] = $sendNewDiscussionNotification;
                 $this->fireEvent('AfterSaveDiscussion');
+
+
+                //FIX: https://github.com/topcoder-platform/forums/issues/213
+                // If the plugin is enabled then send notifications after updating MediaTables with discussionID
+                if ($sendNewDiscussionNotification === true) {
+                    if(!c('EnabledPlugins.editor', false)) {
+                        $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
+                        $this->notifyNewDiscussion($discussion);
+                    }
+                }
             }
         }
 
@@ -2288,6 +2326,13 @@ class DiscussionModel extends Gdn_Model {
             $code = "HeadlineFormat.Discussion";
         }
 
+        // FIX: https://github.com/topcoder-platform/forums/issues/213
+        $mediaModel = new MediaModel();
+        $sqlWhere = [
+          'ForeignTable' => 'discussion',
+          'ForeignID' => $discussionID
+        ];
+        $mediaData = $mediaModel->getWhere($sqlWhere)->resultArray();
         $data = [
             "ActivityType" => "Discussion",
             "ActivityUserID" => $insertUserID,
@@ -2301,6 +2346,7 @@ class DiscussionModel extends Gdn_Model {
             "Data" => [
                 "Name" => $name,
                 "Category" => $categoryName,
+                "Media" => $mediaData
             ]
         ];
 
@@ -2455,7 +2501,7 @@ class DiscussionModel extends Gdn_Model {
             $where = '';
 
             if ($exclude && $archiveDate) {
-                $where = 'where d.DateLastComment > :ArchiveDate';
+                $where = 'where d.LastDiscussionCommentsDate > :ArchiveDate';
                 $params[':ArchiveDate'] = $archiveDate;
             }
 
@@ -2752,11 +2798,15 @@ class DiscussionModel extends Gdn_Model {
             ->select('w.UserID', '', 'WatchUserID')
             ->select('w.Participated')
             ->select('d.DateLastComment', '', 'LastDate')
+            ->select('d.LastDiscussionCommentsDate', '', 'LastDiscussionCommentsDate')
+            ->select('d.LastDiscussionCommentsUserID', '', 'LastDiscussionCommentsUserID')
             ->select('d.LastCommentUserID', '', 'LastUserID')
             ->select('lcu.Name', '', 'LastName')
+            ->select('ldcu.Name', '', 'LastDiscussionCommentsUserName')
             ->from('Discussion d')
             ->join('UserDiscussion w', "d.DiscussionID = w.DiscussionID and w.UserID = $userID", 'left')
             ->join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left')// Last comment user
+            ->join('User ldcu', 'd.LastDiscussionCommentsUserID = ldcu.UserID', 'left')// Last discussion/comment user
             ->where('d.DiscussionID', $discussionID)
             ->get();
 
