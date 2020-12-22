@@ -31,6 +31,9 @@ RUN git clone https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-gro
 #Copy the SumoLogic plugin
 RUN git clone https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-sumologic-plugin /tmp/forums-plugins/Sumologic
 
+#Copy the TopcoderEditor plugin
+RUN git clone https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-topcoder-editor-plugin /tmp/forums-plugins/TopcoderEditor
+
 # Copy all plugins to the Vanilla plugins folder
 RUN cp -r /tmp/forums-plugins/. /vanillapp/plugins
 
