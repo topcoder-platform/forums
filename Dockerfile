@@ -48,6 +48,8 @@ RUN composer install --working-dir /vanillapp/plugins/Topcoder
 RUN composer install --working-dir /vanillapp/plugins/Filestack
 # Install Groups dependencies
 RUN composer install --working-dir /vanillapp/plugins/Groups
+# Install TopcoderEditor dependencies
+RUN composer install --working-dir /vanillapp/plugins/TopcoderEditor
 # Copy Vanilla configuration files
 COPY ./config/vanilla/. /vanillapp/conf/.
 # Copy Topcoder Vanilla files
