@@ -446,6 +446,9 @@ class PostController extends VanillaController {
             }
         } else {
             $record = $this->DiscussionModel->getID($discussionID);
+            // FIX: Issues-308: Editor - supporting old and new formats
+            $this->EventArguments['Discussion'] = &$record;
+            $this->fireEvent('BeforeEditDiscussion');
             $this->setData('Discussion', $record, true);
             $this->CategoryID = $this->Discussion->CategoryID;
         }
