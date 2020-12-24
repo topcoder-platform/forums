@@ -1507,7 +1507,7 @@ class CommentModel extends Gdn_Model {
                 coalesce(p.UpdateUserID, p.InsertUserID)
             else coalesce(c.UpdateUserID,c.InsertUserID) end as LastUserID from GDN_Comment c
             join GDN_Discussion p on p.DiscussionID = c.DiscussionID
-            where  c.DiscussionID = %d order by c.DateUpdated desc,c.DateInserted LIMIT 1", $discussionID))->value('LastUserID', false);
+            where  c.DiscussionID = %d order by c.DateUpdated desc,c.DateInserted desc LIMIT 1", $discussionID))->value('LastUserID', false);
 
 
         $this->EventArguments['Discussion'] =& $discussion;
