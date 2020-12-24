@@ -213,9 +213,6 @@ if (!function_exists('writeListItem')):
                             <span class="MItem LastDiscussionTitle">
                                 <?php echo mostRecentString($category); ?>
                             </span>
-                            <span class="MItem LastCommentDate">
-                                <?php echo Gdn_Format::date(val('LastDiscussionCommentsDate', $category)); ?>
-                            </span>
                         <?php endif;
                         if ($writeChildren === 'list'): ?>
                             <div class="ChildCategories">
