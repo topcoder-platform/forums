@@ -1502,12 +1502,14 @@ class CommentModel extends Gdn_Model {
         value('GreatestDate');
 
         // If comments exist get last user ID taking account DateInserted and DateUpdated
-        $lastUserID = $this->SQL->query(sprintf("SELECT case
-            when coalesce(p.DateUpdated,p.DateInserted) > coalesce(c.DateUpdated,c.DateInserted) then
-                coalesce(p.UpdateUserID, p.InsertUserID)
-            else coalesce(c.UpdateUserID,c.InsertUserID) end as LastUserID from GDN_Comment c
-            join GDN_Discussion p on p.DiscussionID = c.DiscussionID
-            where  c.DiscussionID = %d order by c.DateUpdated desc,c.DateInserted desc LIMIT 1", $discussionID))->value('LastUserID', false);
+        $lastUserID = $this->SQL->query(sprintf("SELECT t.LastUserID  FROM (
+            (SELECT coalesce(d.DateUpdated,d.DateInserted) LastDate,  coalesce(d.UpdateUserID, d.InsertUserID) LastUserID
+                from GDN_Discussion d where  d.DiscussionID =  %d)
+            UNION
+            (SELECT coalesce(c.DateUpdated,c.DateInserted) LastDate, coalesce(c.UpdateUserID,c.InsertUserID) LastUserID
+                from GDN_Comment c where  c.DiscussionID =  %d )) 
+        t order by t.LastDate  desc LIMIT 1", $discussionID, $discussionID))->value('LastUserID', null);
+
 
 
         $this->EventArguments['Discussion'] =& $discussion;
@@ -1549,6 +1551,7 @@ class CommentModel extends Gdn_Model {
                     ->set('LastCommentID', null)
                     ->set('DateLastComment', 'DateInserted', false, false)
                     ->set('LastCommentUserID', null)
+                    ->set('LastDiscussionCommentsUserID', $lastUserID)
                     ->set('LastDiscussionCommentsDate', $greatestDate)
                     ->where('DiscussionID', $discussionID)
                     ->put();
