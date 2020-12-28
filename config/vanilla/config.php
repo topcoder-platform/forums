@@ -191,3 +191,9 @@ $Configuration['Vanilla']['Comments']['AutoOffset'] = false;
 $Configuration['Vanilla']['Comment']['MaxLength'] = 16000;
 //    Minimum comment length to discourage short comments
 $Configuration['Vanilla']['Comment']['MinLength'] = 2;
+
+// File handling.
+$Configuration['Garden']['Upload']['MaxFileSize'] = '5M';
+$Configuration['Garden']['Upload']['AllowedFileExtensions'] = [
+    'txt', 'jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'ico', 'zip', 'gz', 'tar.gz', 'tgz', 'psd', 'ai', 'pdf', 'doc', 'xls', 'ppt', 'docx', 'xlsx', 'pptx', 'log', 'rar', '7z', 'xml', 'json'
+];
