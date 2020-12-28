@@ -157,6 +157,8 @@ class PostController extends VanillaController {
 
         // Check permission
         if (isset($this->Discussion)) {
+            $this->setData('ShowPreviewButton', $this->Discussion->Format != 'Rich');
+
             // Make sure that content can (still) be edited.
             $canEdit = DiscussionModel::canEdit($this->Discussion);
             if (!$canEdit) {
@@ -178,6 +180,7 @@ class PostController extends VanillaController {
                 $this->setData('Type', 'Discussion');
             }
         } else {
+            $this->setData('ShowPreviewButton', c('Garden.InputFormatter') != 'Rich');
             // New discussion? Make sure a discussion ID didn't sneak in.
             $this->Form->removeFormValue('DiscussionID');
             // Make sure a group discussion doesn't get announced outside the groups category.
@@ -439,13 +442,14 @@ class PostController extends VanillaController {
         if ($draftID != '') {
             $record = $this->Draft = $this->DraftModel->getID($draftID);
             $this->CategoryID = $this->Draft->CategoryID;
-
+            $this->setData('ShowPreviewButton', $record->Format != 'Rich');
             // Verify this is their draft
             if (val('InsertUserID', $this->Draft) != Gdn::session()->UserID) {
                 throw permissionException();
             }
         } else {
             $record = $this->DiscussionModel->getID($discussionID);
+            $this->setData('ShowPreviewButton', $this->Discussion->Format != 'Rich');
             // FIX: Issues-308: Editor - supporting old and new formats
             $this->EventArguments['Discussion'] = &$record;
             $this->fireEvent('BeforeEditDiscussion');
