@@ -226,6 +226,31 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
     }
 
     /**
+     * Callback for inline images
+     * @param  array $matches
+     * @return string
+     */
+    protected function _doImages_inline_callback($matches) {
+        $whole_match	= $matches[1];
+        $alt_text		= $matches[2];
+        $url			= $matches[3] == '' ? $matches[4] : $matches[3];
+        $title			=& $matches[7];
+        $attr  = $this->doExtraAttributes("img", $dummy =& $matches[8]);
+
+        $alt_text = $this->encodeAttribute($alt_text);
+        $url = $this->encodeURLAttribute($url);
+        $result = "<a href=\"$url\" target=\"_blank\"><img src=\"$url\" alt=\"$alt_text\"";
+        if (isset($title)) {
+            $title = $this->encodeAttribute($title);
+            $result .=  " title=\"$title\""; // $title already quoted
+        }
+        $result .= $attr;
+        $result .= $this->empty_element_suffix;
+        $result .= "</a>";
+        return $this->hashPart($result);
+    }
+
+    /**
      * Callback for inline anchors
      * @param  array $matches
      * @return string

@@ -197,3 +197,5 @@ $Configuration['Garden']['Upload']['MaxFileSize'] = '5M';
 $Configuration['Garden']['Upload']['AllowedFileExtensions'] = [
     'txt', 'jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'ico', 'zip', 'gz', 'tar.gz', 'tgz', 'psd', 'ai', 'pdf', 'doc', 'xls', 'ppt', 'docx', 'xlsx', 'pptx', 'log', 'rar', '7z', 'xml', 'json'
 ];
+// Allow "target='_blank'" for Markdown format;
+$Configuration['Garden']['Html']['BlockedAttributes']='on*, download';
