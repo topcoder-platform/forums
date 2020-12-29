@@ -273,7 +273,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
         //FIX: process url
         $url = $this->processUrl($url);
 
-        $result = "<a href=\"$url\"";
+        $result = "<a href=\"$url\" target=\"_blank\"";
         if (isset($title)) {
             $title = $this->encodeAttribute($title);
             $result .=  " title=\"$title\"";
