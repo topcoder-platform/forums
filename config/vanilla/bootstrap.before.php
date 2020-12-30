@@ -307,12 +307,16 @@ if (!function_exists('dateUpdated')) {
             $dateUpdatedFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($dateUpdated, false, DateTimeFormatter::FORCE_FULL_FORMAT);
             if ($updateUser) {
                 $title = sprintf(t('Edited %s by %s.'), $dateUpdatedFormatted, val('Name', $updateUser));
+                $link = userAnchor($updateUser);
+                $text =  sprintf(t('edited %s by %s'), $dateUpdatedFormatted, $link);
             } else {
                 $title = sprintf(t('Edited %s.'), $dateUpdatedFormatted);
+                $text = sprintf(t('edited %s'), $dateUpdatedFormatted);
             }
 
             $result = ' <span title="'.htmlspecialchars($title).'" class="DateUpdated">'.
-                sprintf(t('edited %s'), $dateUpdatedFormatted).'</span> ';
+                $text.'</span> ';
+
             if ($wrap) {
                 $result = $wrap[0].$result.$wrap[1];
             }
