@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Formatting\DateTimeFormatter;
+
+if (!defined('APPLICATION')) exit();
 
 if (!function_exists('CategoryHeading')):
 
@@ -121,8 +123,9 @@ if (!function_exists('MostRecentString')):
 
             $r .= '<span class="MostRecentOn">';
             $r .= t('on').' ';
+            $dateFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($lastDate, false, DateTimeFormatter::FORCE_FULL_FORMAT);
             $r .= anchor(
-                Gdn_Format::date( $lastDate, 'html'),
+                $dateFormatted,
                 $row['LastUrl'],
                 'CommentDate');
             $r .= '</span>';
