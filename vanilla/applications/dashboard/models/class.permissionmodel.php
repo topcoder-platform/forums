@@ -1477,4 +1477,23 @@ class PermissionModel extends Gdn_Model {
     }
 
 
+    // Original: checkPermission from package/library/core/class.session.php works only with signed-in user
+    // In REST API, we need to check permissions for any user, not only current user
+    public static function checkPermission($allUserPermissions, $permission, $fullMatch = true, $junctionTable = '', $junctionID = '') {
+        if ($junctionID === 'any' || $junctionID === '' || empty($junctionTable) ||
+            c("Garden.Permissions.Disabled.{$junctionTable}")) {
+            $junctionID = null;
+        }
+
+        if (is_array($permission)) {
+            if ($fullMatch) {
+                return $allUserPermissions->hasAll($permission, $junctionID);
+            } else {
+                return $allUserPermissions->hasAny($permission, $junctionID);
+            }
+        } else {
+            return $allUserPermissions->has($permission, $junctionID);
+        }
+    }
+
 }
