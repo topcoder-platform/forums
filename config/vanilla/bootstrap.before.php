@@ -364,17 +364,18 @@ EOT;
 
 if (!function_exists('checkGroupPermission')) {
     /**
-     * Check group permission for the current user
+     * Check group permission for an user
+     * @param $userID
      * @param $groupID
-     * @param null $category
+     * @param null $categoryID
      * @param null $permissionCategoryID
      * @param null $permission null - any permission for a group
      * @param bool $fullMatch
      * @return bool return true if user has a permission
      */
-   function checkGroupPermission($groupID, $category = null , $permissionCategoryID = null , $permission = null, $fullMatch = true) {
+   function checkGroupPermission($userID,$groupID, $categoryID = null , $permissionCategoryID = null , $permission = null, $fullMatch = true) {
        $groupModel = new GroupModel();
-       return $groupModel->checkPermission(Gdn::session()->UserID,$groupID, $category,$permissionCategoryID , $permission, $fullMatch);
+       return $groupModel->checkPermission($userID,$groupID, $categoryID,$permissionCategoryID , $permission, $fullMatch);
    }
 }
 
