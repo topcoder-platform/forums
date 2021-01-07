@@ -5,21 +5,19 @@
     <!--[if !mso]><!-->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!--<![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {literal}
     <style type="text/css">
-       .notification {
-        margin-top: 0px;
-        margin-right: 0px;
-        margin-bottom: 0px;
-        margin-left: 0px;
-        padding-top: 0px !important;
-        padding-right: 0px !important;
-        padding-bottom: 0px !important;
-        padding-left: 0px !important;
+    .notification {
+        margin: 0 0;
+        padding: 0 0;
         font-size: 10pt;
+        font-weight: normal;
+        font-style: normal;
         font-family: "\48\65\6C\76\65\74\69\63\61", "\41\72\69\61", sans-serif;
-        line-height: 14px;
+    }
+    .notification hr {
+        border-top: 1px dashed #8c8b8b;
+        border-bottom: 1px dashed #fff;
     }
 
     .notification table td {
@@ -46,22 +44,63 @@
         text-decoration: none;
     }
 
+    .notification h1, h2, h3, h4, h5, h6 {
+        font-weight: normal;
+        font-style: normal;
+        font-family: "\48\65\6C\76\65\74\69\63\61", "\41\72\69\61", sans-serif;
+        margin: 2px 0;
+        padding: 4px 0;
+    }
+
     .notification h1 {
+        font-size: 14pt;
+        font-weight: 700;
+    }
+
+    .notification h2 {
         font-size: 12pt;
-        line-height: 20px;
+        font-weight: 700;
     }
 
     .notification h3 {
-        font-size: 12pt;
-        line-height: 20px;
+        font-size: 10pt;
+        font-weight: 600;
     }
 
     .notification h4 {
         font-size: 10pt;
+        font-weight: 500;
     }
 
-    .notification p {
+    .notification h5 {
         font-size: 10pt;
+        font-weight: 400;
+    }
+
+    .notification h6 {
+        font-size: 10pt;
+        font-weight: 300;
+    }
+
+    .notification blockquote {
+        padding: 1ex 16px;
+        margin: 1em 0;
+        background: #f3f3f3;
+        background: rgba(0, 0, 0, 0.05);
+        border-left: 4px solid #eee;
+        border-left: 4px solid rgba(0, 0, 0, 0.1);
+        min-width: 200px;
+        overflow-y: initial;
+    }
+    .notification code {
+        padding: 5px 20px;
+        display: block;
+        background-color: #f7f7f7;
+    }
+
+    .notification p, span {
+        padding: 0 0;
+        margin: 0;
     }
     .footer a {
         text-decoration: underline;
@@ -69,7 +108,7 @@
     </style>
     {/literal}
 </head>
-<body style="background-color: {$email.backgroundColor} !important;  color: {$email.textColor};">
+<body style="margin: 0; padding: 0; background-color: {$email.backgroundColor} !important;  color: {$email.textColor};">
 <center>
     <div class="notification" style="max-width: 600px;color: {$email.textColor};background-color: {$email.containerBackgroundColor}">
         <!--[if (gte mso 9)|(IE)]>
@@ -114,7 +153,7 @@
                     <td>
                         {if $email.title}<h1 style='color: {$email.textColor};'>{$email.title}</h1>{/if}
                         {if $email.lead}<p style='color: {$email.textColor}'>{$email.lead}</p>{/if}
-                        <p class="message" style='margin: 0;Margin-bottom: 10px;padding: 0;color: {$email.textColor};text-align: left;line-height: 1.4;margin-top: 10px;
+                        <p class="message" style='margin: 0;Margin-bottom: 10px;padding: 0;color: {$email.textColor};text-align: left;margin-top: 10px;
                                 margin-bottom: 15px'>{$email.message}</p>
                         {if $email.button}
                             <div style="margin: 0;padding: 0; text-align: center">
@@ -151,7 +190,7 @@
                            target="_blank">All Challenges</a>&nbsp;&nbsp;|&nbsp;&nbsp;
                         <a href="https://arena.topcoder.com/" rel=" noopener noreferrer" style="color: {$email.button.textColor};"
                            target="_blank">Competitive Programming</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-                        <a href="https://www.topcoder-dev.com/gigs" rel=" noopener noreferrer" style="color: {$email.button.textColor};"
+                        <a href="https://www.topcoder.com/gigs" rel=" noopener noreferrer" style="color: {$email.button.textColor};"
                            target="_blank" >Gig Work</a>
 			        </span>
                     </td>
