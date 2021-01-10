@@ -443,6 +443,9 @@ class PostController extends VanillaController {
             $record = $this->Draft = $this->DraftModel->getID($draftID);
             $this->CategoryID = $this->Draft->CategoryID;
             $this->setData('ShowPreviewButton', $record->Format != 'Rich');
+
+            // FIX: https://github.com/topcoder-platform/forums/issues/347
+            $this->setData('_CancelUrl', '/drafts');
             // Verify this is their draft
             if (val('InsertUserID', $this->Draft) != Gdn::session()->UserID) {
                 throw permissionException();
@@ -455,6 +458,7 @@ class PostController extends VanillaController {
             $this->fireEvent('BeforeEditDiscussion');
             $this->setData('Discussion', $record, true);
             $this->CategoryID = $this->Discussion->CategoryID;
+            $this->setData('_CancelUrl', discussionUrl($this->data('Discussion')));
         }
 
         // Normalize the edit data.
@@ -466,8 +470,6 @@ class PostController extends VanillaController {
         if (c('Garden.ForceInputFormatter')) {
             $this->Form->removeFormValue('Format');
         }
-
-        $this->setData('_CancelUrl', discussionUrl($this->data('Discussion')));
 
         // Set view and render
         $this->View = 'Discussion';
