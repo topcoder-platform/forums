@@ -95,10 +95,11 @@ class MediaApiController extends AbstractApiController {
      *
      * @param UploadedFile $upload An object representing an uploaded file.
      * @param string $type The upload type (e.g. "image").
-     * @throws Exception if there was an error encountered when saving the upload.
+     * @param bool $doImageProcessing
      * @return array
+     * @throws Exception if there was an error encountered when saving the upload.
      */
-    private function doUpload(UploadedFile $upload, $type) {
+    private function doUpload(UploadedFile $upload, string $type, bool $doImageProcessing) {
         $file = $upload->getFile();
 
         $media = [
@@ -109,9 +110,11 @@ class MediaApiController extends AbstractApiController {
             'ForeignTable' => 'embed'
         ];
 
-        switch ($type) {
-            case self::TYPE_IMAGE:
-                [$media['ImageWidth'], $media['ImageHeight']] = $this->preprocessImage($upload);
+        if($doImageProcessing) {
+            switch ($type) {
+                case self::TYPE_IMAGE:
+                    [$media['ImageWidth'], $media['ImageHeight']] = $this->preprocessImage($upload);
+            }
         }
 
         $ext = pathinfo(strtolower($upload->getClientFilename()), PATHINFO_EXTENSION);
@@ -385,10 +388,12 @@ class MediaApiController extends AbstractApiController {
         $imageExtensions = array_keys(ImageResizer::getExtType());
         /** @var UploadedFile $file */
         $file = $body['file'];
-        $extension = pathinfo($file->getClientFilename(), PATHINFO_EXTENSION) ?? '';
+        $extension = strtolower(pathinfo($file->getClientFilename(), PATHINFO_EXTENSION) ?? '');
         $type = in_array($extension, $imageExtensions) ? self::TYPE_IMAGE : self::TYPE_FILE;
 
-        $row = $this->doUpload($body['file'], $type);
+        $doImageProcessing = $type === self::TYPE_IMAGE && in_array($extension, ['gif', 'jpeg', 'png', 'jpg']);
+
+        $row = $this->doUpload($body['file'], $type, $doImageProcessing);
 
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);

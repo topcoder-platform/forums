@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Formatting\DateTimeFormatter;
+
+if (!defined('APPLICATION')) exit();
 
 if (!function_exists('AdminCheck')) {
     /**
@@ -131,7 +133,7 @@ if (!function_exists('WriteDiscussion')) :
 
         $first = userBuilder($discussion, 'First');
         $last = userBuilder($discussion, 'LastDiscussionComments');
-        $lastDate = val('LastDiscussionComments', $discussion);
+        $lastDate = val('LastDiscussionCommentsDate', $discussion);
         $sender->EventArguments['FirstUser'] = &$first;
         $sender->EventArguments['LastUser'] = &$last;
 
@@ -204,11 +206,13 @@ if (!function_exists('WriteDiscussion')) :
                     $sender->fireEvent('AfterCountMeta');
 
                     if ($discussion->LastDiscussionCommentsUserID != '') {
+                        $dateFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($lastDate, false, DateTimeFormatter::FORCE_FULL_FORMAT);
                         echo ' <span class="MItem LastCommentBy">'.sprintf(t('Most recent by %1$s'), userAnchor($last)).'</span> ';
-                        echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($lastDate, 'html').'</span>';
+                        echo ' <span class="MItem LastCommentDate">'.$dateFormatted.'</span>';
                     } else {
+                        $dateFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($discussion->FirstDate, false, DateTimeFormatter::FORCE_FULL_FORMAT);
                         echo ' <span class="MItem LastCommentBy">'.sprintf(t('Started by %1$s'), userAnchor($first)).'</span> ';
-                        echo ' <span class="MItem LastCommentDate">'.Gdn_Format::date($discussion->FirstDate, 'html');
+                        echo ' <span class="MItem LastCommentDate">'.$dateFormatted;
                         if ($source = val('Source', $discussion)) {
                             echo ' '.sprintf(t('via %s'), t($source.' Source', $source));
                         }

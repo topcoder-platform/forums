@@ -889,9 +889,16 @@ class CategoryModel extends Gdn_Model {
      * @param int|array|object $category The category to check.
      * @param string|array $permission The permission(s) to check.
      * @param bool $fullMatch Whether or not the permission has to be a full match.
+     * @param null $userID if userID is not set then the current user is used by default
      * @return bool Returns **true** if the current user has the permission or **false** otherwise.
      */
-    public static function checkPermission($category, $permission, $fullMatch = true) {
+    public static function checkPermission($category, $permission, $fullMatch = true, $userID = null) {
+        if(!$userID) {
+           $userID = Gdn::session()->UserID;
+           $userPermissions = Gdn::session()->getPermissions();
+        } else {
+           $userPermissions = Gdn::userModel()->getPermissions($userID);
+        }
         if (is_numeric($category)) {
             $category = static::categories($category);
         }
@@ -906,10 +913,10 @@ class CategoryModel extends Gdn_Model {
         }
 
         if($groupID && $groupID > 0) {
-           $result = checkGroupPermission($groupID, $category, $permissionCategoryID,  $permission, $fullMatch);
+           $result = checkGroupPermission($userID, $groupID, $categoryID, $permissionCategoryID,  $permission, $fullMatch);
         } else {
-           $result = Gdn::session()->checkPermission($permission, $fullMatch, 'Category', $permissionCategoryID)
-                    || Gdn::session()->checkPermission($permission, $fullMatch, 'Category', $categoryID);
+           $result = PermissionModel::checkPermission($userPermissions,$permission, $fullMatch, 'Category', $permissionCategoryID)
+                    || PermissionModel::checkPermission($userPermissions,$permission, $fullMatch, 'Category', $categoryID);
         }
 
         return $result;

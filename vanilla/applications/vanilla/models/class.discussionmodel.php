@@ -2575,7 +2575,7 @@ class DiscussionModel extends Gdn_Model {
 
     /**
      * Update a user's discussion count.
-     *
+     * FIX: https://github.com/topcoder-platform/forums/issues/301
      * @param int $userID The user to calculate.
      * @param bool $inc Whether to increment of recalculate from scratch.
      */
@@ -2596,14 +2596,83 @@ class DiscussionModel extends Gdn_Model {
             }
         }
 
-        $countDiscussions = $this->SQL
-            ->select('DiscussionID', 'count', 'CountDiscussions')
-            ->from('Discussion')
-            ->where('InsertUserID', $userID)
-            ->get()->value('CountDiscussions', 0);
+        // FIX: https://github.com/topcoder-platform/forums/issues/301
+        $discussionModel = new DiscussionModel();
+        $countDiscussions = $discussionModel->getMyDiscussionsCount($userID);
 
         // Save the count to the user table
         Gdn::userModel()->setField($userID, 'CountDiscussions', $countDiscussions);
+    }
+
+    // FIX: https://github.com/topcoder-platform/forums/issues/301
+    // Get all Category View Permissions for an user. This method works for any UserID.
+    // We can't use some Vanilla methods due to they are implemented for signed-in user only.
+    // return array|true arrays of CategoryIDs. or true if user has access to all categories
+    private function getCategoryPermissions($userID, $escape = false) {
+        $user = Gdn::userModel()->getID($userID);
+        $isAdmin = val('Admin', $user, false);
+        if ($isAdmin) {
+            $categoryPermissions = true;
+        } elseif (c('Garden.Permissions.Disabled.Category')) {
+            $categoryPermissions = true;
+        } else {
+            // Get Current Tree from cache
+            $categories = CategoryModel::categories();
+
+            // Clone  it to avoid changing category tree for current user
+            $iDs = array_column($categories, 'CategoryID');
+
+            $categoryPermissions = [];
+            // Add User permissions.
+            foreach ($iDs as $cID) {
+                $hasViewPermission = CategoryModel::checkPermission($cID, 'Vanilla.Discussions.View', true, $userID);
+                if ($hasViewPermission) {
+                    $categoryPermissions[] = ($escape ? '@' : '') . $cID;
+                }
+            }
+
+            // Check to see if the user has permission to all categories. This is for speed.
+            $categoryCount = count($categories);
+            if (count($categoryPermissions) == $categoryCount) {
+                $categoryPermissions = true;
+            }
+        }
+        return $categoryPermissions;
+    }
+
+    /**
+     * Calculate count of discussions (respecting user category (group) permissions).
+     * @param $userID
+     * @return array|int|mixed|string|null
+     */
+    public function getMyDiscussionsCount($userID) {
+        // Get permissions.
+        $perms = $this->getCategoryPermissions($userID);
+
+        // No permissions
+        if (!$perms) {
+            return 0;
+        }
+
+        // We have permission to everything.
+        if ($perms === true) {
+            //default query
+            return Gdn::sql()
+                ->select('DiscussionID', 'count', 'CountDiscussions')
+                ->from('Discussion')
+                ->where('InsertUserID', $userID)
+                ->get()->value('CountDiscussions', 0);
+        }
+
+        return Gdn::sql()
+            ->select('d.DiscussionID', 'count', 'CountDiscussions')
+            ->from('Discussion d')
+            ->join('Category c', 'd.CategoryID = c.CategoryID')
+            ->where('c.CategoryID', $perms)
+            ->where('d.InsertUserID', $userID)
+            ->get()
+            ->firstRow()
+            ->CountDiscussions;
     }
 
     /**

@@ -71,7 +71,11 @@ if (!$CancelUrl) {
     if (!property_exists($this, 'Discussion') || !is_object($this->Discussion) || (property_exists($this, 'Draft') && is_object($this->Draft))) {
         echo $this->Form->button('Save Draft', ['class' => 'Button DraftButton']);
     }
-    echo $this->Form->button('Preview', ['class' => 'Button PreviewButton']);
+    $previewClass= 'Button PreviewButton';
+    if($this->data('ShowPreviewButton') == false) {
+        $previewClass .= ' Hidden';
+    }
+    echo $this->Form->button('Preview', ['class' => $previewClass]);
     echo ' '.anchor(t('Edit'), '#', 'Button WriteButton Hidden')."\n";
     $this->fireEvent('AfterFormButtons');
     echo anchor(t('Cancel'), $CancelUrl, 'Button Cancel');

@@ -25,6 +25,7 @@ $Configuration['EnabledPlugins']['recaptcha'] = true;
 $Configuration['EnabledPlugins']['GettingStarted'] = 'GettingStarted';
 $Configuration['EnabledPlugins']['stubcontent'] = false;
 $Configuration['EnabledPlugins']['Topcoder'] = true;
+$Configuration['EnabledPlugins']['TopcoderEditor'] = true;
 $Configuration['EnabledPlugins']['rich-editor'] = true;
 $Configuration['EnabledPlugins']['editor'] = false;
 $Configuration['EnabledPlugins']['emojiextender'] = true;
@@ -57,14 +58,15 @@ $Configuration['Garden']['Email']['SmtpPassword'] = getenv('MAIL_SMTP_PASSWORD')
 $Configuration['Garden']['Email']['SmtpPort'] = getenv('MAIL_SMTP_PORT');
 $Configuration['Garden']['Email']['SmtpSecurity'] = getenv('MAIL_SMTP_SECURITY');
 $Configuration['Garden']['UpdateToken'] = '105e786dc643fd20143d3c137b593af168560c13';
-$Configuration['Garden']['InputFormatter'] = 'Rich';
+$Configuration['Garden']['InputFormatter'] = 'Markdown';
+$Configuration['Garden']['MobileInputFormatter'] = 'Markdown';
+$Configuration['Garden']['ForceInputFormatter'] = false;
 $Configuration['Garden']['Version'] = 'Undefined';
 $Configuration['Garden']['CanProcessImages'] = true;
 $Configuration['Garden']['Theme'] = 'topcoder';
 $Configuration['Garden']['MobileTheme'] = 'topcoder';
 $Configuration['Garden']['Profile']['EditPhotos'] = false;
 $Configuration['Garden']['SystemUserID'] = '1';
-$Configuration['Garden']['MobileInputFormatter'] = 'Rich';
 $Configuration['Garden']['AllowFileUploads'] = true;
 $Configuration['Garden']['EditContentTimeout'] = -1;
 $Configuration['Garden']['Profile']['EditPhotos'] = false;
@@ -189,3 +191,11 @@ $Configuration['Vanilla']['Comments']['AutoOffset'] = false;
 $Configuration['Vanilla']['Comment']['MaxLength'] = 16000;
 //    Minimum comment length to discourage short comments
 $Configuration['Vanilla']['Comment']['MinLength'] = 2;
+
+// File handling.
+$Configuration['Garden']['Upload']['MaxFileSize'] = '5M';
+$Configuration['Garden']['Upload']['AllowedFileExtensions'] = [
+    'txt', 'jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'ico', 'zip', 'gz', 'tar.gz', 'tgz', 'psd', 'ai', 'pdf', 'doc', 'xls', 'ppt', 'docx', 'xlsx', 'pptx', 'log', 'rar', '7z', 'xml', 'json'
+];
+// Allow "target='_blank'" for Markdown format;
+$Configuration['Garden']['Html']['BlockedAttributes']='on*, download';
