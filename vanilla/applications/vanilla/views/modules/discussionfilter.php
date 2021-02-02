@@ -38,14 +38,15 @@ if (c('Vanilla.Discussions.ShowCounts', true)) {
         //      if (c('Vanilla.Categories.ShowTabs')) {
         if (c('Vanilla.Categories.Use')) {
             $CssClass = 'AllCategories';
-            if (strtolower($Controller->ControllerName) == 'categoriescontroller' && in_array(strtolower($Controller->RequestMethod), ['index', 'all'])) {
+            if ((strtolower($Controller->ControllerName) == 'categoriescontroller' && in_array(strtolower($Controller->RequestMethod),['index', 'all']))
+                || strpos(strtolower($Controller->Request->path()) , 'categories') === 0) {
                 $CssClass .= ' Active';
             }
 
             echo '<li class="'.$CssClass.'">'.anchor(sprite('SpAllCategories').' '.t('All Categories', 'Categories'), '/categories').'</li> ';
         }
         ?>
-        <li id="RecentDiscussions" class="Discussions<?php echo strtolower($Controller->ControllerName) == 'discussionscontroller' && strtolower($Controller->RequestMethod) == 'index' ? ' Active' : ''; ?>"><?php echo Gdn_Theme::link('forumroot', sprite('SpDiscussions').' '.t('Recent Discussions')); ?></li>
+        <li id="RecentDiscussions" class="Discussions<?php echo strtolower($Controller->ControllerName) == 'discussionscontroller' && strtolower($Controller->RequestMethod) == 'index' && strpos(strtolower($Controller->Request->path()) , 'discussions') === 0? ' Active' : ''; ?>"><?php echo Gdn_Theme::link('forumroot', sprite('SpDiscussions').' '.t('Recent Discussions')); ?></li>
         <?php echo myBookmarksMenuItem($CountBookmarks); ?>
         <?php if (($CountDiscussions > 0 || $Controller->RequestMethod == 'mine') && c('Vanilla.Discussions.ShowMineTab', true)) {
             ?>
