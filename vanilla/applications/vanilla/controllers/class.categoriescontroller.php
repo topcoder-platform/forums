@@ -327,6 +327,9 @@ class CategoriesController extends VanillaController {
             $this->setData('Breadcrumbs', CategoryModel::getAncestors(val('CategoryID', $category)));
 
             $this->setData('Category', $category, true);
+            // Set CategoryID
+            $categoryID = val('CategoryID', $category);
+            $this->setData('CategoryID', $categoryID, true);
             $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
 
             $this->title(htmlspecialchars(val('Name', $category, '')));
@@ -391,10 +394,6 @@ class CategoriesController extends VanillaController {
                 $this->addJsFile('discussions.js');
                 $this->Head->addRss(categoryUrl($category) . '/feed.rss', $this->Head->title());
             }
-
-            // Set CategoryID
-            $categoryID = val('CategoryID', $category);
-            $this->setData('CategoryID', $categoryID, true);
 
             // Add modules
             $this->addModule('NewDiscussionModule');
@@ -626,6 +625,7 @@ class CategoriesController extends VanillaController {
         $this->addModule('NewDiscussionModule');
         $this->addModule('DiscussionFilterModule');
         $this->addModule('BookmarkedModule');
+        $this->addModule('CategoriesModule');
         $this->addModule($CategoryFollowToggleModule);
         $this->addModule('TagModule');
 
