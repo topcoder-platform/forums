@@ -144,7 +144,8 @@ $Configuration['Routes']['XmZpbGVzdGFjaygvLiopPyQ='] = array (
 $Configuration['Vanilla']['SSO']['Debug'] = true;
 $Configuration['Vanilla']['Activity']['ShowDiscussionBody'] = true;
 $Configuration['Vanilla']['Activity']['ShowCommentBody'] = true;
-$Configuration['Vanilla']['EnableCategoryFollowing'] = true;
+// Allow users to follow categories. Users will be able to see a feed of discussions of only their followed categories.
+$Configuration['Vanilla']['EnableCategoryFollowing'] = false;
 $Configuration['Vanilla']['Version'] = '3.0';
 
 
