@@ -144,6 +144,8 @@ $Configuration['Routes']['XmZpbGVzdGFjaygvLiopPyQ='] = array (
 $Configuration['Vanilla']['SSO']['Debug'] = true;
 $Configuration['Vanilla']['Activity']['ShowDiscussionBody'] = true;
 $Configuration['Vanilla']['Activity']['ShowCommentBody'] = true;
+// Show 'My Discussions' in the left nav
+$Configuration['Vanilla']['Discussions']['ShowMineTab'] = false;
 // Allow users to follow categories. Users will be able to see a feed of discussions of only their followed categories.
 $Configuration['Vanilla']['EnableCategoryFollowing'] = false;
 $Configuration['Vanilla']['Version'] = '3.0';
