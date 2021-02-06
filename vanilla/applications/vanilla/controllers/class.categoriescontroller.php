@@ -29,7 +29,7 @@ class CategoriesController extends VanillaController {
     public $Category;
 
     /** @var bool Value indicating if the category-following filter should be displayed when rendering a view */
-    public $enableFollowingFilter = true;//false;
+    public $enableFollowingFilter = false;
 
     const SORT_LAST_POST = 'new';
     const SORT_OLDEST_POST = 'old';
@@ -264,15 +264,23 @@ class CategoriesController extends VanillaController {
     public function index($categoryIdentifier = '', $page = '0') {
         // Figure out which category layout to choose (Defined on "Homepage" settings page).
         $layout = c('Vanilla.Categories.Layout');
-        $followed = Gdn::request()->get('followed', null);
-        $saveFollowing =  $followed !== null && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
-        if($saveFollowing) {
-            $followed = Gdn::request()->get('followed');
-            Gdn::session()->setPreference('FollowedCategories', $followed);
+
+        if ($this->CategoryModel->followingEnabled()) {
+            $followed = Gdn::request()->get('followed', null);
+            $saveFollowing = $followed !== null && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
+            if ($saveFollowing) {
+                $followed = Gdn::request()->get('followed');
+                Gdn::session()->setPreference('FollowedCategories', $followed);
+            }
+
+            $followed = Gdn::session()->getPreference('FollowedCategories', false);
+            $this->enableFollowingFilter = true;
+        } else {
+            $this->enableFollowingFilter = $followed = false;
         }
 
-        $followed = Gdn::session()->getPreference('FollowedCategories', false);
         $this->setData('Followed', $followed);
+        $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
 
         $sort = Gdn::request()->get('sort', null);
         $saveSorting = $sort !== null && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
@@ -283,13 +291,11 @@ class CategoriesController extends VanillaController {
         $this->setData('CategorySort', $sort);
 
         if ($categoryIdentifier == '') {
-            $this->enableFollowingFilter = true;
             $this->fireEvent('EnableFollowingFilter', [
                 'CategoryIdentifier' => $categoryIdentifier,
                 'EnableFollowingFilter' => &$this->enableFollowingFilter
             ]);
-            $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
-            switch ($layout) {
+             switch ($layout) {
                 case 'mixed':
                     $this->View = 'discussions';
                     $this->discussions();
@@ -316,12 +322,14 @@ class CategoriesController extends VanillaController {
 
             Gdn_Theme::section($category->CssClass);
 
-            // The view filter is shown always if category type != 'discussions'
-            $this->enableFollowingFilter = strtolower( val('DisplayAs', $category, '')) != 'discussions';
-            $this->fireEvent('EnableFollowingFilter', [
-                'CategoryIdentifier' => $categoryIdentifier,
-                'EnableFollowingFilter' => &$this->enableFollowingFilter
-            ]);
+            if($this->CategoryModel->followingEnabled()) {
+                // The view filter is shown always if category type != 'discussions'
+                $this->enableFollowingFilter = strtolower(val('DisplayAs', $category, '')) != 'discussions';
+                $this->fireEvent('EnableFollowingFilter', [
+                    'CategoryIdentifier' => $categoryIdentifier,
+                    'EnableFollowingFilter' => &$this->enableFollowingFilter
+                ]);
+            }
 
             // Load the breadcrumbs.
             $this->setData('Breadcrumbs', CategoryModel::getAncestors(val('CategoryID', $category)));

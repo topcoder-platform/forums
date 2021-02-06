@@ -123,8 +123,7 @@ class DiscussionsController extends VanillaController {
         $this->setData('Breadcrumbs', [['Name' => t('Recent Discussions'), 'Url' => '/discussions']]);
 
         $categoryModel = new CategoryModel();
-        //FIX: the module is always enabled to show the view filter
-        $followingEnabled = true;//$categoryModel->followingEnabled();
+        $followingEnabled = $categoryModel->followingEnabled();
         if ($followingEnabled) {
             $followed = Gdn::request()->get('followed', null);
             $saveFollowing =  Gdn::request()->get('followed') !== null && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
@@ -134,9 +133,11 @@ class DiscussionsController extends VanillaController {
             if ($this->SelfUrl === "discussions") {
                 $this->enableFollowingFilter = true;
             }
+            $followed = Gdn::session()->getPreference('FollowedCategories', false);
+        } else {
+            $followed = false;
         }
 
-        $followed = Gdn::session()->getPreference('FollowedCategories', false);
         $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
         $this->setData('Followed', $followed);
 
