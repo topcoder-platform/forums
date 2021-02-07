@@ -173,7 +173,7 @@ class PostController extends VanillaController {
             $this->Form->setFormValue('DiscussionID', $this->Discussion->DiscussionID);
 
             $this->title(t('Edit Discussion'));
-
+            $this->setData('ActionType', 'EditDiscussion');
             if ($this->Discussion->Type) {
                 $this->setData('Type', $this->Discussion->Type);
             } else {
@@ -197,8 +197,10 @@ class PostController extends VanillaController {
                 $this->permission('Vanilla.Discussions.Add');
             }
             $this->title(t('New Discussion'));
+            $this->setData('ActionType', 'NewDiscussion');
         }
 
+        $this->Form->addHidden('ActionType', $this->data('ActionType'));
         touchValue('Type', $this->Data, 'Discussion');
 
         // Remove Announce parameter if it was injected into the form.
@@ -443,7 +445,7 @@ class PostController extends VanillaController {
             $record = $this->Draft = $this->DraftModel->getID($draftID);
             $this->CategoryID = $this->Draft->CategoryID;
             $this->setData('ShowPreviewButton', $record->Format != 'Rich');
-
+            $this->setData('ActionType', 'NewDiscussion');
             // FIX: https://github.com/topcoder-platform/forums/issues/347
             $this->setData('_CancelUrl', '/drafts');
             // Verify this is their draft
@@ -452,6 +454,7 @@ class PostController extends VanillaController {
             }
         } else {
             $record = $this->DiscussionModel->getID($discussionID);
+            $this->setData('ActionType', 'EditDiscussion');
             $this->setData('ShowPreviewButton', $this->Discussion->Format != 'Rich');
             // FIX: Issues-308: Editor - supporting old and new formats
             $this->EventArguments['Discussion'] = &$record;
@@ -693,7 +696,7 @@ class PostController extends VanillaController {
         $this->Form->addHidden('DiscussionID', $DiscussionID);
         $this->Form->addHidden('CommentID', $CommentID);
         $this->Form->addHidden('DraftID', $DraftID, true);
-
+        $this->Form->addHidden('ActionType', $this->data('ActionType'));
         // Check permissions
         if ($Discussion && $Editing) {
             // Make sure that content can (still) be edited.
@@ -987,9 +990,11 @@ class PostController extends VanillaController {
      */
     public function editComment($commentID = '', $draftID = '') {
         if (is_numeric($commentID) && $commentID > 0) {
+            $this->setData('ActionType', 'EditComment');
             $this->Form->setModel($this->CommentModel);
             $this->Comment = $this->CommentModel->getID($commentID);
         } else {
+            $this->setData('ActionType', 'NewComment');
             $this->Form->setModel($this->DraftModel);
             $this->Comment = $this->DraftModel->getID($draftID);
         }

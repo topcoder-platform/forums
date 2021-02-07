@@ -257,6 +257,8 @@ class DiscussionController extends VanillaController {
         $this->DiscussionID = $this->Discussion->DiscussionID;
         $this->Form->addHidden('DiscussionID', $this->DiscussionID);
         $this->Form->addHidden('CommentID', '');
+        $this->setData('ActionType', 'NewComment');
+        $this->Form->addHidden('ActionType', 'NewComment');
 
         // Look in the session stash for a comment
         $StashComment = $Session->getPublicStash('CommentForDiscussionID_'.$this->Discussion->DiscussionID);

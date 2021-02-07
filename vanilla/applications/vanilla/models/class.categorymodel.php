@@ -211,6 +211,8 @@ class CategoryModel extends Gdn_Model {
         $category['PermsDiscussionsAdd'] = self::checkPermission($category, 'Vanilla.Discussions.Add');
         $category['PermsDiscussionsEdit'] = self::checkPermission($category, 'Vanilla.Discussions.Edit');
         $category['PermsCommentsAdd'] = self::checkPermission($category, 'Vanilla.Comments.Add');
+        $category['PermsDiscussionsUploads'] = self::checkPermission($category, 'Vanilla.Discussions.Uploads');
+        $category['PermsCommentsUploads'] = self::checkPermission($category, 'Vanilla.Comments.Uploads');
 
         $code = $category['UrlCode'];
         $category['Name'] = Gdn::translate("Categories.".$code.".Name", $category['Name']);

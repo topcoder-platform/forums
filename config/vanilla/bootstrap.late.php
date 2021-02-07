@@ -55,4 +55,16 @@ if (c('Garden.Installed')) {
        $CategoryModel->recalculateTree();
        unset($CategoryModel);
     }
+
+
+   // Define some permissions for the Vanilla categories.
+   // FIX: https://github.com/topcoder-platform/forums/issues/373
+   $PermissionModel->define(
+        [
+            'Vanilla.Discussions.Uploads' => 0,
+            'Vanilla.Comments.Uploads' => 0],
+        'tinyint',
+        'Category',
+        'PermissionCategoryID'
+    );
 }
