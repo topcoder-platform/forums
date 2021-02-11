@@ -419,6 +419,7 @@ class PostController extends VanillaController {
             'Url' => val('AddUrl', val($this->data('Type'), DiscussionModel::discussionTypes()), '/post/discussion')
         ];
 
+        array_unshift ( $breadcrumbs , CategoriesController::ROOT_CATEGORY);
         $this->setData('Breadcrumbs', $breadcrumbs);
 
         // FIX: Hide Announce options
@@ -1022,7 +1023,7 @@ class PostController extends VanillaController {
         // Add modules
         $this->addModule('NewDiscussionModule');
         $this->addModule('DiscussionFilterModule');
-        $this->addModule('CategoriesModule');
+        // $this->addModule('CategoriesModule');
         $this->addModule('BookmarkedModule');
 
         parent::initialize();

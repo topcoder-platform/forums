@@ -183,32 +183,15 @@ if (!function_exists('WriteDiscussion')) :
                     <?php
                     writeTags($discussion);
                     ?>
-                    <span class="MItem MCount ViewCount"><?php
-                        printf(pluralTranslate($discussion->CountViews,
-                            '%s view html', '%s views html', t('%s view'), t('%s views')),
-                            bigPlural($discussion->CountViews, '%s view'));
-                        ?></span>
-         <span class="MItem MCount CommentCount"><?php
-             printf(pluralTranslate($discussion->CountComments,
-                 '%s comment html', '%s comments html', t('%s comment'), t('%s comments')),
-                 bigPlural($discussion->CountComments, '%s comment'));
-             ?></span>
-         <span class="MItem MCount DiscussionScore Hidden"><?php
-             $score = $discussion->Score;
-             if ($score == '') $score = 0;
-             printf(plural($score,
-                 '%s point', '%s points',
-                 bigPlural($score, '%s point')));
-             ?></span>
                     <?php
                     echo newComments($discussion);
 
                     $sender->fireEvent('AfterCountMeta');
 
                     if ($discussion->LastDiscussionCommentsUserID != '') {
-                        $dateFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($lastDate, false, DateTimeFormatter::FORCE_FULL_FORMAT);
-                        echo ' <span class="MItem LastCommentBy">'.sprintf(t('Most recent by %1$s'), userAnchor($last)).'</span> ';
-                        echo ' <span class="MItem LastCommentDate">'.$dateFormatted.'</span>';
+                        $dateFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($lastDate, false, '%a, %b %e %Y');
+                        $timeFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($lastDate, false, '%I:%M %p');
+                        echo '<span class="MItem LastCommentBy">'.sprintf(t('Most recent by %1$s on %2$s at %3$s'), userAnchor($last),$dateFormatted, $timeFormatted).'</span>';
                     } else {
                         $dateFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($discussion->FirstDate, false, DateTimeFormatter::FORCE_FULL_FORMAT);
                         echo ' <span class="MItem LastCommentBy">'.sprintf(t('Started by %1$s'), userAnchor($first)).'</span> ';
@@ -228,9 +211,28 @@ if (!function_exists('WriteDiscussion')) :
                             'span',
                             ['class' => 'MItem Category '.$category['CssClass']]
                         );
-                    }
+                    } ?>
+                    <span class="fill-remaining-space"></span>
+                    <span class="MItem MCount CommentCount"><?php
+                        printf(pluralTranslate($discussion->CountComments,
+                            '%s comment html', '%s comments html', t('%s comment'), t('%s comments')),
+                            bigPlural($discussion->CountComments, '%s comment'));
+                        ?></span>
+                    <span class="MiddleDot">&#183;</span>
+                    <span class="MItem MCount ViewCount"><?php
+                        printf(pluralTranslate($discussion->CountViews,
+                            '%s view html', '%s views html', t('%s view'), t('%s views')),
+                            bigPlural($discussion->CountViews, '%s view'));
+                        ?></span>
+                    <span class="MItem MCount DiscussionScore Hidden"><?php
+                        $score = $discussion->Score;
+                        if ($score == '') $score = 0;
+                        printf(plural($score, '%s point', '%s points', bigPlural($score, '%s point')));
+                        ?></span>
+                    <?php
                     $sender->fireEvent('DiscussionMeta');
                     ?>
+
                 </div>
             </div>
             <?php $sender->fireEvent('AfterDiscussionContent'); ?>

@@ -125,7 +125,9 @@ class DiscussionController extends VanillaController {
             Gdn_Theme::section($CategoryCssClass);
         }
 
-        $this->setData('Breadcrumbs', CategoryModel::getAncestors($this->CategoryID));
+        $ancestors = CategoryModel::getAncestors($this->CategoryID);
+        array_unshift ( $ancestors , CategoriesController::ROOT_CATEGORY);
+        $this->setData('Breadcrumbs', $ancestors);
 
         // Setup
         $this->title($this->Discussion->Name);
@@ -294,7 +296,7 @@ class DiscussionController extends VanillaController {
         // Add modules
         $this->addModule('DiscussionFilterModule');
         $this->addModule('NewDiscussionModule');
-        $this->addModule('CategoriesModule');
+       // $this->addModule('CategoriesModule');
         $this->addModule('BookmarkedModule');
 
         $this->CanEditComments = Gdn::session()->checkPermission('Vanilla.Comments.Edit', true, 'Category', 'any') && c('Vanilla.AdminCheckboxes.Use');
