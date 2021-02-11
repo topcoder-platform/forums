@@ -34,6 +34,7 @@ class CategoriesController extends VanillaController {
     const SORT_LAST_POST = 'new';
     const SORT_OLDEST_POST = 'old';
 
+    const ROOT_CATEGORY =  ['Name' => 'Roundtables', 'Url'=>'/'];
     /**
      * @var \Closure $categoriesCompatibilityCallback A backwards-compatible callback to get `$this->data('Categories')`.
      */
@@ -332,7 +333,11 @@ class CategoriesController extends VanillaController {
             }
 
             // Load the breadcrumbs.
-            $this->setData('Breadcrumbs', CategoryModel::getAncestors(val('CategoryID', $category)));
+
+            $ancestors = CategoryModel::getAncestors(val('CategoryID', $category));
+            array_unshift ( $ancestors , self::ROOT_CATEGORY);
+            $this->setData('Breadcrumbs', $ancestors);
+
 
             $this->setData('Category', $category, true);
             // Set CategoryID
@@ -406,7 +411,7 @@ class CategoriesController extends VanillaController {
             // Add modules
             $this->addModule('NewDiscussionModule');
             $this->addModule('DiscussionFilterModule');
-            $this->addModule('CategoriesModule');
+          //  $this->addModule('CategoriesModule');
             $this->addModule('BookmarkedModule');
             $this->addModule('TagModule');
 
@@ -535,7 +540,7 @@ class CategoriesController extends VanillaController {
             if ($Title) {
                 $this->title($Title, '');
             } else {
-                $this->title(t('All Categories'));
+                $this->title(t('Roundtables'));
             }
         }
         Gdn_Theme::section('CategoryList');
@@ -544,7 +549,10 @@ class CategoriesController extends VanillaController {
             $this->description(c('Garden.Description', null));
         }
 
-        $this->setData('Breadcrumbs', CategoryModel::getAncestors(val('CategoryID', $this->data('Category'))));
+        $ancestors = CategoryModel::getAncestors(val('CategoryID', $this->data('Category')));
+        array_unshift ( $ancestors , self::ROOT_CATEGORY);
+        $this->setData('Breadcrumbs', $ancestors);
+
 
         // Set the category follow toggle before we load category data so that it affects the category query appropriately.
         $CategoryFollowToggleModule = new CategoryFollowToggleModule($this);
@@ -630,10 +638,12 @@ class CategoriesController extends VanillaController {
         $this->setData('CategoryTree', $categoryTree);
 
         // Add modules
-        $this->addModule('NewDiscussionModule');
+        if($Category) {
+            $this->addModule('NewDiscussionModule');
+        }
         $this->addModule('DiscussionFilterModule');
         $this->addModule('BookmarkedModule');
-        $this->addModule('CategoriesModule');
+      //  $this->addModule('CategoriesModule');
         $this->addModule($CategoryFollowToggleModule);
         $this->addModule('TagModule');
 
@@ -669,7 +679,7 @@ class CategoriesController extends VanillaController {
             if ($Title) {
                 $this->title($Title, '');
             } else {
-                $this->title(t('All Categories'));
+                $this->title(t('Roundtables'));
             }
         }
 
@@ -725,7 +735,7 @@ class CategoriesController extends VanillaController {
         // Add modules
         $this->addModule('NewDiscussionModule');
         $this->addModule('DiscussionFilterModule');
-        $this->addModule('CategoriesModule');
+     //   $this->addModule('CategoriesModule');
         $this->addModule('BookmarkedModule');
         $this->addModule($CategoryFollowToggleModule);
 
