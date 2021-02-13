@@ -183,9 +183,6 @@ if (!function_exists('writeListItem')):
                         Gdn::controller()->fireEvent('AfterCategoryTitle');
                         ?>
                     </div>
-                    <div class="CategoryDescription">
-                        <?php echo val('Description', $category) ?>
-                    </div>
                     <div class="Challenge">
                         <?php
                             Gdn::controller()->fireEvent('AfterChallenge', ['Category' =>$category]);
