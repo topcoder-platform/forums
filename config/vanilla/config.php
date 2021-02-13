@@ -134,7 +134,7 @@ $Configuration['Routes']['Y29udGFpbmVyLmh0bWw='] = array (
     0 => 'staticcontent/container',
     1 => 'Internal',
 );
-$Configuration['Routes']['DefaultController'] = 'discussions';
+$Configuration['Routes']['DefaultController'] = 'categories';
 $Configuration['Routes']['XmZpbGVzdGFjaygvLiopPyQ='] = array (
     0 => 'vanilla/filestack$1',
     1 => 'Internal',
