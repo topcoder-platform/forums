@@ -23,6 +23,5 @@ function smarty_function_breadcrumbs($params, &$smarty) {
 
     $options = arrayTranslate($params, ['homeurl' => 'HomeUrl', 'hidelast' => 'HideLast']);
 
-    // Don't show a home link by default
-    return Gdn_Theme::breadcrumbs($breadcrumbs, val('homelink', $params, false), $options);
+    return Gdn_Theme::breadcrumbs($breadcrumbs, val('homelink', $params, true), $options);
 }

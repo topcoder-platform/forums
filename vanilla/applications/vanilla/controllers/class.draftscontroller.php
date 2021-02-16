@@ -32,6 +32,7 @@ class DraftsController extends VanillaController {
         $this->addJsFile('jquery.gardenmorepager.js');
         $this->addJsFile('discussions.js');
         $this->title(t('My Drafts'));
+        $this->setData('Breadcrumbs', [['Name' => t('My Drafts'), 'Url' => '/drafts']]);
 
         // Validate $Offset
         if (!is_numeric($offset) || $offset < 0) {

@@ -57,7 +57,7 @@ class Gdn_Theme {
      * @param array $options
      * @return string
      */
-    public static function breadcrumbs($data, $homeLink = false, $options = []) {
+    public static function breadcrumbs($data, $homeLink = true, $options = []) {
         $format = '<a href="{Url,html}" itemprop="url"><span itemprop="title">{Name,html}</span></a>';
 
         $result = '';
@@ -86,11 +86,6 @@ class Gdn_Theme {
         }
 
         $defaultRoute = ltrim(val('Destination', Gdn::router()->getRoute('DefaultController'), ''), '/');
-
-        // FIX: Don't show current page
-        if(count($data) <= 1) {
-                return '';
-        }
 
         $count = 0;
         $dataCount = 0;
