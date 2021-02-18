@@ -10,8 +10,8 @@ echo '<h1 class="H HomepageTitle">'.
     watchButton($this->data('Category.CategoryID')).
     '</h1>';
 
-$Description = $this->data('Category.Description', $this->description());
-echo wrapIf(Gdn_Format::htmlFilter($Description), 'div', ['class' => 'P PageDescription']);
+// $Description = $this->data('Category.Description', $this->description());
+// echo wrapIf(Gdn_Format::htmlFilter($Description), 'div', ['class' => 'P PageDescription']);
 
 $this->fireEvent('AfterPageTitle');
 

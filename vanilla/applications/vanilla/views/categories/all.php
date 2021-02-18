@@ -6,15 +6,17 @@ if (!is_null($this->Category)) {
     $title .= watchButton($this->Category->CategoryID);
 }
 echo '<h1 class="H HomepageTitle">'.$title.'</h1>';
-if ($description = $this->description()) {
-    echo wrap($description, 'div', ['class' => 'P PageDescription']);
-}
+// if ($description = $this->description()) {
+    //echo wrap($description, 'div', ['class' => 'P PageDescription']);
+// }
 $this->fireEvent('AfterPageTitle');
 echo '<div class="PageControls Top">';
 if ($this->data('EnableFollowingFilter')) {
     echo categoryFilters();
 }
-echo categorySorts();
+if (!is_null($this->Category) && $this->Category->DisplayAs == 'Discussions') {
+    echo categorySorts();
+}
 echo '</div>';
 $categories = $this->data('CategoryTree');
 writeCategoryList($categories, 1);

@@ -364,12 +364,6 @@ class MediaApiController extends AbstractApiController {
      * @return array
      */
     public function post(array $body) {
-        if(!Gdn::session()->checkPermission('Garden.Uploads.Add')) {
-            throw new ClientException('You don\'t have permission to upload files', 403);
-        }
-
-        //$this->permission('Garden.Uploads.Add');
-
         $allowedExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);
         $uploadSchema = new UploadedFileSchema([
             UploadedFileSchema::OPTION_ALLOWED_EXTENSIONS => $allowedExtensions,
@@ -380,10 +374,69 @@ class MediaApiController extends AbstractApiController {
 
         $in = $this->schema([
             'file' => $uploadSchema,
+            'categoryID:i?' => "CategoryID",
+            'discussionID:i?' => "DiscussionID",
+            'commentID:i?' => "CommentID",
+            'actionType:s?' => "ActionType"
         ], 'in')->setDescription('Add a media item.');
-        $out = $this->schema($this->fullSchema(), 'out');
-
         $body = $in->validate($body);
+        $categoryID = $body['categoryID'];
+        $discussionID = $body['discussionID'];
+        $commentID = $body['commentID'];
+        $actionType = $body['actionType'];
+
+        if(!$categoryID && !$discussionID && !Gdn::session()->checkPermission('Garden.Uploads.Add')) {
+             throw new ClientException("You don't have permission to upload files", 403);
+        }
+
+        if(!Gdn::session()->checkPermission('Garden.Uploads.Add')) {
+            switch ($actionType) {
+                case 'NewDiscussion':
+                    if(!$categoryID) {
+                        throw new ClientException("You don't have permission to upload files", 403);
+                    }
+                    $permissionCategory = CategoryModel::permissionCategory($categoryID);
+                    $discussionsUploads = CategoryModel::checkPermission($permissionCategory, 'Vanilla.Discussions.Uploads');
+                    if(!$discussionsUploads) {
+                        throw new ClientException("You don't have permission to upload files", 403);
+                    }
+                    break;
+                case 'EditDiscussion':
+                    $discussionModel = new DiscussionModel();
+                    $discussion =  $discussionModel->getID($discussionID);
+                    if (!$discussion) {
+                        throw new NotFoundException('Discussion');
+                    }
+                    $categoryID = val('CategoryID', $discussion, false);
+                    $permissionCategory = CategoryModel::permissionCategory($categoryID);
+                    $discussionsUploads = CategoryModel::checkPermission($permissionCategory, 'Vanilla.Discussions.Uploads');
+                    if(!$discussionsUploads) {
+                        throw new ClientException("You don't have permission to upload files", 403);
+                    }
+                    break;
+                case 'NewComment':
+                case 'EditComment':
+                    $discussionModel = new DiscussionModel();
+                    $discussion =  $discussionModel->getID($discussionID);
+                    if (!$discussion) {
+                        throw new NotFoundException('Discussion');
+                    }
+
+                    $categoryID = val('CategoryID', $discussion, false);
+                    $permissionCategory = CategoryModel::permissionCategory($categoryID);
+                    $commentsUploads =  CategoryModel::checkPermission($permissionCategory, 'Vanilla.Comments.Uploads');
+                    // No permissions
+                    if(!$commentsUploads) {
+                        throw new ClientException("You don't have permission to upload files", 403);
+                    }
+                    break;
+                default:
+                    throw new ClientException("You don't have permission to upload files", 403);
+            }
+
+        }
+
+        $out = $this->schema($this->fullSchema(), 'out');
 
         $imageExtensions = array_keys(ImageResizer::getExtType());
         /** @var UploadedFile $file */
