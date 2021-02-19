@@ -11,5 +11,13 @@ services:
         - ENV
         - VANILLA_VERSION=3.3
         - CI_DEPLOY_TOKEN
+    links:
+      - tideways-daemon
     ports:
       - 80:80
+  tideways-daemon:
+    container_name: tideways-daemon
+    build:
+      context: ./tideways-daemon
+    ports:
+      - 9135:9135
