@@ -29,11 +29,12 @@ class CategoriesController extends VanillaController {
     public $Category;
 
     /** @var bool Value indicating if the category-following filter should be displayed when rendering a view */
-    public $enableFollowingFilter = true;//false;
+    public $enableFollowingFilter = false;
 
     const SORT_LAST_POST = 'new';
     const SORT_OLDEST_POST = 'old';
 
+    const ROOT_CATEGORY =  ['Name' => 'Roundtables', 'Url'=>'/'];
     /**
      * @var \Closure $categoriesCompatibilityCallback A backwards-compatible callback to get `$this->data('Categories')`.
      */
@@ -264,15 +265,23 @@ class CategoriesController extends VanillaController {
     public function index($categoryIdentifier = '', $page = '0') {
         // Figure out which category layout to choose (Defined on "Homepage" settings page).
         $layout = c('Vanilla.Categories.Layout');
-        $followed = Gdn::request()->get('followed', null);
-        $saveFollowing =  $followed !== null && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
-        if($saveFollowing) {
-            $followed = Gdn::request()->get('followed');
-            Gdn::session()->setPreference('FollowedCategories', $followed);
+
+        if ($this->CategoryModel->followingEnabled()) {
+            $followed = Gdn::request()->get('followed', null);
+            $saveFollowing = $followed !== null && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
+            if ($saveFollowing) {
+                $followed = Gdn::request()->get('followed');
+                Gdn::session()->setPreference('FollowedCategories', $followed);
+            }
+
+            $followed = Gdn::session()->getPreference('FollowedCategories', false);
+            $this->enableFollowingFilter = true;
+        } else {
+            $this->enableFollowingFilter = $followed = false;
         }
 
-        $followed = Gdn::session()->getPreference('FollowedCategories', false);
         $this->setData('Followed', $followed);
+        $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
 
         $sort = Gdn::request()->get('sort', null);
         $saveSorting = $sort !== null && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
@@ -283,13 +292,11 @@ class CategoriesController extends VanillaController {
         $this->setData('CategorySort', $sort);
 
         if ($categoryIdentifier == '') {
-            $this->enableFollowingFilter = true;
             $this->fireEvent('EnableFollowingFilter', [
                 'CategoryIdentifier' => $categoryIdentifier,
                 'EnableFollowingFilter' => &$this->enableFollowingFilter
             ]);
-            $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
-            switch ($layout) {
+             switch ($layout) {
                 case 'mixed':
                     $this->View = 'discussions';
                     $this->discussions();
@@ -316,17 +323,26 @@ class CategoriesController extends VanillaController {
 
             Gdn_Theme::section($category->CssClass);
 
-            // The view filter is shown always if category type != 'discussions'
-            $this->enableFollowingFilter = strtolower( val('DisplayAs', $category, '')) != 'discussions';
-            $this->fireEvent('EnableFollowingFilter', [
-                'CategoryIdentifier' => $categoryIdentifier,
-                'EnableFollowingFilter' => &$this->enableFollowingFilter
-            ]);
+            if($this->CategoryModel->followingEnabled()) {
+                // The view filter is shown always if category type != 'discussions'
+                $this->enableFollowingFilter = strtolower(val('DisplayAs', $category, '')) != 'discussions';
+                $this->fireEvent('EnableFollowingFilter', [
+                    'CategoryIdentifier' => $categoryIdentifier,
+                    'EnableFollowingFilter' => &$this->enableFollowingFilter
+                ]);
+            }
 
             // Load the breadcrumbs.
-            $this->setData('Breadcrumbs', CategoryModel::getAncestors(val('CategoryID', $category)));
+
+            $ancestors = CategoryModel::getAncestors(val('CategoryID', $category));
+            array_unshift ( $ancestors , self::ROOT_CATEGORY);
+            $this->setData('Breadcrumbs', $ancestors);
+
 
             $this->setData('Category', $category, true);
+            // Set CategoryID
+            $categoryID = val('CategoryID', $category);
+            $this->setData('CategoryID', $categoryID, true);
             $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
 
             $this->title(htmlspecialchars(val('Name', $category, '')));
@@ -392,14 +408,10 @@ class CategoriesController extends VanillaController {
                 $this->Head->addRss(categoryUrl($category) . '/feed.rss', $this->Head->title());
             }
 
-            // Set CategoryID
-            $categoryID = val('CategoryID', $category);
-            $this->setData('CategoryID', $categoryID, true);
-
             // Add modules
             $this->addModule('NewDiscussionModule');
             $this->addModule('DiscussionFilterModule');
-            $this->addModule('CategoriesModule');
+          //  $this->addModule('CategoriesModule');
             $this->addModule('BookmarkedModule');
             $this->addModule('TagModule');
 
@@ -528,7 +540,7 @@ class CategoriesController extends VanillaController {
             if ($Title) {
                 $this->title($Title, '');
             } else {
-                $this->title(t('All Categories'));
+                $this->title(t('Roundtables'));
             }
         }
         Gdn_Theme::section('CategoryList');
@@ -537,7 +549,10 @@ class CategoriesController extends VanillaController {
             $this->description(c('Garden.Description', null));
         }
 
-        $this->setData('Breadcrumbs', CategoryModel::getAncestors(val('CategoryID', $this->data('Category'))));
+        $ancestors = CategoryModel::getAncestors(val('CategoryID', $this->data('Category')));
+        array_unshift ( $ancestors , self::ROOT_CATEGORY);
+        $this->setData('Breadcrumbs', $ancestors);
+
 
         // Set the category follow toggle before we load category data so that it affects the category query appropriately.
         $CategoryFollowToggleModule = new CategoryFollowToggleModule($this);
@@ -623,9 +638,12 @@ class CategoriesController extends VanillaController {
         $this->setData('CategoryTree', $categoryTree);
 
         // Add modules
-        $this->addModule('NewDiscussionModule');
+        if($Category) {
+            $this->addModule('NewDiscussionModule');
+        }
         $this->addModule('DiscussionFilterModule');
         $this->addModule('BookmarkedModule');
+      //  $this->addModule('CategoriesModule');
         $this->addModule($CategoryFollowToggleModule);
         $this->addModule('TagModule');
 
@@ -661,7 +679,7 @@ class CategoriesController extends VanillaController {
             if ($Title) {
                 $this->title($Title, '');
             } else {
-                $this->title(t('All Categories'));
+                $this->title(t('Roundtables'));
             }
         }
 
@@ -717,7 +735,7 @@ class CategoriesController extends VanillaController {
         // Add modules
         $this->addModule('NewDiscussionModule');
         $this->addModule('DiscussionFilterModule');
-        $this->addModule('CategoriesModule');
+     //   $this->addModule('CategoriesModule');
         $this->addModule('BookmarkedModule');
         $this->addModule($CategoryFollowToggleModule);
 

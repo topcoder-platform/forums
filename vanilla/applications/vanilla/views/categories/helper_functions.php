@@ -104,11 +104,11 @@ if (!function_exists('MostRecentString')):
         $r = '';
 
         $r .= '<span class="MostRecent">';
-        $r .= '<span class="MLabel">'.t('Most recent:').'</span> ';
-        $r .= anchor(
-            sliceString(Gdn_Format::text($row['LastTitle']), 150),
-            $row['LastUrl'],
-            'LatestPostTitle');
+        $r .= '<span class="MLabel">'.t('Most recent').'</span> ';
+       // $r .= anchor(
+       //     sliceString(Gdn_Format::text($row['LastTitle']), 150),
+       //     $row['LastUrl'],
+       //    'LatestPostTitle');
 
         if ($last) {
             $r .= ' ';
@@ -123,9 +123,10 @@ if (!function_exists('MostRecentString')):
 
             $r .= '<span class="MostRecentOn">';
             $r .= t('on').' ';
-            $dateFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($lastDate, false, DateTimeFormatter::FORCE_FULL_FORMAT);
+            $dateFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($lastDate, false, '%a, %b %e %Y');
+            $timeFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($lastDate, false, '%I:%M %p');
             $r .= anchor(
-                $dateFormatted,
+                $dateFormatted.' at '.$timeFormatted,
                 $row['LastUrl'],
                 'CommentDate');
             $r .= '</span>';
@@ -182,16 +183,26 @@ if (!function_exists('writeListItem')):
                         Gdn::controller()->fireEvent('AfterCategoryTitle');
                         ?>
                     </div>
-                    <div class="CategoryDescription">
-                        <?php echo val('Description', $category) ?>
-                    </div>
                     <div class="Challenge">
                         <?php
                             Gdn::controller()->fireEvent('AfterChallenge', ['Category' =>$category]);
                         ?>
                     </div>
                     <div class="Meta">
-                        <span class="MItem RSS"><?php echo $rssIcon ?></span>
+                        <?php if (val('LastTitle', $category) != '') { ?>
+                            <span class="MItem LastDiscussionTitle">
+                                <?php echo mostRecentString($category); ?>
+                            </span>
+                        <?php  } else { ?>
+                            <span class="MItem"></span>
+                        <?php };
+                        if ($writeChildren === 'list'): ?>
+                            <div class="ChildCategories">
+                                <?php echo wrap(t('Child Categories').': ', 'b'); ?>
+                                <?php echo categoryString($children, $depth + 1); ?>
+                            </div>
+                        <?php endif; ?>
+                        <span class="fill-remaining-space"></span>
                         <span class="MItem DiscussionCount">
                             <?php echo sprintf(
                                 pluralTranslate(
@@ -202,6 +213,7 @@ if (!function_exists('writeListItem')):
                                     t('%s discussions')
                                 ), bigPlural(val('CountAllDiscussions', $category), '%s discussion')) ?>
                         </span>
+                        <span class="MiddleDot">&#183;</span>
                         <span class="MItem CommentCount">
                             <?php echo sprintf(
                                 pluralTranslate(
@@ -211,18 +223,6 @@ if (!function_exists('writeListItem')):
                                     t('%s comments')
                                 ), bigPlural(val('CountAllComments', $category), '%s comment')); ?>
                         </span>
-
-                        <?php if (val('LastTitle', $category) != '') : ?>
-                            <span class="MItem LastDiscussionTitle">
-                                <?php echo mostRecentString($category); ?>
-                            </span>
-                        <?php endif;
-                        if ($writeChildren === 'list'): ?>
-                            <div class="ChildCategories">
-                                <?php echo wrap(t('Child Categories').': ', 'b'); ?>
-                                <?php echo categoryString($children, $depth + 1); ?>
-                            </div>
-                        <?php endif; ?>
                     </div>
                 </div>
             </li>

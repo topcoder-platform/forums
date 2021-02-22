@@ -116,15 +116,14 @@ class DiscussionsController extends VanillaController {
         // Add modules
         $this->addModule('DiscussionFilterModule');
         $this->addModule('NewDiscussionModule');
-        $this->addModule('CategoriesModule');
+      //  $this->addModule('CategoriesModule');
         $this->addModule('BookmarkedModule');
         $this->addModule('TagModule');
 
         $this->setData('Breadcrumbs', [['Name' => t('Recent Discussions'), 'Url' => '/discussions']]);
 
         $categoryModel = new CategoryModel();
-        //FIX: the module is always enabled to show the view filter
-        $followingEnabled = true;//$categoryModel->followingEnabled();
+        $followingEnabled = $categoryModel->followingEnabled();
         if ($followingEnabled) {
             $followed = Gdn::request()->get('followed', null);
             $saveFollowing =  Gdn::request()->get('followed') !== null && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
@@ -134,9 +133,11 @@ class DiscussionsController extends VanillaController {
             if ($this->SelfUrl === "discussions") {
                 $this->enableFollowingFilter = true;
             }
+            $followed = Gdn::session()->getPreference('FollowedCategories', false);
+        } else {
+            $followed = false;
         }
 
-        $followed = Gdn::session()->getPreference('FollowedCategories', false);
         $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
         $this->setData('Followed', $followed);
 
@@ -158,7 +159,8 @@ class DiscussionsController extends VanillaController {
         $categoryIDs = $this->getCategoryIDs();
         // Fix to segregate announcement conditions until announcement caching has been reworked.
         // See https://github.com/vanilla/vanilla/issues/7241
-        $where = $announcementsWhere = [];
+        $where = ['Announce' => 'all'];
+        // Get Discussions  and Announcements
         if ($this->data('Followed')) {
             $followedCategories = array_keys($categoryModel->getFollowed(Gdn::session()->UserID));
             $visibleCategoriesResult = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
@@ -169,7 +171,7 @@ class DiscussionsController extends VanillaController {
             }
             $where['d.CategoryID'] = $visibleFollowedCategories;
         } elseif ($categoryIDs) {
-            $where['d.CategoryID'] = $announcementsWhere['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
+            $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
         } else {
             $visibleCategoriesResult = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
             if ($visibleCategoriesResult !== true) {
@@ -188,11 +190,7 @@ class DiscussionsController extends VanillaController {
 
         $this->setData('CountDiscussions', $CountDiscussions);
 
-        // Get Announcements
-        $this->AnnounceData = $Offset == 0 ? $DiscussionModel->getAnnouncements($announcementsWhere) : false;
-        $this->setData('Announcements', $this->AnnounceData !== false ? $this->AnnounceData : [], true);
-
-        // Get Discussions
+        // Get Discussions  and Announcements
         $this->DiscussionData = $DiscussionModel->getWhereRecent($where, $Limit, $Offset);
 
         $this->setData('Discussions', $this->DiscussionData, true);
@@ -284,7 +282,7 @@ class DiscussionsController extends VanillaController {
         // Add modules
         $this->addModule('DiscussionFilterModule');
         $this->addModule('NewDiscussionModule');
-        $this->addModule('CategoriesModule');
+      //  $this->addModule('CategoriesModule');
         $this->addModule('BookmarkedModule');
         $this->addModule('TagModule');
 
@@ -461,7 +459,7 @@ class DiscussionsController extends VanillaController {
         // Add modules
         $this->addModule('DiscussionFilterModule');
         $this->addModule('NewDiscussionModule');
-        $this->addModule('CategoriesModule');
+     //   $this->addModule('CategoriesModule');
         $this->addModule('TagModule');
 
         // Render default view (discussions/bookmarked.php)
@@ -562,7 +560,7 @@ class DiscussionsController extends VanillaController {
         // Add modules
         $this->addModule('DiscussionFilterModule');
         $this->addModule('NewDiscussionModule');
-        $this->addModule('CategoriesModule');
+        // $this->addModule('CategoriesModule');
         $this->addModule('BookmarkedModule');
         $this->addModule('TagModule');
 
