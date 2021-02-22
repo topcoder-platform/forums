@@ -194,13 +194,6 @@ class CategoryModel extends Gdn_Model {
      * @param bool|null $addUserCategory
      */
     private function calculateUser(array &$category, $addUserCategory = null) {
-        $isCalculated = val('UserCalculated', $category, false);
-        if ($isCalculated) {
-            // Don't recalculate categories that have already been calculated.
-            return;
-        }
-        $category['UserCalculated'] = true;
-
         // Kludge to make sure that the url is absolute when reaching the user's screen (or API).
         $category['Url'] = self::categoryUrl($category, '', true);
 
@@ -618,8 +611,7 @@ class CategoryModel extends Gdn_Model {
             $category['PhotoUrl'] = '';
         }
 
-        // FIX-381: all categories are set with a value, this is used in Vanilla 2.X
-        // self::calculateDisplayAs($category);
+        self::calculateDisplayAs($category);
 
         if (!($category['CssClass'] ?? false)) {
             $category['CssClass'] = 'Category-'.$category['UrlCode'];
@@ -681,14 +673,8 @@ class CategoryModel extends Gdn_Model {
             self::calculate($category);
         }
 
-        //FIX: https://github.com/topcoder-platform/forums/issues/381
-        // array_reverse and array_unshift - O(n) complexity
-        $notreversedKeys = array_keys($data);
-        $index = count($notreversedKeys) -1;
-
-        while ($index >= 0) {
-            // key is reversed
-            $key = $notreversedKeys[$index];
+        $keys = array_reverse(array_keys($data));
+        foreach ($keys as $key) {
             $cat = $data[$key];
             $parentID = $cat['ParentCategoryID'];
 
@@ -702,10 +688,8 @@ class CategoryModel extends Gdn_Model {
                 if (empty($data[$parentID]['ChildIDs'])) {
                     $data[$parentID]['ChildIDs'] = [];
                 }
-
-                $data[$parentID]['ChildIDs'] = array_merge([$key], $data[$parentID]['ChildIDs']);
+                array_unshift($data[$parentID]['ChildIDs'], $key);
             }
-            $index--;
         }
     }
 
@@ -1354,10 +1338,8 @@ class CategoryModel extends Gdn_Model {
      * Given a discussion, update its category's last post info and counts.
      *
      * @param int|array|stdClass $discussion The discussion ID or discussion.
-     * @param null $cacheFields This param was added for particular issue
-     * check details https://github.com/topcoder-platform/forums/issues/381
      */
-    public function incrementLastDiscussion($discussion, &$cacheFields = null) {
+    public function incrementLastDiscussion($discussion) {
         // Lookup the discussion record, if necessary. We need at least a discussion to continue.
         if (filter_var($discussion, FILTER_VALIDATE_INT) !== false) {
             $discussion = DiscussionModel::instance()->getID($discussion);
@@ -1376,29 +1358,20 @@ class CategoryModel extends Gdn_Model {
         $countDiscussions = val('CountDiscussions', $category, 0);
         $countDiscussions++;
 
-        if(is_array($cacheFields)) {
-            $cacheFields[$categoryID]['CountDiscussions'] = $countDiscussions;
-            $cacheFields[$categoryID]['LastCategoryID'] = $categoryID;
-            self::instance()->setField($categoryID, [
-                'CountDiscussions' => $countDiscussions,
-                'LastCategoryID' => $categoryID
-            ], false, false);
-        }else {
-            // setField will update these values in the DB, as well as the cache.
-            self::instance()->setField($categoryID, [
-                'CountDiscussions' => $countDiscussions,
-                'LastCategoryID' => $categoryID
-            ]);
-        }
+        // setField will update these values in the DB, as well as the cache.
+        self::instance()->setField($categoryID, [
+            'CountDiscussions' => $countDiscussions,
+            'LastCategoryID' => $categoryID
+        ]);
 
         // Update the cached last post info with whatever we have.
-        self::updateLastPost($discussion, null, $cacheFields);
+        self::updateLastPost($discussion);
 
         // Update the aggregate discussion count for this category and all its parents.
-        self::incrementAggregateCount($categoryID, self::AGGREGATE_DISCUSSION,1,false, $cacheFields);
+        self::incrementAggregateCount($categoryID, self::AGGREGATE_DISCUSSION);
 
         // Set the new LastCategoryID.
-        self::setAsLastCategory($categoryID, $cacheFields);
+        self::setAsLastCategory($categoryID);
     }
 
     /**
@@ -1447,59 +1420,31 @@ class CategoryModel extends Gdn_Model {
         }
 
         // setField will update these values in the DB, as well as the cache.
-        $categoryFields =  self::instance()->setField($categoryID, [
-             'CountComments' => $countComments,
-             'LastCommentID' => $commentID,
-             'LastDiscussionID' => $discussionID,
-             'LastDateInserted' => val('DateInserted', $comment)
-         ], false, false);
-
-        // FIX: https://github.com/topcoder-platform/forums/issues/381
-        // Add all updated fields in cacheFields and update cache at the end of the method
-        $cacheFields = array();
-        foreach($categoryFields as $key =>$value) {
-            $cacheFields[$categoryID][$key] = $value;
-        }
-
-        $categories = self::instance()->collection->getAncestors($categoryID, true);
-        foreach ($categories as $row) {
-            $currentCategoryID = val('CategoryID', $row);
-            $LastDiscussionCommentsUserID = val('UpdateUserID', $comment) ?  val('UpdateUserID', $comment):  val('InsertUserID', $comment);
-            $LastDiscussionCommentsDiscussionID = val('DiscussionID', $comment);
-            $LastDiscussionCommentsDate = val('UpdateUserID', $comment)?val('DateUpdated', $comment): val('DateInserted', $comment);
-
-            $updatedColumns =  ['LastDiscussionCommentsUserID' =>  $LastDiscussionCommentsUserID,
-            'LastDiscussionCommentsDiscussionID' => $LastDiscussionCommentsDiscussionID,
-            'LastDiscussionCommentsDate' => $LastDiscussionCommentsDate];
-            $categoryFields =  self::instance()->setField($currentCategoryID, $updatedColumns, false, false);
-            foreach($categoryFields as $key =>$value) {
-                $cacheFields[$currentCategoryID][$key] = $value;
-            }
-        }
+        self::instance()->setField($categoryID, [
+            'CountComments' => $countComments,
+            'LastCommentID' => $commentID,
+            'LastDiscussionID' => $discussionID,
+            'LastDateInserted' => val('DateInserted', $comment)
+        ]);
 
         // Update the cached last post info with whatever we have.
-       self::updateLastPost($discussion, $comment, $cacheFields );
+        self::updateLastPost($discussion, $comment);
 
         // Update the aggregate comment count for this category and all its parents.
-        self::incrementAggregateCount($categoryID, self::AGGREGATE_COMMENT, 1, false, $cacheFields);
+        self::incrementAggregateCount($categoryID, self::AGGREGATE_COMMENT);
 
         // Set the new LastCategoryID.
-        self::setAsLastCategory($categoryID, $cacheFields);
-
-        // Update cache for a category and  its ancestors
-        self::setCache($cacheFields, false);
+        self::setAsLastCategory($categoryID);
     }
 
     /**
      * Update the latest post info for a category and its ancestors.
      *
      * @param int|array|object $discussion
-     * @param null $comment
-     * @param null $cacheFields This param was added for particular issue
-     * check details https://github.com/topcoder-platform/forums/issues/381
+     * @param int|array|object $comment
      */
-    public static function updateLastPost($discussion, $comment = null, &$cacheFields = null) {
-       // Make sure we at least have a discussion to work with.
+    public static function updateLastPost($discussion, $comment = null) {
+        // Make sure we at least have a discussion to work with.
         if (is_numeric($discussion)) {
             $discussion = DiscussionModel::instance()->getID($discussion);
         }
@@ -1519,18 +1464,10 @@ class CategoryModel extends Gdn_Model {
         $db = static::postDBFields($discussion, $comment);
 
         $categories = self::instance()->collection->getAncestors($categoryID, true);
-
         foreach ($categories as $row) {
             $currentCategoryID = val('CategoryID', $row);
-            if(is_array($cacheFields)) {
-                foreach ($cache as $key => $value) {
-                    $cacheFields[$currentCategoryID][$key] = $value;
-                }
-                self::instance()->setField($currentCategoryID, $db, false, false);
-            } else {
-                self::instance()->setField($currentCategoryID, $db);
-                CategoryModel::setCache($currentCategoryID, $cache);
-            }
+            self::instance()->setField($currentCategoryID, $db);
+            CategoryModel::setCache($currentCategoryID, $cache);
         }
     }
 
@@ -1538,10 +1475,9 @@ class CategoryModel extends Gdn_Model {
      * Update the latest post info for a category and its ancestors.
      *
      * @param int|array|object $discussion
-     * @param null $cacheFields This param was added for particular issue
-     * check details https://github.com/topcoder-platform/forums/issues/381
+     * @param int|array|object $comment
      */
-    public static function updateModifiedDiscussion($discussion,  & $cacheFields = null) {
+    public static function updateModifiedDiscussion($discussion) {
         // Make sure we at least have a discussion to work with.
         if (is_numeric($discussion)) {
             $discussion = DiscussionModel::instance()->getID($discussion);
@@ -1558,15 +1494,8 @@ class CategoryModel extends Gdn_Model {
         $categories = self::instance()->collection->getAncestors($categoryID, true);
         foreach ($categories as $row) {
             $currentCategoryID = val('CategoryID', $row);
-            if($cacheFields) {
-                self::instance()->setField($currentCategoryID, $db, false, false);
-                foreach ($cache as $key => $value) {
-                    $cacheFields[$currentCategoryID][$key] = $value;
-                }
-            } else {
-                self::instance()->setField($currentCategoryID, $db);
-                CategoryModel::setCache($currentCategoryID, $cache);
-            }
+            self::instance()->setField($currentCategoryID, $db);
+            CategoryModel::setCache($currentCategoryID, $cache);
         }
     }
 
@@ -1715,7 +1644,7 @@ class CategoryModel extends Gdn_Model {
         if ($comment) {
             if(val('UpdateUserID', $comment)) {
                 $result['LastDiscussionCommentsUserID'] = val('UpdateUserID', $comment);
-                $result['LastDiscussionCommentsDiscussionID'] = val('DiscussionID', $comment);
+                $result['LastDiscussionCommentsDiscussionID'] = val('DiscussionID', $$comment);
                 $result['LastDiscussionCommentsDate'] = val('DateUpdated', $comment);
             } else {
                 $result['LastDiscussionCommentsUserID'] = val('InsertUserID', $comment);
@@ -1796,7 +1725,6 @@ class CategoryModel extends Gdn_Model {
     public function joinRecent(&$categoryTree) {
         // Gather all of the IDs from the posts.
         $this->gatherLastIDs($categoryTree, $ids);
-        // TODO: optimize the nex lines
         $discussionIDs = array_unique(array_column($ids, 'DiscussionID'));
         $commentIDs = array_filter(array_unique(array_column($ids, 'CommentID')));
         $userIDs = array_filter(array_unique(array_column($ids, 'UserID')));
@@ -1824,7 +1752,6 @@ class CategoryModel extends Gdn_Model {
             }
         }
 
-        //TODO: bug ?
         $userIDs[] = '';
         // Just gather the users into the local cache.
         Gdn::userModel()->getIDs($userIDs);
@@ -3393,23 +3320,11 @@ class CategoryModel extends Gdn_Model {
      *
      * @since 2.0.18
      * @access public
-     * @param int|bool|array $iD Supports updating cache for several categories.
-     * Use [CategoryID => Data] to set cache for several categories
-     * This fix was added for particular issue
-     * check details https://github.com/topcoder-platform/forums/issues/381
+     * @param int|bool $iD
      * @param array|bool $data
      */
     public static function setCache($iD = false, $data = false) {
-        $ids = false;
-        if(is_array($iD)) { // categoryID => dataFields
-            $ids = $iD;
-        } else if(is_numeric($iD)){
-            $ids[$iD] = $data;
-        }
-
-        foreach ($ids as $i => $data) {
-            self::instance()->collection->refreshCache((int)$i);
-        }
+        self::instance()->collection->refreshCache((int)$iD);
 
         $categories = Gdn::cache()->get(self::CACHE_KEY);
         self::$Categories = null;
@@ -3425,29 +3340,20 @@ class CategoryModel extends Gdn_Model {
         }
         $categories = $categories['categories'];
 
-        foreach ($ids as $i => $data) {
-            // Check for category in list, otherwise remove key if not found
-            if (!array_key_exists($i, $categories)) {
-                Gdn::cache()->remove(self::CACHE_KEY);
-                unset($ids[$i]);
-            }
-        }
-
-        if(count($ids) == 0) {
+        // Check for category in list, otherwise remove key if not found
+        if (!array_key_exists($iD, $categories)) {
+            Gdn::cache()->remove(self::CACHE_KEY);
             return;
         }
-        foreach ($ids as $i => $data) {
-            $category = $categories[$i];
-            $category = array_merge($category, $data);
-            $categories[$i] = $category;
-        }
+
+        $category = $categories[$iD];
+        $category = array_merge($category, $data);
+        $categories[$iD] = $category;
+
         // Update memcache entry
         self::$Categories = $categories;
         unset($categories);
-
-        foreach ($ids as $i => $data) {
-            self::buildCache($i);
-        }
+        self::buildCache($iD);
 
         self::joinUserData(self::$Categories, true);
     }
@@ -3458,11 +3364,9 @@ class CategoryModel extends Gdn_Model {
      * @param int $iD
      * @param array|string $property
      * @param bool|false $value
-     * @param bool $cache This param was added for particular issue
-     * check details https://github.com/topcoder-platform/forums/issues/381
      * @return array|string
      */
-    public function setField($iD, $property, $value = false, $cache = true) {
+    public function setField($iD, $property, $value = false) {
         if (!is_array($property)) {
             $property = [$property => $value];
         }
@@ -3474,9 +3378,7 @@ class CategoryModel extends Gdn_Model {
         $this->SQL->put($this->Name, $property, ['CategoryID' => $iD]);
 
         // Set the cache.
-        if($cache) {
-            self::setCache($iD, $property);
-        }
+        self::setCache($iD, $property);
 
         return $property;
     }
@@ -3566,10 +3468,8 @@ class CategoryModel extends Gdn_Model {
      *
      *
      * @param $categoryID
-     * @param null $cacheFields This param was added for particular issue
-     * check details https://github.com/topcoder-platform/forums/issues/381
      */
-    public function setRecentPost($categoryID, & $cacheFields = null) {
+    public function setRecentPost($categoryID) {
         $row = $this->SQL->getWhere('Discussion', ['CategoryID' => $categoryID], 'DateLastComment', 'desc', 1)->firstRow(DATASET_TYPE_ARRAY);
 
         $fields = ['LastCommentID' => null, 'LastDiscussionID' => null];
@@ -3578,20 +3478,8 @@ class CategoryModel extends Gdn_Model {
             $fields['LastCommentID'] = $row['LastCommentID'];
             $fields['LastDiscussionID'] = $row['DiscussionID'];
         }
-        if(is_array($cacheFields)) {
-            foreach($fields as $key =>$value) {
-                $cacheFields[$categoryID][$key] = $value;
-            }
-            $cacheFields[$categoryID]['LastTitle'] = null;
-            $cacheFields[$categoryID]['LastUserID'] = null;
-            $cacheFields[$categoryID]['LastDateInserted'] = null;
-            $cacheFields[$categoryID]['LastUrl'] = null;
-
-            $this->setField($categoryID, $fields, false, false);
-        } else {
-            $this->setField($categoryID, $fields);
-            self::setCache($categoryID, ['LastTitle' => null, 'LastUserID' => null, 'LastDateInserted' => null, 'LastUrl' => null]);
-        }
+        $this->setField($categoryID, $fields);
+        self::setCache($categoryID, ['LastTitle' => null, 'LastUserID' => null, 'LastDateInserted' => null, 'LastUrl' => null]);
     }
 
     /**
@@ -3825,11 +3713,8 @@ SQL;
      *        check details https://github.com/vanilla/vanilla/issues/7105
      *        and https://github.com/vanilla/vanilla/pull/7843
      *        please avoid of using it.
-     * @param $cacheFields This param was added for particular issue
-     * check details https://github.com/topcoder-platform/forums/issues/381
-     * @throws Exception
      */
-    private static function adjustAggregateCounts($categoryID, $type, $offset, bool $cache = true, &$cacheFields) {
+    private static function adjustAggregateCounts($categoryID, $type, $offset, bool $cache = true) {
         $offset = intval($offset);
 
         if (empty($categoryID)) {
@@ -3858,18 +3743,6 @@ SQL;
             }
         }
 
-        if(is_array($cacheFields)){
-            $categoriesToUpdate = self::instance()->getWhere(['CategoryID' => $updatedCategories]);
-            foreach ($categoriesToUpdate as $current) {
-                $currentID = val('CategoryID', $current);
-                $countAllDiscussions = val('CountAllDiscussions', $current);
-                $countAllComments = val('CountAllComments', $current);
-                $cacheFields[$currentID]['CountAllDiscussions'] = $countAllDiscussions;
-                $cacheFields[$currentID]['CountAllComments'] = $countAllComments;
-
-            }
-        }
-
         // Update the cache.
         if ($cache) {
             $categoriesToUpdate = self::instance()->getWhere(['CategoryID' => $updatedCategories]);
@@ -3895,14 +3768,11 @@ SQL;
      *        check details https://github.com/vanilla/vanilla/issues/7105
      *        and https://github.com/vanilla/vanilla/pull/7843
      *        please avoid of using it.
-     * @param null $fields This param was added for particular issue
-     * check details https://github.com/topcoder-platform/forums/issues/381
-     * @throws Exception
      */
-    public static function incrementAggregateCount($categoryID, $type, $offset = 1, bool $cache = true, &$fields =  null) {
+    public static function incrementAggregateCount($categoryID, $type, $offset = 1, bool $cache = true) {
         // Make sure we're dealing with a positive offset.
         $offset = abs($offset);
-        self::adjustAggregateCounts($categoryID, $type, $offset, $cache,$fields);
+        self::adjustAggregateCounts($categoryID, $type, $offset, $cache);
     }
 
     /**
@@ -3915,14 +3785,11 @@ SQL;
      *        check details https://github.com/vanilla/vanilla/issues/7105
      *        and https://github.com/vanilla/vanilla/pull/7843
      *        please avoid of using it.
-     * @param bool $fields This param was added for particular issue
-     * check details https://github.com/topcoder-platform/forums/issues/381
-     * @throws Exception
      */
-    public static function decrementAggregateCount($categoryID, $type, $offset = 1, bool $cache = true, & $fields = false) {
+    public static function decrementAggregateCount($categoryID, $type, $offset = 1, bool $cache = true) {
         // Make sure we're dealing with a negative offset.
         $offset = (-1 * abs($offset));
-        self::adjustAggregateCounts($categoryID, $type, $offset, $cache,$fields);
+        self::adjustAggregateCounts($categoryID, $type, $offset, $cache);
     }
 
     /**
@@ -4038,20 +3905,13 @@ SQL;
      * Update a category and its parents' LastCategoryID with the specified category's ID.
      *
      * @param int $categoryID A valid category ID.
-     * @param null $cacheFields This param was added for particular issue
-     * check details https://github.com/topcoder-platform/forums/issues/381
      */
-    public static function setAsLastCategory($categoryID, &$cacheFields = null) {
+    public static function setAsLastCategory($categoryID) {
         $categories = self::instance()->collection->getAncestors($categoryID, true);
 
         foreach ($categories as $current) {
             $targetID = val('CategoryID', $current);
-            if(is_array($cacheFields)) {
-                $cacheFields[$targetID]['LastCategoryID'] = $categoryID;
-                self::instance()->setField($targetID, ['LastCategoryID' => $categoryID], false, false);
-            }else {
-                self::instance()->setField($targetID, ['LastCategoryID' => $categoryID]);
-            }
+            self::instance()->setField($targetID, ['LastCategoryID' => $categoryID]);
         }
     }
 }

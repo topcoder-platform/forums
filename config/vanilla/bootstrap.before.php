@@ -374,7 +374,8 @@ if (!function_exists('checkGroupPermission')) {
      * @return bool return true if user has a permission
      */
    function checkGroupPermission($userID,$groupID, $categoryID = null , $permissionCategoryID = null , $permission = null, $fullMatch = true) {
-       return GroupModel::checkPermission($userID,$groupID, $categoryID,$permissionCategoryID , $permission, $fullMatch);
+       $groupModel = new GroupModel();
+       return $groupModel->checkPermission($userID,$groupID, $categoryID,$permissionCategoryID , $permission, $fullMatch);
    }
 }
 
