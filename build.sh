@@ -5,5 +5,9 @@ CI_DEPLOY_TOKEN=$2
 ENV=$3
 UPDATE_CACHE=""
 echo "" > vanilla.env
-ENV=$ENV CI_DEPLOY_TOKEN=$CI_DEPLOY_TOKEN docker-compose -f docker-compose.yml build $APP_NAME
+if [ "$ENV" = "dev" ]; then
+  ENV=$ENV CI_DEPLOY_TOKEN=$CI_DEPLOY_TOKEN docker-compose -f docker-compose.yml -f docker-compose.dev.yml build $APP_NAME
+else
+  ENV=$ENV CI_DEPLOY_TOKEN=$CI_DEPLOY_TOKEN docker-compose -f docker-compose.yml build $APP_NAME
+fi
 #docker create --name app $APP_NAME:latest
