@@ -1064,15 +1064,32 @@ class CategoryModel extends Gdn_Model {
      * @param string $orderDirection
      * @return array
      */
-    public function getTreeAsFlat($id, $offset = null, $limit = null, $filter = null, $orderFields = 'Name', $orderDirection = 'asc') {
-        $query = $this->SQL
-            ->from('Category')
-            ->where('DisplayAs <>', 'Heading')
-            ->where('ParentCategoryID', $id)
-            ->limit($limit, $offset)
+    public function getTreeAsFlat($id, $offset = null, $limit = null, $filter = null, $orderFields = 'Name', $orderDirection = 'asc')
+    {
+        $query = $this->SQL->from('Category c');
+
+        //FIX: https://github.com/topcoder-platform/forums/issues/422
+        if (!val('isAdmin', $filter, false)) {
+            if (val('UserID', $filter, false)) {
+                $userID = val('UserID', $filter);
+                $query->
+                    leftJoin('UserGroup ug', 'c.GroupID = ug.GroupID')
+                    ->beginWhereGroup()
+                    ->where('c.GroupID is null')
+                    ->orWhere('ug.UserID', $userID)
+                    ->endWhereGroup();
+            } else {
+                $query->where('c.GroupID is null');
+            }
+        }
+
+        $query->where('DisplayAs <>', 'Heading')
+              ->where('ParentCategoryID', $id);
+
+        $query->limit($limit, $offset)
             ->orderBy($orderFields, $orderDirection);
 
-        if ($filter) {
+        if ($filter && is_string($filter)) {
             $query->like('Name', $filter);
         }
 
@@ -1080,6 +1097,43 @@ class CategoryModel extends Gdn_Model {
         $categories = $this->flattenCategories($categories);
 
         return $categories;
+    }
+
+    /**
+     * FIX:  https://github.com/topcoder-platform/forums/issues/422
+     * @param int|string $id The parent category ID or slug.
+     * @param string|null $filter Restrict results to only those with names matching this value, if provided.
+     * @return  int
+     *
+     */
+    public function countOfCategories($id, $filter = null) {
+        $query = $this->SQL
+            ->select('c.CategoryID', 'count', 'Count')
+            ->from('Category c');
+
+        if (!val('isAdmin', $filter, false)) {
+            if (val('UserID', $filter, false)) {
+                $userID = val('UserID', $filter);
+                $query->
+                leftJoin('UserGroup ug', 'c.GroupID = ug.GroupID')
+                    ->beginWhereGroup()
+                    ->where('c.GroupID is null')
+                    ->orWhere('ug.UserID', $userID)
+                    ->endWhereGroup();
+            } else {
+                $query->where('c.GroupID is null');
+            }
+        }
+
+        $query->where('DisplayAs <>', 'Heading')
+            ->where('ParentCategoryID', $id);
+
+        if ($filter && is_string($filter)) {
+            $query->like('Name', $filter);
+        }
+        $count = $query->get()
+            ->firstRow()->Count;
+        return $count;
     }
 
     /**
