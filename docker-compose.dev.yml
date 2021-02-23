@@ -1,21 +1,11 @@
 version: '3'
 services:
-  mysql-local:
-    image: mysql
-    container_name: mysql-local
-    ports:
-      - 3306:3306
-    env_file:
-      - ./mysql.env
-    security_opt:
-      - seccomp:unconfined
-    command: --default-authentication-plugin=mysql_native_password
   vanilla-forums:
     links:
-      - mysql-local
-      - memcached-local
-  memcached-local:
-    image: memcached:1.5
-    container_name: memcached-local
+      - tideways-daemon
+  tideways-daemon:
+    container_name: tideways-daemon
+    build:
+      context: ./tideways-daemon
     ports:
-      - "11211:11211"
+      - 9135:9135

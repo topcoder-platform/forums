@@ -1365,8 +1365,6 @@ class CommentModel extends Gdn_Model {
             ['DiscussionID' => $DiscussionID, 'UserID' => val('InsertUserID', $Fields)]
         );
 
-        // Update cached modified column info for a category.
-        CategoryModel::updateModifiedComment($Fields);
 
         if ($Insert) {
             // UPDATE COUNT AND LAST COMMENT ON CATEGORY TABLE
@@ -1380,6 +1378,8 @@ class CommentModel extends Gdn_Model {
                     $Discussion ? (array)$Discussion : null
                 );
             }
+        } else {
+            CategoryModel::updateModifiedComment($Fields);
         }
     }
 
