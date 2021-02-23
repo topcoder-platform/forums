@@ -140,8 +140,16 @@ class CategoriesController extends VanillaController {
                 $perPage = c('Vanilla.Categories.PerPage', 30);
                 $page = Gdn::request()->get('Page', Gdn::request()->get('page', null));
                 list($offset, $limit) = offsetLimit($page, $perPage);
-                $categoryTree = $this->CategoryModel->getTreeAsFlat($categoryIdentifier, $offset, $limit);
+
+                $filter = [];
+                if(Gdn::session()->isValid()) {
+                   $filter['UserID'] = Gdn::session()->UserID;
+                   $filter['isAdmin'] = Gdn::session()->User->Admin;
+                }
+                $categoryTree = $this->CategoryModel->getTreeAsFlat($categoryIdentifier, $offset, $limit,$filter, 'c.DateInserted', 'desc');
+                $countOfCategoryTree = $this->CategoryModel->countOfCategories($categoryIdentifier,$filter);
                 $this->setData('_Limit', $perPage);
+                $this->setData('_RecordCount', $countOfCategoryTree);
                 $this->setData('_CurrentRecords', count($categoryTree));
                 break;
             case 'Categories':
@@ -616,23 +624,25 @@ class CategoriesController extends VanillaController {
                 true
             );
         }
+        // FIX: https://github.com/topcoder-platform/forums/issues/422
+        // Sorting for Flat type in SQL
+        if($displayAs != 'Flat') {
+            if ($this->data('CategorySort')) {
+                if ($this->data('CategorySort') == self::SORT_OLDEST_POST) {
+                    usort($categoryTree, function ($a, $b) {
+                        return Gdn_Format::toTimestamp($a['LastDiscussionCommentsDate']) - Gdn_Format::toTimestamp($b['LastDiscussionCommentsDate']);
+                    });
 
-        if($this->data('CategorySort')) {
-            if( $this->data('CategorySort') == self::SORT_OLDEST_POST) {
-                usort($categoryTree, function ($a, $b) {
-                    return  Gdn_Format::toTimestamp($a['LastDiscussionCommentsDate']) - Gdn_Format::toTimestamp($b['LastDiscussionCommentsDate']);
-                });
-
-            } else if( $this->data('CategorySort') == self::SORT_LAST_POST) {
-                usort($categoryTree, function ($a, $b) {
-                    return  Gdn_Format::toTimestamp($b['LastDiscussionCommentsDate']) - Gdn_Format::toTimestamp($a['LastDiscussionCommentsDate']);
-
+                } else if ($this->data('CategorySort') == self::SORT_LAST_POST) {
+                    usort($categoryTree, function ($a, $b) {
+                        return Gdn_Format::toTimestamp($b['LastDiscussionCommentsDate']) - Gdn_Format::toTimestamp($a['LastDiscussionCommentsDate']);
+                    });
+                }
+            } else {
+                usort($categoryTree, function ($a, $b) { // desc
+                    return Gdn_Format::toTimestamp($b['LastDiscussionCommentsDate']) - Gdn_Format::toTimestamp($a['LastDiscussionCommentsDate']);
                 });
             }
-        } else {
-            usort($categoryTree, function ($a, $b) { // desc
-               return  Gdn_Format::toTimestamp($b['LastDiscussionCommentsDate']) - Gdn_Format::toTimestamp($a['LastDiscussionCommentsDate']);
-            });
         }
 
         $this->setData('CategoryTree', $categoryTree);
