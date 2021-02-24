@@ -1084,6 +1084,14 @@ class CategoryModel extends Gdn_Model {
     {
         $query = $this->SQL->from('Category c');
 
+        if(!$filter) {
+            if (Gdn::session()->isValid()) {
+                $filter = [];
+                $filter['UserID'] = Gdn::session()->UserID;
+                $filter['isAdmin'] = Gdn::session()->User->Admin;
+            }
+        }
+
         //FIX: https://github.com/topcoder-platform/forums/issues/422
         if (!val('isAdmin', $filter, false)) {
             if (val('UserID', $filter, false)) {
