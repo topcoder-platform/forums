@@ -409,7 +409,7 @@ class PostController extends VanillaController {
         $this->fireEvent('BeforeDiscussionRender');
 
         if ($this->CategoryID) {
-            $breadcrumbs = CategoryModel::getAncestors($this->CategoryID);
+            $breadcrumbs = $this->buildBreadcrumbs($this->CategoryID);
         } else {
             $breadcrumbs = [];
         }
@@ -419,7 +419,6 @@ class PostController extends VanillaController {
             'Url' => val('AddUrl', val($this->data('Type'), DiscussionModel::discussionTypes()), '/post/discussion')
         ];
 
-        array_unshift ( $breadcrumbs , CategoriesController::ROOT_CATEGORY);
         $this->setData('Breadcrumbs', $breadcrumbs);
 
         // FIX: Hide Announce options

@@ -13,6 +13,8 @@
  */
 class VanillaController extends Gdn_Controller {
 
+    const ROOT_CATEGORY =  ['Name' => 'Roundtables', 'Url'=>'/'];
+
     /**
      * Include JS, CSS, and modules used by all methods.
      *
@@ -67,6 +69,29 @@ class VanillaController extends Gdn_Controller {
     protected function checkPageRange(int $offset, int $totalCount) {
         if ($offset > 0 && $offset >= $totalCount) {
             throw notFoundException();
+        }
+    }
+
+    protected function buildBreadcrumbs($CategoryID) {
+        $Category = CategoryModel::categories($CategoryID);
+        $ancestors = CategoryModel::getAncestors($CategoryID);
+        if(val('GroupID', $Category) > 0) {
+            $temp = [];
+            foreach ($ancestors as $id => $ancestor) {
+                if($ancestor['GroupID'] > 0) {
+                    $temp[$ancestor['CategoryID']] = $ancestor;
+                } else {
+                    if($ancestor['UrlCode'] == 'challenges-forums') {
+                        array_push($temp,  ['Name' => 'Challenge Discussions', 'Url'=>'/groups/mine?filter=challenge']);
+                    }else if($ancestor['UrlCode'] == 'groups') {
+                        array_push($temp,  ['Name' => 'Group Discussions', 'Url'=>'/groups/mine?filter=regular']);
+                    }
+                }
+            }
+            return $temp;
+        } else {
+            array_unshift($ancestors, self::ROOT_CATEGORY);
+            return $ancestors;
         }
     }
 
