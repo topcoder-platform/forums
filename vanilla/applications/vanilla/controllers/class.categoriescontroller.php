@@ -140,14 +140,8 @@ class CategoriesController extends VanillaController {
                 $perPage = c('Vanilla.Categories.PerPage', 30);
                 $page = Gdn::request()->get('Page', Gdn::request()->get('page', null));
                 list($offset, $limit) = offsetLimit($page, $perPage);
-
-                $filter = [];
-                if(Gdn::session()->isValid()) {
-                   $filter['UserID'] = Gdn::session()->UserID;
-                   $filter['isAdmin'] = Gdn::session()->User->Admin;
-                }
-                $categoryTree = $this->CategoryModel->getTreeAsFlat($categoryIdentifier, $offset, $limit,$filter, 'c.DateInserted', 'desc');
-                $countOfCategoryTree = $this->CategoryModel->countOfCategories($categoryIdentifier,$filter);
+                $categoryTree = $this->CategoryModel->getTreeAsFlat($categoryIdentifier, $offset, $limit,null, 'c.DateInserted', 'desc');
+                $countOfCategoryTree = $this->CategoryModel->countOfCategories($categoryIdentifier, null);
                 $this->setData('_Limit', $perPage);
                 $this->setData('_RecordCount', $countOfCategoryTree);
                 $this->setData('_CurrentRecords', count($categoryTree));

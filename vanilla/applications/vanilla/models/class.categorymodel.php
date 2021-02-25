@@ -1084,18 +1084,20 @@ class CategoryModel extends Gdn_Model {
     {
         $query = $this->SQL->from('Category c');
 
-        if(!$filter) {
-            if (Gdn::session()->isValid()) {
-                $filter = [];
-                $filter['UserID'] = Gdn::session()->UserID;
-                $filter['isAdmin'] = Gdn::session()->User->Admin;
-            }
+        $filters = [];
+        if ($filter && is_string($filter)) {
+            $filters['Name']= $filter;
+        }
+
+        if (Gdn::session()->isValid()) {
+            $filters['UserID'] = Gdn::session()->UserID;
+            $filters['isAdmin'] = Gdn::session()->User->Admin;
         }
 
         //FIX: https://github.com/topcoder-platform/forums/issues/422
-        if (!val('isAdmin', $filter, false)) {
-            if (val('UserID', $filter, false)) {
-                $userID = val('UserID', $filter);
+        if (!val('isAdmin', $filters, false)) {
+            if (val('UserID', $filters, false)) {
+                $userID = val('UserID', $filters);
                 $query->
                     leftJoin('UserGroup ug', 'c.GroupID = ug.GroupID')
                     ->beginWhereGroup()
@@ -1113,8 +1115,8 @@ class CategoryModel extends Gdn_Model {
         $query->limit($limit, $offset)
             ->orderBy($orderFields, $orderDirection);
 
-        if ($filter && is_string($filter)) {
-            $query->like('Name', $filter);
+        if (!val('Name', $filters, false)) {
+            $query->like('Name', $filters['Name']);
         }
 
         $categories = $query->get()->resultArray();
@@ -1131,13 +1133,24 @@ class CategoryModel extends Gdn_Model {
      *
      */
     public function countOfCategories($id, $filter = null) {
+        $filters = [];
+        if ($filter && is_string($filter)) {
+            $filters['Name']= $filter;
+        }
+
+        if (Gdn::session()->isValid()) {
+            $filters['UserID'] = Gdn::session()->UserID;
+            $filters['isAdmin'] = Gdn::session()->User->Admin;
+        }
+
         $query = $this->SQL
             ->select('c.CategoryID', 'count', 'Count')
             ->from('Category c');
 
-        if (!val('isAdmin', $filter, false)) {
-            if (val('UserID', $filter, false)) {
-                $userID = val('UserID', $filter);
+
+        if (!val('isAdmin', $filters, false)) {
+            if (val('UserID', $filters, false)) {
+                $userID = val('UserID', $filters);
                 $query->
                 leftJoin('UserGroup ug', 'c.GroupID = ug.GroupID')
                     ->beginWhereGroup()
@@ -1152,9 +1165,10 @@ class CategoryModel extends Gdn_Model {
         $query->where('DisplayAs <>', 'Heading')
             ->where('ParentCategoryID', $id);
 
-        if ($filter && is_string($filter)) {
-            $query->like('Name', $filter);
+        if (!val('Name', $filters, false)) {
+            $query->like('Name', $filters['Name']);
         }
+
         $count = $query->get()
             ->firstRow()->Count;
         return $count;
