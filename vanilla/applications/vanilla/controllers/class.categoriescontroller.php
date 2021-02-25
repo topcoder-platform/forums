@@ -410,8 +410,10 @@ class CategoriesController extends VanillaController {
                 $this->Head->addRss(categoryUrl($category) . '/feed.rss', $this->Head->title());
             }
 
-            // Add modules
-            $this->addModule('NewDiscussionModule');
+            if($category->DisplayAs == 'Discussions') {
+                // Add modules
+                $this->addModule('NewDiscussionModule');
+            }
             $this->addModule('DiscussionFilterModule');
           //  $this->addModule('CategoriesModule');
             $this->addModule('BookmarkedModule');
@@ -642,7 +644,7 @@ class CategoriesController extends VanillaController {
         $this->setData('CategoryTree', $categoryTree);
 
         // Add modules
-        if($Category) {
+        if($Category && $displayAs == 'Discussions') {
             $this->addModule('NewDiscussionModule');
         }
         $this->addModule('DiscussionFilterModule');
