@@ -125,9 +125,7 @@ class DiscussionController extends VanillaController {
             Gdn_Theme::section($CategoryCssClass);
         }
 
-        $ancestors = CategoryModel::getAncestors($this->CategoryID);
-        array_unshift ( $ancestors , CategoriesController::ROOT_CATEGORY);
-        $this->setData('Breadcrumbs', $ancestors);
+        $this->setData('Breadcrumbs', $this->buildBreadcrumbs($this->CategoryID));
 
         // Setup
         $this->title($this->Discussion->Name);

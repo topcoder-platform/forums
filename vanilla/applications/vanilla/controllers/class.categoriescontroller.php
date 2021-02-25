@@ -34,7 +34,6 @@ class CategoriesController extends VanillaController {
     const SORT_LAST_POST = 'new';
     const SORT_OLDEST_POST = 'old';
 
-    const ROOT_CATEGORY =  ['Name' => 'Roundtables', 'Url'=>'/'];
     /**
      * @var \Closure $categoriesCompatibilityCallback A backwards-compatible callback to get `$this->data('Categories')`.
      */
@@ -335,11 +334,7 @@ class CategoriesController extends VanillaController {
             }
 
             // Load the breadcrumbs.
-
-            $ancestors = CategoryModel::getAncestors(val('CategoryID', $category));
-            array_unshift ( $ancestors , self::ROOT_CATEGORY);
-            $this->setData('Breadcrumbs', $ancestors);
-
+            $this->setData('Breadcrumbs', $this->buildBreadcrumbs(val('CategoryID', $category)));
 
             $this->setData('Category', $category, true);
             // Set CategoryID
@@ -553,10 +548,7 @@ class CategoriesController extends VanillaController {
             $this->description(c('Garden.Description', null));
         }
 
-        $ancestors = CategoryModel::getAncestors(val('CategoryID', $this->data('Category')));
-        array_unshift ( $ancestors , self::ROOT_CATEGORY);
-        $this->setData('Breadcrumbs', $ancestors);
-
+        $this->setData('Breadcrumbs', $this->buildBreadcrumbs(val('CategoryID', $this->data('Category'))));
 
         // Set the category follow toggle before we load category data so that it affects the category query appropriately.
         $CategoryFollowToggleModule = new CategoryFollowToggleModule($this);
