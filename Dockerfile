@@ -35,7 +35,7 @@ RUN git clone --branch ${BRANCH} https://${CI_DEPLOY_TOKEN}@github.com/topcoder-
 RUN git clone --branch ${BRANCH} https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-topcoder-editor-plugin /tmp/forums-plugins/TopcoderEditor
 
 # Copy the forum-theme repository
-RUN git clone --branch ${BRANCH} 'https://github.com/topcoder-platform/forums-theme.git' /vanillapp/themes/topcoder
+RUN git clone --branch ${BRANCH} https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-theme.git /vanillapp/themes/topcoder
 
 # Remove DebugPlugin from PROD env
 # RUN if [ "$ENV" = "prod" ]; \
