@@ -51,7 +51,7 @@ jobs:
       LOGICAL_ENV: "dev"
       APPNAME: "vanilla-forums"
       CI_DEPLOY_TOKEN: $CI_DEPLOY_TOKEN
-      BRANCH: $CIRCLE_BRANCH
+      BRANCH: "develop"
     steps: *builddeploy_steps
 
   "build-prod":
@@ -61,7 +61,7 @@ jobs:
       LOGICAL_ENV: "prod"    
       APPNAME: "vanilla-forums"
       CI_DEPLOY_TOKEN: $CI_DEPLOY_TOKEN
-      BRANCH: $CIRCLE_BRANCH
+      BRANCH: "master"
     steps: *builddeploy_steps
 
 workflows:
