@@ -113,6 +113,8 @@ $Configuration['Plugins']['Filestack']['ApiKey'] = getenv('FILESTACK_API_KEY');
 $Configuration['Plugins']['Sumologic']['HttpSourceURL'] = '';
 $Configuration['Plugins']['Sumologic']['BatchSize'] = 10;
 
+// e.g. '+15 min',  '+1 day'
+$Configuration['Plugins']['Groups']['InviteExpiration']= '+20 min';
 
 // RichEditor
 $Configuration['RichEditor']['Quote']['Enable'] = true;
