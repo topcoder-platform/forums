@@ -106,12 +106,15 @@ class PostController extends VanillaController {
     /**
      * Create or update a discussion.
      *
+     * @param string $categoryUrlCode
+     * @param bool $announce Used for a new discussion only,
+     * https://github.com/topcoder-platform/forums/issues/444
+     * @throws Gdn_UserException
      * @since 2.0.0
      * @access public
      *
-     * @param int $categoryID Unique ID of the category to add the discussion to.
      */
-    public function discussion($categoryUrlCode = '') {
+    public function discussion($categoryUrlCode = '', $announce = '') {
         // Override CategoryID if categories are disabled
         $useCategories = $this->ShowCategorySelector = (bool)c('Vanilla.Categories.Use');
         if (!$useCategories) {
@@ -185,6 +188,9 @@ class PostController extends VanillaController {
             $this->Form->removeFormValue('DiscussionID');
             // Make sure a group discussion doesn't get announced outside the groups category.
             $formAnnounce = $this->Form->_FormValues['Announce'];
+            if($announce && $announce == 1) {
+                $this->Form->setFormValue('Announce', '2'); // Announce in a category only
+            }
             // if (isset($formAnnounce) && $formAnnounce === '1') {
             // if (isset($this->Data['Group'])) {
             //     $this->Form->setFormValue('Announce', '2');
