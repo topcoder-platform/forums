@@ -1723,6 +1723,12 @@ if (!function_exists('signInUrl')) {
             }
         }
 
+       // FIX: https://github.com/topcoder-platform/forums/issues/383
+       // The '' and the default route navigates to a home page
+       if ($target === c('Routes.DefaultController')) {
+            $target = '' ;
+       }
+
         return '/entry/signin'.($target ? '?Target='.urlencode($target) : '');
     }
 }
