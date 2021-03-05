@@ -336,7 +336,7 @@ if (!function_exists('getDiscussionOptionsDropdown')):
         }
 
         $discussionID = $discussion->DiscussionID;
-        $categoryUrl = urlencode(categoryUrl(CategoryModel::categories($categoryID)));
+        $categoryUrl = urlencode(categoryUrl(CategoryModel::categories($categoryID),'',false));
 
         // Permissions
         $canEdit = DiscussionModel::canEdit($discussion, $timeLeft);
