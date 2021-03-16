@@ -2124,6 +2124,10 @@ class DiscussionModel extends Gdn_Model {
         }
 
         if (count($validationResults) == 0) {
+
+            // FIX: https://github.com/topcoder-platform/forums/issues/381
+            $cacheFields = array();
+
             // Backward compatible check for flood control
             if (!val('SpamCheck', $this, true)) {
                 deprecated('DiscussionModel->SpamCheck attribute', 'FloodControlTrait->setFloodControlEnabled()');
@@ -2226,8 +2230,8 @@ class DiscussionModel extends Gdn_Model {
                     $discussionID = $this->SQL->insert($this->Name, $fields);
                     $fields['DiscussionID'] = $discussionID;
 
-                    // Update cached last post info for a category.
-                    CategoryModel::updateLastPost($fields);
+                    // Update last post info for a category in DB, then in cache
+                    CategoryModel::updateLastPost($fields, null, $cacheFields);
 
                     // Clear the cache if necessary.
                     if (val('Announce', $fields)) {
@@ -2262,17 +2266,22 @@ class DiscussionModel extends Gdn_Model {
 
                 // Update discussion counter for affected categories.
                 if ($insert || $storedCategoryID) {
-                    CategoryModel::instance()->incrementLastDiscussion($discussion);
+                    CategoryModel::instance()->incrementLastDiscussion($discussion, $cacheFields);
                 }
 
-                if ($storedCategoryID) {
-                    $this->updateDiscussionCount($storedCategoryID);
+               if ($storedCategoryID) {
+                    $this->updateDiscussionCount($storedCategoryID, false,  $cacheFields);
                 }
+
 
                 // Update cached modified discussion info for a category.
-                CategoryModel::updateModifiedDiscussion($discussion);
+                CategoryModel::updateModifiedDiscussion($discussion, $cacheFields);
 
-                $this->calculateMediaAttachments($discussionID, !$insert);
+                // Update cache
+                CategoryModel::setCache($cacheFields, false);
+
+                // Don't use MediaAttahmenent for discussions
+                // $this->calculateMediaAttachments($discussionID, !$insert);
 
                 // Fire an event that the discussion was saved.
                 $this->EventArguments['FormPostValues'] = $formPostValues;
@@ -2281,8 +2290,7 @@ class DiscussionModel extends Gdn_Model {
                 $this->EventArguments['SendNewDiscussionNotification'] = $sendNewDiscussionNotification;
                 $this->fireEvent('AfterSaveDiscussion');
 
-
-                //FIX: https://github.com/topcoder-platform/forums/issues/213
+                // FIX: https://github.com/topcoder-platform/forums/issues/213
                 // If the plugin is enabled then send notifications after updating MediaTables with discussionID
                 if ($sendNewDiscussionNotification === true) {
                     if(!c('EnabledPlugins.editor', false)) {
@@ -2498,8 +2506,10 @@ class DiscussionModel extends Gdn_Model {
      *
      * @param int $categoryID Unique ID of category we are updating.
      * @param array|false $discussion The discussion to update the count for or **false** for all of them.
+     * @param null $cacheFields This param was added for particular issue
+     * check details https://github.com/topcoder-platform/forums/issues/381
      */
-    public function updateDiscussionCount($categoryID, $discussion = false) {
+    public function updateDiscussionCount($categoryID, $discussion = false, &$cacheFields = null) {
         $discussionID = val('DiscussionID', $discussion, false);
         if (strcasecmp($categoryID, 'All') == 0) {
             $exclude = (bool)Gdn::config('Vanilla.Archive.Exclude');
@@ -2557,8 +2567,17 @@ class DiscussionModel extends Gdn_Model {
             }
 
             $categoryModel = new CategoryModel();
-            $categoryModel->setField($categoryID, $cacheAmendment);
-            $categoryModel->setRecentPost($categoryID);
+            if(is_array($cacheFields)) {
+                //Update cache later
+                foreach($cacheAmendment as $key =>$value) {
+                    $cacheFields[$categoryID][$key] = $value;
+                }
+                $categoryModel->setField($categoryID, $cacheAmendment, false, false);
+                $categoryModel->setRecentPost($categoryID, $cacheFields);
+            } else {
+                $categoryModel->setField($categoryID, $cacheAmendment);
+                $categoryModel->setRecentPost($categoryID);
+            }
         }
     }
 

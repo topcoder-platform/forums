@@ -34,7 +34,6 @@ class CategoriesController extends VanillaController {
     const SORT_LAST_POST = 'new';
     const SORT_OLDEST_POST = 'old';
 
-    const ROOT_CATEGORY =  ['Name' => 'Roundtables', 'Url'=>'/'];
     /**
      * @var \Closure $categoriesCompatibilityCallback A backwards-compatible callback to get `$this->data('Categories')`.
      */
@@ -140,8 +139,10 @@ class CategoriesController extends VanillaController {
                 $perPage = c('Vanilla.Categories.PerPage', 30);
                 $page = Gdn::request()->get('Page', Gdn::request()->get('page', null));
                 list($offset, $limit) = offsetLimit($page, $perPage);
-                $categoryTree = $this->CategoryModel->getTreeAsFlat($categoryIdentifier, $offset, $limit);
+                $categoryTree = $this->CategoryModel->getTreeAsFlat($categoryIdentifier, $offset, $limit,null, 'c.DateInserted', 'desc');
+                $countOfCategoryTree = $this->CategoryModel->countOfCategories($categoryIdentifier, null);
                 $this->setData('_Limit', $perPage);
+                $this->setData('_RecordCount', $countOfCategoryTree);
                 $this->setData('_CurrentRecords', count($categoryTree));
                 break;
             case 'Categories':
@@ -333,11 +334,7 @@ class CategoriesController extends VanillaController {
             }
 
             // Load the breadcrumbs.
-
-            $ancestors = CategoryModel::getAncestors(val('CategoryID', $category));
-            array_unshift ( $ancestors , self::ROOT_CATEGORY);
-            $this->setData('Breadcrumbs', $ancestors);
-
+            $this->setData('Breadcrumbs', $this->buildBreadcrumbs(val('CategoryID', $category)));
 
             $this->setData('Category', $category, true);
             // Set CategoryID
@@ -408,8 +405,10 @@ class CategoriesController extends VanillaController {
                 $this->Head->addRss(categoryUrl($category) . '/feed.rss', $this->Head->title());
             }
 
-            // Add modules
-            $this->addModule('NewDiscussionModule');
+            if($category->DisplayAs == 'Discussions') {
+                // Add modules
+                $this->addModule('NewDiscussionModule');
+            }
             $this->addModule('DiscussionFilterModule');
           //  $this->addModule('CategoriesModule');
             $this->addModule('BookmarkedModule');
@@ -549,10 +548,7 @@ class CategoriesController extends VanillaController {
             $this->description(c('Garden.Description', null));
         }
 
-        $ancestors = CategoryModel::getAncestors(val('CategoryID', $this->data('Category')));
-        array_unshift ( $ancestors , self::ROOT_CATEGORY);
-        $this->setData('Breadcrumbs', $ancestors);
-
+        $this->setData('Breadcrumbs', $this->buildBreadcrumbs(val('CategoryID', $this->data('Category'))));
 
         // Set the category follow toggle before we load category data so that it affects the category query appropriately.
         $CategoryFollowToggleModule = new CategoryFollowToggleModule($this);
@@ -616,29 +612,31 @@ class CategoriesController extends VanillaController {
                 true
             );
         }
+        // FIX: https://github.com/topcoder-platform/forums/issues/422
+        // Sorting for Flat type in SQL
+        if($displayAs != 'Flat') {
+            if ($this->data('CategorySort')) {
+                if ($this->data('CategorySort') == self::SORT_OLDEST_POST) {
+                    usort($categoryTree, function ($a, $b) {
+                        return Gdn_Format::toTimestamp($a['LastDiscussionCommentsDate']) - Gdn_Format::toTimestamp($b['LastDiscussionCommentsDate']);
+                    });
 
-        if($this->data('CategorySort')) {
-            if( $this->data('CategorySort') == self::SORT_OLDEST_POST) {
-                usort($categoryTree, function ($a, $b) {
-                    return  Gdn_Format::toTimestamp($a['LastDiscussionCommentsDate']) - Gdn_Format::toTimestamp($b['LastDiscussionCommentsDate']);
-                });
-
-            } else if( $this->data('CategorySort') == self::SORT_LAST_POST) {
-                usort($categoryTree, function ($a, $b) {
-                    return  Gdn_Format::toTimestamp($b['LastDiscussionCommentsDate']) - Gdn_Format::toTimestamp($a['LastDiscussionCommentsDate']);
-
+                } else if ($this->data('CategorySort') == self::SORT_LAST_POST) {
+                    usort($categoryTree, function ($a, $b) {
+                        return Gdn_Format::toTimestamp($b['LastDiscussionCommentsDate']) - Gdn_Format::toTimestamp($a['LastDiscussionCommentsDate']);
+                    });
+                }
+            } else {
+                usort($categoryTree, function ($a, $b) { // desc
+                    return Gdn_Format::toTimestamp($b['LastDiscussionCommentsDate']) - Gdn_Format::toTimestamp($a['LastDiscussionCommentsDate']);
                 });
             }
-        } else {
-            usort($categoryTree, function ($a, $b) { // desc
-               return  Gdn_Format::toTimestamp($b['LastDiscussionCommentsDate']) - Gdn_Format::toTimestamp($a['LastDiscussionCommentsDate']);
-            });
         }
 
         $this->setData('CategoryTree', $categoryTree);
 
         // Add modules
-        if($Category) {
+        if($Category && $displayAs == 'Discussions') {
             $this->addModule('NewDiscussionModule');
         }
         $this->addModule('DiscussionFilterModule');
