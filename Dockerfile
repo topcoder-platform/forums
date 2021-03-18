@@ -82,3 +82,9 @@ RUN if [ "$ENV" = "dev" ]; then \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*; \
     echo 'extension=tideways.so\ntideways.connection=tcp://tideways-daemon:9135\ntideways.enable_cli=0\n' >> opt/docker/etc/php/php.ini; \
 fi
+
+# Copy custom supervisor's configs and scripts
+# Netcat is used to connect to a memcached server
+RUN apt-get update && apt-get install -y netcat
+COPY ./services/flush_cache.conf /opt/docker/etc/supervisor.d/
+COPY ./services/flush_cache.sh /opt/docker/bin/service.d/
