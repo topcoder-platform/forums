@@ -51,7 +51,8 @@ class CategoriesApiController extends AbstractApiController {
      */
     public function categoryPostSchema($type = '', array $extra = []) {
         if ($this->categoryPostSchema === null) {
-            $fields = ['name', 'parentCategoryID?', 'urlcode', 'displayAs?', 'customPermissions?', 'groupID?'];
+            $fields = ['name', 'parentCategoryID?', 'urlcode', 'displayAs?', 'customPermissions?',
+                'groupID?', 'archived?'];
             $this->categoryPostSchema = $this->schema(
                 Schema::parse(array_merge($fields, $extra))->add($this->schemaWithParent()),
                 'CategoryPost'
@@ -129,7 +130,7 @@ class CategoriesApiController extends AbstractApiController {
             'parentCategoryID:i|n' => 'Parent category ID.',
             'groupID:i|n' => 'Group ID.',
             'customPermissions:b' => 'Are custom permissions set for this category?',
-            'isArchived:b' => 'The archived state of this category.',
+            'archived:b' => 'The archived state of this category.',
             'urlcode:s' => 'The URL code of the category.',
             'url:s' => 'The URL to the category.',
             'displayAs:s' => [
@@ -551,9 +552,6 @@ class CategoriesApiController extends AbstractApiController {
         if (!empty($dbRecord['Children']) && is_array($dbRecord['Children'])) {
             $dbRecord['Children'] = array_map([$this, 'normalizeOutput'], $dbRecord['Children']);
         }
-
-        $dbRecord['isArchived'] = $dbRecord['Archived'];
-
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         return $schemaRecord;
     }
