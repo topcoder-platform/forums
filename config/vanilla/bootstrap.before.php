@@ -299,13 +299,14 @@ if (!function_exists('dateUpdated')) {
      */
     function dateUpdated($row, $wrap = null) {
         $result = '';
+        $insertUserID = val('InsertUserID', $row);
         $dateUpdated = val('DateUpdated', $row);
         $updateUserID = val('UpdateUserID', $row);
 
         if ($dateUpdated) {
             $updateUser = Gdn::userModel()->getID($updateUserID);
             $dateUpdatedFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($dateUpdated, false, DateTimeFormatter::FORCE_FULL_FORMAT);
-            if ($updateUser) {
+            if ($updateUser && $insertUserID != $updateUserID) {
                 $title = sprintf(t('Edited %s by %s.'), $dateUpdatedFormatted, val('Name', $updateUser));
                 $link = userAnchor($updateUser);
                 $text =  sprintf(t('edited %s by %s'), $dateUpdatedFormatted, $link);
