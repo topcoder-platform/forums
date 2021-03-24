@@ -539,7 +539,7 @@ class CategoriesController extends VanillaController {
             if ($Title) {
                 $this->title($Title, '');
             } else {
-                $this->title(t('Roundtables'));
+                $this->title(t('Public Forums'));
             }
         }
         Gdn_Theme::section('CategoryList');
@@ -677,7 +677,7 @@ class CategoriesController extends VanillaController {
             if ($Title) {
                 $this->title($Title, '');
             } else {
-                $this->title(t('Roundtables'));
+                $this->title(t('Public Forums'));
             }
         }
 
