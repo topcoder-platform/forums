@@ -147,6 +147,11 @@ if (!function_exists('writeListItem')):
      * @throws Exception
      */
     function writeListItem($category, $depth) {
+        $urlcode = $category['UrlCode'];
+        // FIX: https://github.com/topcoder-platform/forums/issues/477: Don't show 'Challenge Forums'
+        if($urlcode == VanillaController::CHALLENGE_FORUMS_URLCODE) {
+            return;
+        }
         $children = $category['Children'];
         $categoryID = val('CategoryID', $category);
         $cssClass = cssClass($category, true);
