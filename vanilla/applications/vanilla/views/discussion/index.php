@@ -38,7 +38,8 @@ if ($this->data('Page') == 1) {
         <div class="Item-BodyWrap">
             <div class="Item-Body">
                 <?php
-                    Gdn::controller()->fireEvent('Replies');
+                   writeInlineDiscussionOptions($this->data('Discussion'));
+                   // Gdn::controller()->fireEvent('Replies');
                 ?>
             </div>
         </div>

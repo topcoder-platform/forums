@@ -805,3 +805,78 @@ if (!function_exists('myDraftsMenuItem')) {
         return sprintf('<li id="MyDrafts" class="%s">%s</li>', $cssClass, anchor(sprite('SpMyDrafts').$Drafts, '/drafts'));
     }
 }
+
+if(!function_exists('writeInlineDiscussionOptions')) {
+    function writeInlineDiscussionOptions($discussionRow) {
+       $discussionID = val('DiscussionID', $discussionRow);
+       Gdn::controller()->EventArguments['RecordID'] = $discussionID;
+        //Gdn_Theme::bulletRow();
+       echo '<div class="Controls flex">';
+       echo '<div class="left">';
+       Gdn::controller()->EventArguments['RecordID'] = $discussionID;
+       Gdn::controller()->fireEvent('InlineDiscussionOptionsLeft');
+       echo '</div>';
+       echo '<div class="center"></div>';
+       echo '<div class="right">';
+
+        // Write the items.
+       static $items = [];
+
+       // $canEdit = DiscussionModel::canEdit($discussionRow, $timeLeft);
+       // if($canEdit) {
+          // array_push($items, anchor(t('Edit'), '/post/editdiscussion/'.$discussionID));
+       // }
+
+       Gdn::controller()->EventArguments['Items'] = &$items;
+        // Allow addons to work with items
+       Gdn::controller()->fireEvent('InlineDiscussionOptionsRight');
+       if (!empty($items) && is_array($items)) {
+           array_walk($items, function(&$value, $key) {
+               $value = '<span class="" style="">'.$value.'</span>';
+           });
+
+           echo implode('<span class="MiddleDot">·</span>', $items);
+        }
+       echo '</div>';
+       echo '</div>';
+
+    }
+}
+
+if(!function_exists('writeInlineCommentOptions')) {
+    function writeInlineCommentOptions($comment) {
+        $iD = val('CommentID', $comment);
+        Gdn::controller()->EventArguments['RecordID'] = $iD;
+        //Gdn_Theme::bulletRow();
+        echo '<div class="Controls flex">';
+        echo  '<div class="left">';
+
+        $commentOptions = getCommentOptions($comment);
+        if (!empty($commentOptions) && is_array($commentOptions)) {
+
+            array_walk($commentOptions, function(&$value, $key) {
+                $anchor = anchor($value['Label'], $value['Url'], val('Class', $value, $key));
+                $value = '<span class="" style="">'.$anchor.'</span>';
+            });
+
+            echo implode('<span class="MiddleDot">·</span>', $commentOptions);
+        }
+        echo '</div>';
+        echo '<div class="center"></div>';
+        echo '<div class="right">';
+
+        // Write the items.
+        $items = null;
+        Gdn::controller()->EventArguments['Comment'] = $comment;
+        Gdn::controller()->EventArguments['Items'] = &$items;
+        // Allow addons to work with items
+        Gdn::controller()->fireEvent('InlineCommentOptionsRight');
+        if (!empty($items) && is_array($items)) {
+           array_walk($items, function(&$x) {$x = '<span class="" style="">'.$x.'</span>';});
+           echo implode('<span class="MiddleDot">·</span>', $items);
+        }
+        echo '</div>';
+        echo '</div>';
+
+    }
+}
