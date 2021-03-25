@@ -125,10 +125,7 @@ if (!function_exists('MostRecentString')):
             $r .= t('on').' ';
             $dateFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($lastDate, false, '%a, %b %e %Y');
             $timeFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($lastDate, false, '%I:%M %p');
-            $r .= anchor(
-                $dateFormatted.' at '.$timeFormatted,
-                $row['LastUrl'],
-                'CommentDate');
+            $r .=  $dateFormatted.' at '.$timeFormatted;
             $r .= '</span>';
         }
 

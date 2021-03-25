@@ -51,9 +51,7 @@ $this->fireEvent('BeforeDiscussionDisplay');
             </div>
             <div class="Meta DiscussionMeta">
             <span class="MItem DateCreated">
-                <?php
-                echo anchor(Gdn_Format::date($Discussion->DateInserted, 'html'), $Discussion->Url, 'Permalink', ['rel' => 'nofollow']);
-                ?>
+                <?php  echo Gdn_Format::date($Discussion->DateInserted, 'html'); ?>
             </span>
                 <?php
                 echo dateUpdated($Discussion, ['<span class="MItem">', '</span>']);

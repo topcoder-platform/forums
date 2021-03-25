@@ -145,7 +145,8 @@ if (!function_exists('writeComment')) :
                     </div>
                     <div class="Meta CommentMeta CommentInfo">
                         <span class="MItem DateCreated">
-                            <?php echo anchor(Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($comment->DateInserted, true, DateTimeFormatter::FORCE_FULL_FORMAT), $permalink, 'Permalink', ['name' => 'Item_'.($currentOffset), 'rel' => 'nofollow']); ?>
+                            <?php echo Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($comment->DateInserted, true,
+                                DateTimeFormatter::FORCE_FULL_FORMAT); ?>
                         </span>
                         <?php
                         echo dateUpdated($comment, ['<span class="MItem">', '</span>']);
