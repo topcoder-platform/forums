@@ -88,6 +88,7 @@ $this->fireEvent('BeforeDiscussionDisplay');
                 if (val('Attachments', $Discussion)) {
                     writeAttachments($Discussion->Attachments);
                 }
+                writeInlineDiscussionOptions($Discussion);
                 ?>
             </div>
         </div>

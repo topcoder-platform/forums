@@ -117,7 +117,7 @@ if (!function_exists('writeComment')) :
                 }
                 ?>
                 <div class="Options">
-                    <?php writeCommentOptions($comment); ?>
+                    <?php // writeCommentOptions($comment); ?>
                 </div>
                 <?php $sender->fireEvent('BeforeCommentMeta'); ?>
                 <div class="Item-Header CommentHeader">
@@ -180,6 +180,7 @@ if (!function_exists('writeComment')) :
                                 writeAttachments($comment->Attachments);
                             }
                         }
+                        writeInlineCommentOptions($comment);
                         ?>
                     </div>
                 </div>
