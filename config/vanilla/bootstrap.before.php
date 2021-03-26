@@ -819,24 +819,33 @@ if(!function_exists('writeInlineDiscussionOptions')) {
        echo '<div class="center"></div>';
        echo '<div class="right">';
 
-        // Write the items.
-       static $items = [];
+       // Write the items.
+       // DropdownModule
+       $discussionDropdown = getDiscussionOptionsDropdown($discussionRow);
 
-       // $canEdit = DiscussionModel::canEdit($discussionRow, $timeLeft);
-       // if($canEdit) {
-          // array_push($items, anchor(t('Edit'), '/post/editdiscussion/'.$discussionID));
-       // }
+       // Allow plugins to edit the dropdown.
+       $sender = Gdn::controller();
+       $sender->EventArguments['DiscussionOptions'] = &$discussionDropdown ;
+       $sender->EventArguments['Discussion'] = $discussionRow;
+       $sender->fireEvent('InlineDiscussionOptions');
 
-       Gdn::controller()->EventArguments['Items'] = &$items;
-        // Allow addons to work with items
-       Gdn::controller()->fireEvent('InlineDiscussionOptionsRight');
-       if (!empty($items) && is_array($items)) {
-           array_walk($items, function(&$value, $key) {
-               $value = '<span class="" style="">'.$value.'</span>';
+        $discussionDropdownItems = $discussionDropdown->toArray()['items'];
+
+        unset($discussionDropdownItems['announce']);
+        unset($discussionDropdownItems['sink']);
+        unset($discussionDropdownItems['close']);
+        unset($discussionDropdownItems['dismiss']);
+        unset($discussionDropdownItems['move']);
+        unset($discussionDropdownItems['tag']);
+
+      if (!empty($discussionDropdownItems) && is_array($discussionDropdownItems)) {
+           array_walk($discussionDropdownItems, function(&$value, $key) {
+               $anchor = anchor($value['text'], $value['url'], val('cssClass', $value, $key));
+               $value = '<span class="" style="">'.$anchor.'</span>';
            });
 
-           echo implode('<span class="MiddleDot">·</span>', $items);
-        }
+           echo implode('<span class="MiddleDot">·</span>', $discussionDropdownItems);
+       }
        echo '</div>';
        echo '</div>';
 
@@ -849,31 +858,18 @@ if(!function_exists('writeInlineCommentOptions')) {
         Gdn::controller()->EventArguments['RecordID'] = $iD;
         //Gdn_Theme::bulletRow();
         echo '<div class="Controls flex">';
-        echo  '<div class="left">';
-
-        $commentOptions = getCommentOptions($comment);
-        if (!empty($commentOptions) && is_array($commentOptions)) {
-
-            array_walk($commentOptions, function(&$value, $key) {
-                $anchor = anchor($value['Label'], $value['Url'], val('Class', $value, $key));
-                $value = '<span class="" style="">'.$anchor.'</span>';
-            });
-
-            echo implode('<span class="MiddleDot">·</span>', $commentOptions);
-        }
-        echo '</div>';
+        echo '<div class="left"></div>';
         echo '<div class="center"></div>';
         echo '<div class="right">';
 
         // Write the items.
-        $items = null;
-        Gdn::controller()->EventArguments['Comment'] = $comment;
-        Gdn::controller()->EventArguments['Items'] = &$items;
-        // Allow addons to work with items
-        Gdn::controller()->fireEvent('InlineCommentOptionsRight');
+        $items = getCommentOptions($comment);
         if (!empty($items) && is_array($items)) {
-           array_walk($items, function(&$x) {$x = '<span class="" style="">'.$x.'</span>';});
-           echo implode('<span class="MiddleDot">·</span>', $items);
+            array_walk($items, function(&$value, $key) {
+                $anchor = anchor($value['Label'], $value['Url'], val('Class', $value, $key));
+                $value = '<span class="" style="">'.$anchor.'</span>';
+            });
+            echo implode('<span class="MiddleDot">·</span>', $items);
         }
         echo '</div>';
         echo '</div>';
