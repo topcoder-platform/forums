@@ -264,6 +264,11 @@ class QuotesPlugin extends Gdn_Plugin {
             return;
         }
 
+        $isClosed = ((int)$discussion->Closed) == 1;
+        if ($isClosed) {
+            return;
+        }
+
         if (!Gdn::session()->UserID) {
             return;
         }
