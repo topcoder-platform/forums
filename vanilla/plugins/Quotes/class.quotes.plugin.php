@@ -264,16 +264,18 @@ class QuotesPlugin extends Gdn_Plugin {
             return;
         }
 
-        $isClosed = ((int)$discussion->Closed) == 1;
-        if ($isClosed) {
-            return;
-        }
-
         if (!Gdn::session()->UserID) {
             return;
         }
 
-        if (!Gdn::session()->checkPermission('Vanilla.Comments.Add', false, 'Category', $discussion->PermissionCategoryID)) {
+        //Check permission
+        $CategoryID = val('PermissionCategoryID', $discussion)? val('PermissionCategoryID', $discussion):val('CategoryID', $discussion);
+        $userCanClose = CategoryModel::checkPermission($CategoryID, 'Vanilla.Discussions.Close');
+        $userCanComment = CategoryModel::checkPermission($CategoryID, 'Vanilla.Comments.Add');
+
+        // See  the 'writeCommentForm' method vanilla/applications/vanilla/views/discussion/helper_functions.php
+        $canAddComment = ($discussion->Closed == '1' && $userCanClose) || ($discussion->Closed == '0' && $userCanComment);
+        if (!$canAddComment) {
             return;
         }
 
