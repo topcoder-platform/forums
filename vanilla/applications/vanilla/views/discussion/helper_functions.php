@@ -121,27 +121,44 @@ if (!function_exists('writeComment')) :
                 </div>
                 <?php $sender->fireEvent('BeforeCommentMeta'); ?>
                 <div class="Item-Header CommentHeader">
-                    <div class="AuthorWrap">
-            <span class="Author">
-               <?php
-               if ($userPhotoFirst) {
-                   echo userPhoto($author);
-                   echo userAnchor($author, 'Username');
-               } else {
-                   echo userAnchor($author, 'Username');
-                   echo userPhoto($author);
-               }
-               echo formatMeAction($comment);
-               $sender->fireEvent('AuthorPhoto');
-               ?>
-            </span>
-            <span class="AuthorInfo">
-               <?php
-               echo ' '.wrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);
-               echo ' '.wrapIf(htmlspecialchars(val('Location', $author)), 'span', ['class' => 'MItem AuthorLocation']);
-               $sender->fireEvent('AuthorInfo');
-               ?>
-            </span>
+                    <div class="AuthorWrap flex">
+                        <span class="Author">
+                           <?php
+                           if ($userPhotoFirst) {
+                               echo userPhoto($author);
+                               echo userAnchor($author, 'Username');
+                           } else {
+                               echo userAnchor($author, 'Username');
+                               echo userPhoto($author);
+                           }
+                           echo formatMeAction($comment);
+                           $sender->fireEvent('AuthorPhoto');
+                           ?>
+                        </span>
+                        <span class="AuthorInfo">
+                           <?php
+                           echo ' '.wrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);
+                           echo ' '.wrapIf(htmlspecialchars(val('Location', $author)), 'span', ['class' => 'MItem AuthorLocation']);
+                           $sender->fireEvent('AuthorInfo');
+                           ?>
+                        </span>
+                        <span class="DiscussionInfo right">
+                            <?php
+                                $discussionName = 'Re: '. val('Name', $sender->data('Discussion'));
+                                $parentCommentID = $comment->ParentCommentID;
+                                if($parentCommentID) {
+                                    $commentModel =  new CommentModel();
+                                    $parentComment = $commentModel->getID($parentCommentID);
+                                    $parentCommentPermalink = '/discussion/comment/' . $parentCommentID . '/#Comment_' . $parentCommentID;
+                                    $parentCommentAuthor = Gdn::userModel()->getID($parentComment->InsertUserID);
+                                    $parentCommentAuthor = userAnchor($parentCommentAuthor);
+                                    $post = anchor('post', $parentCommentPermalink, 'ParentComment');
+                                    echo ''. wrapIf($discussionName . ' (response to '.$post.' by '.$parentCommentAuthor.')', 'span', ['class' => '']);
+                                } else {
+                                    echo ''. wrapIf($discussionName, 'span', ['class' => '']);
+                                }
+                            ?>
+                        </span>
                     </div>
                     <div class="Meta CommentMeta CommentInfo">
                         <span class="MItem DateCreated">
@@ -366,7 +383,7 @@ if (!function_exists('getDiscussionOptionsDropdown')):
             ->addLinkIf($canRefetch, t('Refetch Page'), '/discussion/refetchpageinfo.json?discussionid='.$discussionID, 'refetch', 'RefetchPage Hijack')
             ->addLinkIf($canMove, t('Move'), '/moderation/confirmdiscussionmoves?discussionid='.$discussionID, 'move', 'MoveDiscussion Popup')
             ->addLinkIf($canTag, t('Tag'), '/discussion/tag?discussionid='.$discussionID, 'tag', 'TagDiscussion Popup')
-            ->addLinkIf($canDelete, t('Delete Discussion'), '/discussion/delete?discussionid='.$discussionID.'&target='.$categoryUrl, 'delete', 'DeleteDiscussion Popup');
+            ->addLinkIf($canDelete, t('Delete'), '/discussion/delete?discussionid='.$discussionID.'&target='.$categoryUrl, 'delete', 'DeleteDiscussion Popup');
 
         // DEPRECATED
         $options = [];

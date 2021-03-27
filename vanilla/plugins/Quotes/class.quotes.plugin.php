@@ -238,13 +238,13 @@ class QuotesPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    public function base_InlineDiscussionOptionsRight_handler($sender, $args) {
+    public function base_inlineDiscussionOptions_handler($sender, $args) {
         if ($this->isSupportedFormat(c('Garden.InputFormatter'))) {
             $this->addQuoteButton($sender, $args);
         }
     }
 
-    public function base_inlineCommentOptionsRight_handler($sender, $args) {
+    public function base_commentOptions_handler($sender, $args) {
         if ($this->isSupportedFormat(c('Garden.InputFormatter'))) {
             $this->addQuoteButton($sender, $args);
         }
@@ -258,7 +258,8 @@ class QuotesPlugin extends Gdn_Plugin {
      */
     protected function addQuoteButton($sender, $args) {
         // There are some case were Discussion is not set as an event argument so we use the sender data instead.
-        $discussion = $sender->data('Discussion');
+        // $sender->data('Discussion') is used for updating comment
+        $discussion = $args['Discussion'] ? $args['Discussion']  : $sender->data('Discussion');
         if (!$discussion) {
             return;
         }
@@ -267,31 +268,36 @@ class QuotesPlugin extends Gdn_Plugin {
             return;
         }
 
-        if (!Gdn::session()->checkPermission('Vanilla.Comments.Add', false, 'Category', $discussion->PermissionCategoryID)) {
+        //Check permission
+        $CategoryID = val('PermissionCategoryID', $discussion)? val('PermissionCategoryID', $discussion):val('CategoryID', $discussion);
+        $userCanClose = CategoryModel::checkPermission($CategoryID, 'Vanilla.Discussions.Close');
+        $userCanComment = CategoryModel::checkPermission($CategoryID, 'Vanilla.Comments.Add');
+
+        // See  the 'writeCommentForm' method vanilla/applications/vanilla/views/discussion/helper_functions.php
+        $canAddComment = ($discussion->Closed == '1' && $userCanClose) || ($discussion->Closed == '0' && $userCanComment);
+        if (!$canAddComment) {
             return;
         }
 
         if (isset($args['Comment'])) {
             $object = $args['Comment'];
             $objectID = 'Comment_'.$object->CommentID;
+            $options = &$args['CommentOptions'];
+            $options['Quote'] = [
+                'Label' =>  t('Quote'),
+                'Url' => url("post/quote/{$object->DiscussionID}/{$objectID}", true),
+                'Class' => 'ReactButton Quote Visible'
+            ];
+
         } elseif ($discussion) {
             $object = $discussion;
             $objectID = 'Discussion_'.$object->DiscussionID;
-        } else {
-            return;
+            // DropdownModule options
+            $options = & $args['DiscussionOptions'];
+            $options->addLink('Quote', url("post/quote/{$object->DiscussionID}/{$objectID}", true),
+                'quote', 'ReactButton Quote Visible');
         }
 
-        $items = & $args['Items'];
-        //echo Gdn_Theme::bulletItem('Flags');
-        if(empty($items)) {
-            $items = [];
-        }
-        array_push( $items, anchor(
-            t('Quote'),
-            url("post/quote/{$object->DiscussionID}/{$objectID}", true),
-            'ReactButton Quote Visible',
-            ['role' => 'button']
-        ).' ');
     }
 
     /**
