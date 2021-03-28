@@ -85,6 +85,7 @@ class QuotesPlugin extends Gdn_Plugin {
      *
      * @param profileController $sender
      */
+    /*
     public function profileController_quotes_create($sender) {
         $sender->permission('Garden.SignIn.Allow');
         $sender->title(t("Quote Settings"));
@@ -140,7 +141,7 @@ class QuotesPlugin extends Gdn_Plugin {
 
         $sender->render('quotes', '', 'plugins/Quotes');
     }
-
+    */
     /**
      * Set user's quote folding preference in the page for Javascript access.
      *

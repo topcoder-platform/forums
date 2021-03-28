@@ -876,3 +876,33 @@ if(!function_exists('writeInlineCommentOptions')) {
 
     }
 }
+
+if (!function_exists('discussionUrl')) {
+    /**
+     * Return a URL for a discussion. This function is in here and not functions.general so that plugins can override.
+     *
+     * @param object|array $discussion
+     * @param int|string $page
+     * @param bool $withDomain
+     * @return string
+     */
+    function discussionUrl($discussion, $page = '', $withDomain = true) {
+        $discussion = (object)$discussion;
+        $name = Gdn_Format::url($discussion->Name);
+
+        // Disallow an empty name slug in discussion URLs.
+        if (empty($name)) {
+            $name = 'x';
+        }
+
+        $result = '/discussion/'.$discussion->DiscussionID.'/'.$name;
+
+        if ($page) {
+            //if ($page > 1 || Gdn::session()->UserID) {
+                $result .= '/p'.$page;
+           // }
+        }
+
+        return url($result, $withDomain);
+    }
+}
