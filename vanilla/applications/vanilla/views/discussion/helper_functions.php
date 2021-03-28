@@ -106,7 +106,12 @@ if (!function_exists('writeComment')) :
         $sender->EventArguments['Type'] = 'Comment';
 
         // First comment template event
-        $sender->fireEvent('BeforeCommentDisplay'); ?>
+        $sender->fireEvent('BeforeCommentDisplay');
+
+        // FIX: https://github.com/topcoder-platform/forums/issues/488:
+        // ViewMode should be set before displaying comment
+        $viewMode = $sender->data('ViewMode');
+        ?>
         <li class="<?php echo $cssClass; ?>" id="<?php echo 'Comment_'.$comment->CommentID; ?>">
             <div class="Comment">
 
@@ -144,18 +149,24 @@ if (!function_exists('writeComment')) :
                         </span>
                         <span class="DiscussionInfo right">
                             <?php
-                                $discussionName = 'Re: '. val('Name', $sender->data('Discussion'));
-                                $parentCommentID = $comment->ParentCommentID;
-                                if($parentCommentID) {
-                                    $commentModel =  new CommentModel();
-                                    $parentComment = $commentModel->getID($parentCommentID);
-                                    $parentCommentPermalink = '/discussion/comment/' . $parentCommentID . '/#Comment_' . $parentCommentID;
-                                    $parentCommentAuthor = Gdn::userModel()->getID($parentComment->InsertUserID);
-                                    $parentCommentAuthor = userAnchor($parentCommentAuthor);
-                                    $post = anchor('post', $parentCommentPermalink, 'ParentComment');
-                                    echo ''. wrapIf($discussionName . ' (response to '.$post.' by '.$parentCommentAuthor.')', 'span', ['class' => '']);
-                                } else {
-                                    echo ''. wrapIf($discussionName, 'span', ['class' => '']);
+                                if($viewMode == 'flat') {
+                                    $discussionName = 'Re: ' . val('Name', $sender->data('Discussion'));
+                                    $parentCommentID = $comment->ParentCommentID;
+                                    if ($parentCommentID) {
+                                        $commentModel = new CommentModel();
+                                        $parentComment = $commentModel->getID($parentCommentID);
+                                        $parentCommentPermalink = '/discussion/comment/' . $parentCommentID . '/?view='.$viewMode.'#Comment_' . $parentCommentID;
+                                        $parentCommentAuthor = Gdn::userModel()->getID($parentComment->InsertUserID);
+                                        $post = anchor('post', $parentCommentPermalink, 'ParentCommentLink');
+                                        echo '' . wrapIf($discussionName . ' (response to ' . $post . ' by ' .userAnchor($parentCommentAuthor) . ')', 'span', ['class' => '']);
+                                    } else {
+                                        $discussion = $sender->data('Discussion');
+                                        $discussionPermalink = discussionUrl($discussion).'?view='.$viewMode;
+                                        $discussionAuthor = Gdn::userModel()->getID($discussion->InsertUserID);
+                                        //echo '' . wrapIf($discussionName, 'span', ['class' => '']);
+                                        $post = anchor('post', $discussionPermalink, 'DiscussionLink');
+                                        echo '' . wrapIf($discussionName . ' (response to ' . $post . ' by ' . userAnchor($discussionAuthor) . ')', 'span', ['class' => '']);
+                                    }
                                 }
                             ?>
                         </span>

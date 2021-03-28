@@ -44,12 +44,13 @@ $this->fireEvent('BeforeCommentForm');
                         $CancelClass = 'Cancel';
                     }
 
-                    echo '<span class="'.$CancelClass.'">';
-                    echo anchor($CancelText, '/');
-                    if ($this->data('Editor.BackLink')) {
-                        echo ' <span class="Bullet">•</span> '.$this->data('Editor.BackLink') ;
-                    }
-                    echo '</span>';
+                   // FIX: https://github.com/topcoder-platform/forums/issues/488
+                   // echo '<span class="'.$CancelClass.'">';
+                   // echo anchor($CancelText, '/');
+                   // if ($this->data('Editor.BackLink')) {
+                   //      echo ' <span class="Bullet">•</span> '.$this->data('Editor.BackLink') ;
+                   //  }
+                   // echo '</span>';
 
                     $ButtonOptions = ['class' => 'Button Primary CommentButton'];
                     $ButtonOptions['tabindex'] = 1;
