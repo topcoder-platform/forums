@@ -157,7 +157,7 @@
                                 margin-bottom: 15px'>{$email.message}</p>
                         {if $email.button}
                             <div style="margin: 0;padding: 0; text-align: center">
-                                <a class="button" href="{$email.button.url}" style="margin: 0;padding: 0;color: {$email.button.textColor};
+                                <a class="button" href="{$email.button.url}" style="margin: 0;padding: 0;color: #137d60;
                                         cursor: pointer;display: inline-block;" rel=" noopener noreferrer" target="_blank">{$email.button.text}</a>
                             </div>
                         {/if}
