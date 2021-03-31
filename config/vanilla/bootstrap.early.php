@@ -152,4 +152,17 @@ if (c('Garden.Installed')) {
             ->column('DateExpires', 'datetime')
             ->set(false, false);
     }
+
+    // FIX: https://github.com/topcoder-platform/forums/issues/479
+    if(!Gdn::structure()->table('User')->columnExists('CountWatchedCategories')) {
+        Gdn::structure()->table('User')
+        ->column('CountWatchedCategories', 'int', null)
+        ->set(false, false);
+
+        // Set count of WatchedCategories for users
+        Gdn::sql()->query('update GDN_User u set u.CountWatchedCategories  = (
+            select count(c.CategoryID) from GDN_Category c, (select distinct CAST(SUBSTRING_INDEX(um.Name, ".", -1) as UNSIGNED) as CategoryID from GDN_UserMeta  um
+            where um.Name LIKE "Preferences.%" AND UserID = u.UserID and Value = 1) ws where ws.CategoryID = c.CategoryID)');
+
+    }
 }

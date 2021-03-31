@@ -71,11 +71,13 @@ if (!function_exists('BookmarkButton')) {
         }
 
         // Bookmark link
-        $title = t($discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
+        $hasWatched = $discussion->Bookmarked == '1';
+        $title = t($hasWatched ? 'Stop watching the discussion' : 'Watch the discussion');
+        $icon = watchIcon($hasWatched);
         return anchor(
-            $title,
+            $icon,
             '/discussion/bookmark/'.$discussion->DiscussionID.'/'.Gdn::session()->transientKey(),
-            'Hijack Bookmark'.($discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
+            'Hijack  watchButton '.($hasWatched ? ' isWatching' : ''),
             ['title' => $title]
         );
     }

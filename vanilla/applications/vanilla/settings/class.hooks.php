@@ -202,7 +202,8 @@ class VanillaHooks implements Gdn_IPlugin {
                 'CountUnreadDiscussions' => 0,
                 'CountComments' => 0,
                 'CountDrafts' => 0,
-                'CountBookmarks' => 0
+                'CountBookmarks' => 0,
+                'CountWatchedCategories' => 0
             ])
             ->where('UserID', $userID)
             ->put();

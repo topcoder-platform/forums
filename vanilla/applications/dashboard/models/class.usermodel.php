@@ -95,7 +95,7 @@ class UserModel extends Gdn_Model {
         $this->addFilterField([
             'Admin', 'Deleted', 'CountVisits', 'CountInvitations', 'CountNotifications', 'Preferences', 'Permissions',
             'LastIPAddress', 'AllIPAddresses', 'DateFirstVisit', 'DateLastActive', 'CountDiscussions', 'CountComments',
-            'Score'
+            'Score', 'CountWatchedCategories'
         ]);
 
 
@@ -1239,7 +1239,7 @@ class UserModel extends Gdn_Model {
      */
     public function userQuery($safeData = false) {
         if ($safeData) {
-            $this->SQL->select('u.UserID, u.Name, u.Photo, u.CountVisits, u.DateFirstVisit, u.DateLastActive, u.DateInserted, u.DateUpdated, u.Score, u.Deleted, u.CountDiscussions, u.CountComments');
+            $this->SQL->select('u.UserID, u.Name, u.Photo, u.CountVisits, u.DateFirstVisit, u.DateLastActive, u.DateInserted, u.DateUpdated, u.Score, u.Deleted, u.CountDiscussions, u.CountComments, u.CountWatchedCategories');
         } else {
             $this->SQL->select('u.*');
         }
@@ -2096,6 +2096,11 @@ class UserModel extends Gdn_Model {
                 case 'CountBookmarks':
                     $count = $this->SQL->getCount('UserDiscussion', ['UserID' => $userID, 'Bookmarked' => '1']);
                     $this->setField($userID, 'CountBookmarks', $count);
+                    break;
+                case 'CountWatchedCategories':
+                    $userMetaModel = new UserMetaModel();
+                    $count = $userMetaModel->userWatchedCategoriesCount($userID);
+                    $this->setField($userID, 'CountWatchedCategories', $count);
                     break;
                 default:
                     $count = false;

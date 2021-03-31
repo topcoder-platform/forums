@@ -149,7 +149,7 @@ if (!function_exists('writeListItem')):
         if($urlcode == VanillaController::CHALLENGE_FORUMS_URLCODE) {
             return;
         }
-        $children = $category['Children'];
+        $children = val('Children',$category);
         $categoryID = val('CategoryID', $category);
         $cssClass = cssClass($category, true);
         $writeChildren = getWriteChildrenMethod($category, $depth);
@@ -177,7 +177,10 @@ if (!function_exists('writeListItem')):
                 ?>
                 <div class="ItemContent Category">
                     <div class="Options">
-                        <?php echo getOptions($category) ?>
+                        <?php
+                        echo watchButton($category);
+                        echo getOptions($category);
+                        ?>
                     </div>
                     <?php echo categoryPhoto($category); ?>
                     <div role="heading" aria-level="<?php echo $headingLevel; ?>" class="TitleWrap">

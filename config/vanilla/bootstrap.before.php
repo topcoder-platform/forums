@@ -327,6 +327,46 @@ if (!function_exists('dateUpdated')) {
     }
 }
 
+if (!function_exists('watchIcon')) {
+    /**
+     *
+     * Writes the Watch/watching icon
+     *
+     * @param int $categoryID
+     * @return string
+     */
+    function watchIcon($hasWatched = false) {
+        if($hasWatched) {
+            $icon = <<<EOT
+<svg width="21px" height="14px" viewBox="0 0 21 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>C37BD87D-4683-4407-B623-A16FF477E263</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="02-Challenge-Forums" transform="translate(-1261.000000, -328.000000)" fill="#0AB88A" fill-rule="nonzero">
+            <path d="M1271.08333,328 C1266.5,328 1262.58583,330.850833 1261,334.875 C1262.58583,338.899167 1266.5,341.75 1271.08333,341.75 C1275.66667,341.75 1279.58083,338.899167 1281.16667,334.875 C1279.58083,330.850833 1275.66667,328 1271.08333,328 Z M1271.08333,339.458333 C1268.55333,339.458333 1266.5,337.405 1266.5,334.875 C1266.5,332.345 1268.55333,330.291667 1271.08333,330.291667 C1273.61333,330.291667 1275.66667,332.345 1275.66667,334.875 C1275.66667,337.405 1273.61333,339.458333 1271.08333,339.458333 Z M1271.08333,332.125 C1269.56167,332.125 1268.33333,333.353333 1268.33333,334.875 C1268.33333,336.396667 1269.56167,337.625 1271.08333,337.625 C1272.605,337.625 1273.83333,336.396667 1273.83333,334.875 C1273.83333,333.353333 1272.605,332.125 1271.08333,332.125 Z" id="Shape"></path>
+        </g>
+    </g>
+</svg>       
+EOT;
+        } else {
+            $icon = <<<EOT
+         <svg width="22px" height="22px" viewBox="0 0 22 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>A8A8C574-0B97-4F46-826B-9E3C5F919266</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="02-Challenge-Forums" transform="translate(-1260.000000, -594.000000)">
+            <g id="watch-icon" transform="translate(1260.000000, 594.000000)">
+                <polygon id="Path" points="0 0 22 0 22 22 0 22"></polygon>
+                <path d="M11,6.41666667 C14.4741667,6.41666667 17.5725,8.36916667 19.085,11.4583333 C17.5725,14.5475 14.4741667,16.5 11,16.5 C7.52583333,16.5 4.4275,14.5475 2.915,11.4583333 C4.4275,8.36916667 7.52583333,6.41666667 11,6.41666667 M11,4.58333333 C6.41666667,4.58333333 2.5025,7.43416667 0.916666667,11.4583333 C2.5025,15.4825 6.41666667,18.3333333 11,18.3333333 C15.5833333,18.3333333 19.4975,15.4825 21.0833333,11.4583333 C19.4975,7.43416667 15.5833333,4.58333333 11,4.58333333 Z M11,9.16666667 C12.265,9.16666667 13.2916667,10.1933333 13.2916667,11.4583333 C13.2916667,12.7233333 12.265,13.75 11,13.75 C9.735,13.75 8.70833333,12.7233333 8.70833333,11.4583333 C8.70833333,10.1933333 9.735,9.16666667 11,9.16666667 M11,7.33333333 C8.72666667,7.33333333 6.875,9.185 6.875,11.4583333 C6.875,13.7316667 8.72666667,15.5833333 11,15.5833333 C13.2733333,15.5833333 15.125,13.7316667 15.125,11.4583333 C15.125,9.185 13.2733333,7.33333333 11,7.33333333 Z" id="Shape" fill="#555555" fill-rule="nonzero"></path>
+            </g>
+        </g>
+    </g>
+</svg>
+EOT;
+        }
+
+        return $icon;
+    }
+}
+
 if (!function_exists('watchButton')) {
     /**
      *
@@ -335,27 +375,25 @@ if (!function_exists('watchButton')) {
      * @param int $categoryID
      * @return string
      */
-    function watchButton($categoryID) {
+    function watchButton($category) {
         $output = ' ';
         $userID = Gdn::session()->UserID;
-        $category = CategoryModel::categories($categoryID);
+        if(is_numeric($category)) {
+            $category = CategoryModel::categories($category);
+        }
 
-        if ($userID && $category && $category['DisplayAs'] == 'Discussions') {
+        //if ($userID && $category && $category['DisplayAs'] == 'Discussions') {
+        if ($userID && $category) {
             $categoryModel = new CategoryModel();
+            $categoryID= val('CategoryID', $category);
             $hasWatched = $categoryModel->hasWatched($categoryID, $userID);
-            $iconTitle = t('Watch');
-            $icon = <<<EOT
-                <svg xmlns="http://www.w3.org/2000/svg" class="watchButton-icon" viewBox="0 0 16 16" aria-hidden="true">
-                    <title>{$iconTitle}</title>  
-                    <path d="M7.568,14.317a.842.842,0,0,1-1.684,0,4.21,4.21,0,0,0-4.21-4.21h0a.843.843,0,0,1,0-1.685A5.9,5.9,0,0,1,7.568,14.317Zm4.21,0a.842.842,0,0,1-1.684,0A8.421,8.421,0,0,0,1.673,5.9h0a.842.842,0,0,1,0-1.684,10.1,10.1,0,0,1,10.105,10.1Zm4.211,0a.842.842,0,0,1-1.684,0A12.633,12.633,0,0,0,1.673,1.683.842.842,0,0,1,1.673,0,14.315,14.315,0,0,1,15.989,14.315ZM1.673,16a1.684,1.684,0,1,1,1.684-1.684h0A1.684,1.684,0,0,1,1.673,16Z" transform="translate(0.011 0.001)" style="fill: currentColor;"/>
-                </svg>
-EOT;
 
-            $text = $hasWatched ? t('Watching') : t('Watch');
+            $icon = watchIcon($hasWatched);
+            $text = $hasWatched ? t('Stop watching the category') : t('Watch the category');
             $output .= anchor(
-                $icon . $text,
+                $icon,
                 $hasWatched ? "/category/watched/{$categoryID}/" . Gdn::session()->transientKey() : "/category/watch/{$categoryID}/" . Gdn::session()->transientKey(),
-                'Hijack watchButton' . ($hasWatched ? ' TextColor isWatching' : ''),
+                'Hijack watchButton' . ($hasWatched ? ' isWatching' : ''),
                 ['title' => $text, 'aria-pressed' => $hasWatched ? 'true' : 'false', 'role' => 'button', 'tabindex' => '0']
             );
         }
@@ -803,6 +841,32 @@ if (!function_exists('myDraftsMenuItem')) {
         $cssClass .= Gdn::controller()->ControllerName == 'draftscontroller' ? ' Active' : '';
         $cssClass .= $CountDrafts == 0 ? ' hidden': '';
         return sprintf('<li id="MyDrafts" class="%s">%s</li>', $cssClass, anchor(sprite('SpMyDrafts').$Drafts, '/drafts'));
+    }
+}
+
+if (!function_exists('myWatchingMenuItem')) {
+    /**
+     *
+     *
+     * @param $CountBookmarks
+     * @return string
+     */
+    function myWatchingMenuItem($CountWatches) {
+        if (!Gdn::session()->isValid()) {
+            return '';
+        }
+        $watching = t('Watching');
+        $watching .= FilterCountString($CountWatches, '/watching');
+        $cssClass = 'MyWatching';
+        Logger::event(
+            'topcoder_plugin',
+            Logger::DEBUG,
+            'myWatchingMenuItem:'.Gdn::controller()->RequestMethod,
+            []
+        );
+        $cssClass .= Gdn::controller()->ControllerName == 'watchingcontroller' ? ' Active' : '';
+        $cssClass .= $CountWatches == 0 ? ' hidden': '';
+        return sprintf('<li id="MyWatching" class="%s">%s</li>', $cssClass, anchor(sprite('SpBookmarks').$watching, '/watching'));
     }
 }
 

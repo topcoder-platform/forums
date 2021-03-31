@@ -9,12 +9,17 @@ if ($Title == '')
 $Bookmarked = t('My Bookmarks');
 $MyDiscussions = t('My Discussions');
 $MyDrafts = t('My Drafts');
+$MyWatches = t('Watching');
 $CountBookmarks = 0;
 $CountDiscussions = 0;
 $CountDrafts = 0;
+$CountWatchedCategories = 0;
+$CountWatches = 0;
 
 if ($Session->isValid()) {
     $CountBookmarks = $Session->User->CountBookmarks;
+    $CountWatchedCategories = $Session->User->CountWatchedCategories;
+    $CountWatches = $CountBookmarks + $CountWatchedCategories;
     $CountDiscussions = $Session->User->CountDiscussions;
     $CountDrafts = $Session->User->CountDrafts;
 }
@@ -58,7 +63,8 @@ if (c('Vanilla.Discussions.ShowCounts', true)) {
             <?php
         }
         echo myDraftsMenuItem($CountDrafts);
-        echo myBookmarksMenuItem($CountBookmarks);
+        echo myWatchingMenuItem($CountWatches);
+        // echo myBookmarksMenuItem($CountBookmarks);
         $Controller->fireEvent('AfterDiscussionFilters');
         ?>
     </ul>
