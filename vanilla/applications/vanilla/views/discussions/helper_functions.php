@@ -220,7 +220,7 @@ if (!function_exists('WriteDiscussion')) :
                             '%s comment html', '%s comments html', t('%s comment'), t('%s comments')),
                             bigPlural($discussion->CountComments, '%s comment'));
                         ?></span>
-                    <span class="MiddleDot">&#183;</span>
+                    <span class="MItem MiddleDot">&#183;</span>
                     <span class="MItem MCount ViewCount"><?php
                         printf(pluralTranslate($discussion->CountViews,
                             '%s view html', '%s views html', t('%s view'), t('%s views')),
