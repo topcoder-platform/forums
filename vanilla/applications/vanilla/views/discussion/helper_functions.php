@@ -42,13 +42,17 @@ if (!function_exists('writeBookmarkLink')) :
         $discussion = Gdn::controller()->data('Discussion');
 
         // Bookmark link
-        $title = t($discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
-        echo anchor(
-            $title,
+        $output = '';
+        $hasWatched = $discussion->Bookmarked == '1';
+        $title = t($hasWatched? 'Stop watching the discussion' : 'Watch the discussion');
+        $icon = watchIcon($hasWatched);
+        $output .= anchor(
+            $icon,
             '/discussion/bookmark/'.$discussion->DiscussionID.'/'.Gdn::session()->transientKey().'?Target='.urlencode(Gdn::controller()->SelfUrl),
-            'Hijack Bookmark'.($discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-            ['title' => $title]
+            'Hijack watchBookmark '.($hasWatched? ' isWatching' : ''),
+            ['title' => $title, 'aria-pressed' => $hasWatched ? 'true' : 'false', 'role' => 'button', 'tabindex' => '0']
         );
+        echo $output;
     }
 endif;
 

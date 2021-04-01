@@ -17,7 +17,8 @@ if ($this->data('_PagerUrl')) {
     $PagerOptions['Url'] = $this->data('_PagerUrl');
 }
 
-echo '<h1 class="H HomepageTitle">'.$this->data('Title').followButton($this->data('Category.CategoryID')).watchButton($this->data('Category.CategoryID')).'</h1>';
+echo '<h1 class="H HomepageTitle">'.$this->data('Title').followButton($this->data('Category.CategoryID')).'</h1>';
+    //.watchButton($this->data('Category.CategoryID'))
 
 $Description = $this->data('Category.Description', $this->description());
 echo wrapIf(Gdn_Format::htmlFilter($Description), 'div', ['class' => 'P PageDescription']);

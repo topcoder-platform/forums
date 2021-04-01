@@ -3,7 +3,7 @@ include_once $this->fetchViewLocation('helper_functions', 'categories');
 $title = $this->data('Title');
 if (!is_null($this->Category)) {
     $title .= followButton($this->Category->CategoryID);
-    $title .= watchButton($this->Category->CategoryID);
+   // $title .= watchButton($this->Category->CategoryID);
 }
 echo '<h1 class="H HomepageTitle">'.$title.'</h1>';
 if ($description = $this->description()) {

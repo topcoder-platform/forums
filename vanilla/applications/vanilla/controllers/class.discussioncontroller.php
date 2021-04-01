@@ -513,6 +513,13 @@ class DiscussionController extends VanillaController {
         $CountBookmarksHtml = myBookmarksMenuItem($CountBookmarks);
         $this->jsonTarget('#MyBookmarks', $CountBookmarksHtml, 'ReplaceWith');
 
+       // FIX: https://github.com/topcoder-platform/forums/issues/479
+        $userMetaModel = new UserMetaModel();
+        $CountWatchedCategories = $userMetaModel->userWatchedCategoriesCount($UserID);
+        $TotalCount = $CountBookmarks + $CountWatchedCategories;
+        $CountWatchesHtml = myWatchingMenuItem($TotalCount);
+        $this->jsonTarget('#MyWatching', $CountWatchesHtml, 'ReplaceWith');
+
         //  Short circuit if this is an api call.
         if ($this->deliveryType() === DELIVERY_TYPE_DATA) {
             $this->render('Blank', 'Utility', 'Dashboard');
