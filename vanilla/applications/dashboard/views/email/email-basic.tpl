@@ -156,9 +156,11 @@
                         <p class="message" style='margin: 0;Margin-bottom: 10px;padding: 0;color: {$email.textColor};text-align: left;margin-top: 10px;
                                 margin-bottom: 15px'>{$email.message}</p>
                         {if $email.button}
-                            <div style="margin: 0;padding: 0; text-align: center">
-                                <a class="button" href="{$email.button.url}" style="margin: 0;padding: 0;color: {$email.button.textColor};
-                                        cursor: pointer;display: inline-block;" rel=" noopener noreferrer" target="_blank">{$email.button.text}</a>
+                            <div style="margin: 5px 0px;padding: 0;text-align: center">
+                                <a class="button" href="{$email.button.url}" style="font-size: 12px;
+    border: 1px solid #137D60;min-width: 36px;background: #137D60;color: #FAFAFB;line-height: 30px;min-height: 30px;text-decoration: none;
+    white-space: nowrap;text-align: center;font-weight: 700 !important;letter-spacing: .69px !important; text-transform: uppercase;
+    border-radius: 20px !important; padding: 10px 20px !important;" rel=" noopener noreferrer" target="_blank">{$email.button.text}</a>
                             </div>
                         {/if}
 

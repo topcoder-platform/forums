@@ -106,7 +106,12 @@ if (!function_exists('writeComment')) :
         $sender->EventArguments['Type'] = 'Comment';
 
         // First comment template event
-        $sender->fireEvent('BeforeCommentDisplay'); ?>
+        $sender->fireEvent('BeforeCommentDisplay');
+
+        // FIX: https://github.com/topcoder-platform/forums/issues/488:
+        // ViewMode should be set before displaying comment
+        $viewMode = $sender->data('ViewMode');
+        ?>
         <li class="<?php echo $cssClass; ?>" id="<?php echo 'Comment_'.$comment->CommentID; ?>">
             <div class="Comment">
 
@@ -117,35 +122,59 @@ if (!function_exists('writeComment')) :
                 }
                 ?>
                 <div class="Options">
-                    <?php writeCommentOptions($comment); ?>
+                    <?php // writeCommentOptions($comment); ?>
                 </div>
                 <?php $sender->fireEvent('BeforeCommentMeta'); ?>
                 <div class="Item-Header CommentHeader">
-                    <div class="AuthorWrap">
-            <span class="Author">
-               <?php
-               if ($userPhotoFirst) {
-                   echo userPhoto($author);
-                   echo userAnchor($author, 'Username');
-               } else {
-                   echo userAnchor($author, 'Username');
-                   echo userPhoto($author);
-               }
-               echo formatMeAction($comment);
-               $sender->fireEvent('AuthorPhoto');
-               ?>
-            </span>
-            <span class="AuthorInfo">
-               <?php
-               echo ' '.wrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);
-               echo ' '.wrapIf(htmlspecialchars(val('Location', $author)), 'span', ['class' => 'MItem AuthorLocation']);
-               $sender->fireEvent('AuthorInfo');
-               ?>
-            </span>
+                    <div class="AuthorWrap flex">
+                        <span class="Author">
+                           <?php
+                           if ($userPhotoFirst) {
+                               echo userPhoto($author);
+                               echo userAnchor($author, 'Username');
+                           } else {
+                               echo userAnchor($author, 'Username');
+                               echo userPhoto($author);
+                           }
+                           echo formatMeAction($comment);
+                           $sender->fireEvent('AuthorPhoto');
+                           ?>
+                        </span>
+                        <span class="AuthorInfo">
+                           <?php
+                           echo ' '.wrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);
+                           echo ' '.wrapIf(htmlspecialchars(val('Location', $author)), 'span', ['class' => 'MItem AuthorLocation']);
+                           $sender->fireEvent('AuthorInfo');
+                           ?>
+                        </span>
+                        <span class="DiscussionInfo right">
+                            <?php
+                                if($viewMode == 'flat') {
+                                    $discussionName = 'Re: ' . val('Name', $sender->data('Discussion'));
+                                    $parentCommentID = $comment->ParentCommentID;
+                                    if ($parentCommentID) {
+                                        $commentModel = new CommentModel();
+                                        $parentComment = $commentModel->getID($parentCommentID);
+                                        $parentCommentPermalink = '/discussion/comment/' . $parentCommentID . '/?view='.$viewMode.'#Comment_' . $parentCommentID;
+                                        $parentCommentAuthor = Gdn::userModel()->getID($parentComment->InsertUserID);
+                                        $post = anchor('post', $parentCommentPermalink, 'ParentCommentLink');
+                                        echo '' . wrapIf($discussionName . ' (response to ' . $post . ' by ' .userAnchor($parentCommentAuthor) . ')', 'span', ['class' => '']);
+                                    } else {
+                                        $discussion = $sender->data('Discussion');
+                                        $discussionPermalink = discussionUrl($discussion).'?view='.$viewMode;
+                                        $discussionAuthor = Gdn::userModel()->getID($discussion->InsertUserID);
+                                        //echo '' . wrapIf($discussionName, 'span', ['class' => '']);
+                                        $post = anchor('post', $discussionPermalink, 'DiscussionLink');
+                                        echo '' . wrapIf($discussionName . ' (response to ' . $post . ' by ' . userAnchor($discussionAuthor) . ')', 'span', ['class' => '']);
+                                    }
+                                }
+                            ?>
+                        </span>
                     </div>
                     <div class="Meta CommentMeta CommentInfo">
                         <span class="MItem DateCreated">
-                            <?php echo anchor(Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($comment->DateInserted, true, DateTimeFormatter::FORCE_FULL_FORMAT), $permalink, 'Permalink', ['name' => 'Item_'.($currentOffset), 'rel' => 'nofollow']); ?>
+                            <?php echo Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($comment->DateInserted, true,
+                                DateTimeFormatter::FORCE_FULL_FORMAT); ?>
                         </span>
                         <?php
                         echo dateUpdated($comment, ['<span class="MItem">', '</span>']);
@@ -179,6 +208,7 @@ if (!function_exists('writeComment')) :
                                 writeAttachments($comment->Attachments);
                             }
                         }
+                        writeInlineCommentOptions($comment);
                         ?>
                     </div>
                 </div>
@@ -364,7 +394,7 @@ if (!function_exists('getDiscussionOptionsDropdown')):
             ->addLinkIf($canRefetch, t('Refetch Page'), '/discussion/refetchpageinfo.json?discussionid='.$discussionID, 'refetch', 'RefetchPage Hijack')
             ->addLinkIf($canMove, t('Move'), '/moderation/confirmdiscussionmoves?discussionid='.$discussionID, 'move', 'MoveDiscussion Popup')
             ->addLinkIf($canTag, t('Tag'), '/discussion/tag?discussionid='.$discussionID, 'tag', 'TagDiscussion Popup')
-            ->addLinkIf($canDelete, t('Delete Discussion'), '/discussion/delete?discussionid='.$discussionID.'&target='.$categoryUrl, 'delete', 'DeleteDiscussion Popup');
+            ->addLinkIf($canDelete, t('Delete'), '/discussion/delete?discussionid='.$discussionID.'&target='.$categoryUrl, 'delete', 'DeleteDiscussion Popup');
 
         // DEPRECATED
         $options = [];

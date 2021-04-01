@@ -105,7 +105,7 @@ Gdn_Quotes.prototype.GetEditor = function () {
     var editor = $(this.currentEditor);
     if (!document.body.contains(this.currentEditor) || !editor.length) {
         // FIX: https://github.com/topcoder-platform/forums/issues/83
-        editor = $('.richEditor-textWrap').first();
+        editor = $('.bodybox-wrap').first();
     }
 
     return editor;
@@ -165,23 +165,7 @@ Gdn_Quotes.prototype.QuoteResponse = function(Data, Status, XHR) {
 
 // Insert the quote text into the editor.
 Gdn_Quotes.prototype.ApplyQuoteText = function(QuoteText) {
-    var Editor = this.GetEditor();
-
-    // First try and throw an event.
-    Editor.trigger('appendHtml', QuoteText + '<br />');
-
-    QuoteText = QuoteText + '\n';
-    Editor.val(Editor.val() + QuoteText);
-
-    // DEPRECATED: cleditor support
-    if ($('div.cleditorMain').length) {
-        Editor.val(Editor.val() + '<br/>');
-        Editor.get(0).editor.updateFrame();
-    }
-
-    Editor
-        .focus()
-        .trigger('autosize.resize');
+    $(document).trigger('ApplyQuoteText', [QuoteText]);
 };
 
 (function(window) {

@@ -299,13 +299,14 @@ if (!function_exists('dateUpdated')) {
      */
     function dateUpdated($row, $wrap = null) {
         $result = '';
+        $insertUserID = val('InsertUserID', $row);
         $dateUpdated = val('DateUpdated', $row);
         $updateUserID = val('UpdateUserID', $row);
 
         if ($dateUpdated) {
             $updateUser = Gdn::userModel()->getID($updateUserID);
             $dateUpdatedFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($dateUpdated, false, DateTimeFormatter::FORCE_FULL_FORMAT);
-            if ($updateUser) {
+            if ($updateUser && $insertUserID != $updateUserID) {
                 $title = sprintf(t('Edited %s by %s.'), $dateUpdatedFormatted, val('Name', $updateUser));
                 $link = userAnchor($updateUser);
                 $text =  sprintf(t('edited %s by %s'), $dateUpdatedFormatted, $link);
@@ -802,5 +803,106 @@ if (!function_exists('myDraftsMenuItem')) {
         $cssClass .= Gdn::controller()->ControllerName == 'draftscontroller' ? ' Active' : '';
         $cssClass .= $CountDrafts == 0 ? ' hidden': '';
         return sprintf('<li id="MyDrafts" class="%s">%s</li>', $cssClass, anchor(sprite('SpMyDrafts').$Drafts, '/drafts'));
+    }
+}
+
+if(!function_exists('writeInlineDiscussionOptions')) {
+    function writeInlineDiscussionOptions($discussionRow) {
+       $discussionID = val('DiscussionID', $discussionRow);
+       Gdn::controller()->EventArguments['RecordID'] = $discussionID;
+        //Gdn_Theme::bulletRow();
+       echo '<div class="Controls flex">';
+       echo '<div class="left">';
+       Gdn::controller()->EventArguments['RecordID'] = $discussionID;
+       Gdn::controller()->fireEvent('InlineDiscussionOptionsLeft');
+       echo '</div>';
+       echo '<div class="center"></div>';
+       echo '<div class="right">';
+
+       // Write the items.
+       // DropdownModule
+       $discussionDropdown = getDiscussionOptionsDropdown($discussionRow);
+
+       // Allow plugins to edit the dropdown.
+       $sender = Gdn::controller();
+       $sender->EventArguments['DiscussionOptions'] = &$discussionDropdown ;
+       $sender->EventArguments['Discussion'] = $discussionRow;
+       $sender->fireEvent('InlineDiscussionOptions');
+
+        $discussionDropdownItems = $discussionDropdown->toArray()['items'];
+
+        unset($discussionDropdownItems['announce']);
+        unset($discussionDropdownItems['sink']);
+        unset($discussionDropdownItems['close']);
+        unset($discussionDropdownItems['dismiss']);
+        unset($discussionDropdownItems['move']);
+        unset($discussionDropdownItems['tag']);
+
+      if (!empty($discussionDropdownItems) && is_array($discussionDropdownItems)) {
+           array_walk($discussionDropdownItems, function(&$value, $key) {
+               $anchor = anchor($value['text'], $value['url'], val('cssClass', $value, $key));
+               $value = '<span class="" style="">'.$anchor.'</span>';
+           });
+
+           echo implode('<span class="MiddleDot">·</span>', $discussionDropdownItems);
+       }
+       echo '</div>';
+       echo '</div>';
+
+    }
+}
+
+if(!function_exists('writeInlineCommentOptions')) {
+    function writeInlineCommentOptions($comment) {
+        $iD = val('CommentID', $comment);
+        Gdn::controller()->EventArguments['RecordID'] = $iD;
+        //Gdn_Theme::bulletRow();
+        echo '<div class="Controls flex">';
+        echo '<div class="left"></div>';
+        echo '<div class="center"></div>';
+        echo '<div class="right">';
+
+        // Write the items.
+        $items = getCommentOptions($comment);
+        if (!empty($items) && is_array($items)) {
+            array_walk($items, function(&$value, $key) {
+                $anchor = anchor($value['Label'], $value['Url'], val('Class', $value, $key));
+                $value = '<span class="" style="">'.$anchor.'</span>';
+            });
+            echo implode('<span class="MiddleDot">·</span>', $items);
+        }
+        echo '</div>';
+        echo '</div>';
+
+    }
+}
+
+if (!function_exists('discussionUrl')) {
+    /**
+     * Return a URL for a discussion. This function is in here and not functions.general so that plugins can override.
+     *
+     * @param object|array $discussion
+     * @param int|string $page
+     * @param bool $withDomain
+     * @return string
+     */
+    function discussionUrl($discussion, $page = '', $withDomain = true) {
+        $discussion = (object)$discussion;
+        $name = Gdn_Format::url($discussion->Name);
+
+        // Disallow an empty name slug in discussion URLs.
+        if (empty($name)) {
+            $name = 'x';
+        }
+
+        $result = '/discussion/'.$discussion->DiscussionID.'/'.$name;
+
+        if ($page) {
+            //if ($page > 1 || Gdn::session()->UserID) {
+                $result .= '/p'.$page;
+           // }
+        }
+
+        return url($result, $withDomain);
     }
 }

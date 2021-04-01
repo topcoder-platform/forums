@@ -42,7 +42,7 @@ if (c('Vanilla.Discussions.ShowCounts', true)) {
                 || strpos(strtolower($Controller->Request->path()) , 'categories') === 0) {
                 $CssClass .= ' Active';
             }
-            echo '<li class="'.$CssClass.'">'.anchor('Roundtables', '/categories').'</li> ';
+            echo '<li class="'.$CssClass.'">'.anchor('Public Forums', '/categories').'</li> ';
         }
         /*
            <li id="RecentDiscussions" class="Discussions<?php echo strtolower($Controller->ControllerName) == 'discussionscontroller' && strtolower($Controller->RequestMethod) == 'index' && strpos(strtolower($Controller->Request->path()) , 'discussions') === 0? ' Active' : ''; ?>">

@@ -539,7 +539,7 @@ class CategoriesController extends VanillaController {
             if ($Title) {
                 $this->title($Title, '');
             } else {
-                $this->title(t('Roundtables'));
+                $this->title(t('Public Forums'));
             }
         }
         Gdn_Theme::section('CategoryList');
@@ -614,7 +614,7 @@ class CategoriesController extends VanillaController {
         }
         // FIX: https://github.com/topcoder-platform/forums/issues/422
         // Sorting for Flat type in SQL
-        if($displayAs != 'Flat') {
+        if($displayAs != 'Flat' && $Category) {
             if ($this->data('CategorySort')) {
                 if ($this->data('CategorySort') == self::SORT_OLDEST_POST) {
                     usort($categoryTree, function ($a, $b) {
@@ -677,7 +677,7 @@ class CategoriesController extends VanillaController {
             if ($Title) {
                 $this->title($Title, '');
             } else {
-                $this->title(t('Roundtables'));
+                $this->title(t('Public Forums'));
             }
         }
 

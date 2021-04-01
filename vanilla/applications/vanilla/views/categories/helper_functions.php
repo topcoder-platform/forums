@@ -125,10 +125,7 @@ if (!function_exists('MostRecentString')):
             $r .= t('on').' ';
             $dateFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($lastDate, false, '%a, %b %e %Y');
             $timeFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($lastDate, false, '%I:%M %p');
-            $r .= anchor(
-                $dateFormatted.' at '.$timeFormatted,
-                $row['LastUrl'],
-                'CommentDate');
+            $r .=  $dateFormatted.' at '.$timeFormatted;
             $r .= '</span>';
         }
 
@@ -147,6 +144,11 @@ if (!function_exists('writeListItem')):
      * @throws Exception
      */
     function writeListItem($category, $depth) {
+        $urlcode = $category['UrlCode'];
+        // FIX: https://github.com/topcoder-platform/forums/issues/477: Don't show 'Challenge Forums'
+        if($urlcode == VanillaController::CHALLENGE_FORUMS_URLCODE) {
+            return;
+        }
         $children = $category['Children'];
         $categoryID = val('CategoryID', $category);
         $cssClass = cssClass($category, true);
@@ -182,6 +184,9 @@ if (!function_exists('writeListItem')):
                         <?php echo anchor(Gdn_Format::text(val('Name', $category)), categoryUrl($category), 'Title');
                         Gdn::controller()->fireEvent('AfterCategoryTitle');
                         ?>
+                    </div>
+                    <div class="CategoryDescription">
+                        <?php echo val('Description', $category) ?>
                     </div>
                     <div class="Challenge">
                         <?php

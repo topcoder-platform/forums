@@ -13,8 +13,8 @@
  */
 class VanillaController extends Gdn_Controller {
 
-    const ROOT_CATEGORY =  ['Name' => 'Roundtables', 'Url'=>'/'];
-
+    const ROOT_CATEGORY =  ['Name' => 'Public Forums', 'Url'=>'/'];
+    const CHALLENGE_FORUMS_URLCODE = 'challenges-forums';
     /**
      * Include JS, CSS, and modules used by all methods.
      *
@@ -81,15 +81,27 @@ class VanillaController extends Gdn_Controller {
                 if($ancestor['GroupID'] > 0) {
                     $temp[$ancestor['CategoryID']] = $ancestor;
                 } else {
-                    if($ancestor['UrlCode'] == 'challenges-forums') {
-                        array_push($temp,  ['Name' => 'Challenge Discussions', 'Url'=>'/groups/mine?filter=challenge']);
+                    if($ancestor['UrlCode'] == self::CHALLENGE_FORUMS_URLCODE) {
+                        array_push($temp,  ['Name' => 'Challenge Forums', 'Url'=>'/groups/mine?filter=challenge']);
                     }else if($ancestor['UrlCode'] == 'groups') {
-                        array_push($temp,  ['Name' => 'Group Discussions', 'Url'=>'/groups/mine?filter=regular']);
+                        array_push($temp,  ['Name' => 'Group Forums', 'Url'=>'/groups/mine?filter=regular']);
                     }
                 }
             }
             return $temp;
         } else {
+            $urlCode = val('UrlCode', $Category);
+            if($urlCode == self::CHALLENGE_FORUMS_URLCODE) {
+                return $ancestors;
+            }
+
+            // Check if ancestors contains 'challenges-forums'
+            foreach ($ancestors as $id => $ancestor) {
+                if($ancestor['UrlCode'] == self::CHALLENGE_FORUMS_URLCODE) {
+                    return $ancestors;
+                }
+            }
+
             array_unshift($ancestors, self::ROOT_CATEGORY);
             return $ancestors;
         }
