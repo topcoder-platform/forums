@@ -221,7 +221,7 @@ if (!function_exists('writeListItem')):
                                     t('%s discussions')
                                 ), bigPlural(val('CountAllDiscussions', $category), '%s discussion')) ?>
                         </span>
-                        <span class="MiddleDot">&#183;</span>
+                        <span class="MItem MiddleDot">&#183;</span>
                         <span class="MItem CommentCount">
                             <?php echo sprintf(
                                 pluralTranslate(
