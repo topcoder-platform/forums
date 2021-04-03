@@ -740,6 +740,14 @@ jQuery(document).ready(function($) {
         return urlFormat.replace("{Path}", path);
     };
 
+    // Get query param from url
+    gdn.urlQueryParam = function (url, name) {
+        var results = new RegExp('[\?&]' + name + '=([^&#]*)')
+          .exec(url);
+
+        return (results !== null) ? results[1] || 0 : false;
+    };
+
     // Fill in placeholders.
     if (!gdn.elementSupports('input', 'placeholder')) {
         $('input:text,textarea').not('.NoIE').each(function() {

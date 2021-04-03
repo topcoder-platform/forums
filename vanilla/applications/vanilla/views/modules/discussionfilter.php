@@ -40,14 +40,28 @@ if (c('Vanilla.Discussions.ShowCounts', true)) {
     <ul role="nav" class="FilterMenu">
         <?php
         $Controller->fireEvent('BeforeDiscussionFilters');
-        //      if (c('Vanilla.Categories.ShowTabs')) {
         if (c('Vanilla.Categories.Use')) {
+            $menuOptions = [];
+
             $CssClass = 'AllCategories';
-            if ((strtolower($Controller->ControllerName) == 'categoriescontroller' && in_array(strtolower($Controller->RequestMethod),['index', 'all']))
-                || strpos(strtolower($Controller->Request->path()) , 'categories') === 0) {
-                $CssClass .= ' Active';
+            $isActive = false;
+            if($Controller instanceof CategoriesController || $Controller instanceof DiscussionController
+                || $Controller instanceof PostController) {
+               $isActive = true;
             }
-            echo '<li class="'.$CssClass.'">'.anchor('Public Forums', '/categories').'</li> ';
+
+            $menuOptions['AllCategories']['Url'] = anchor('Public Forums', '/categories');
+            $menuOptions['AllCategories']['IsActive'] = $isActive;
+            $menuOptions['AllCategories']['CssClass'] = $CssClass;
+
+            $Controller->EventArguments['Menu'] = &$menuOptions;
+            $Controller->fireEvent('BeforeRenderDiscussionFilters');
+            foreach($menuOptions as $key => $value) {
+                if($menuOptions[$key]['IsActive'] === true) {
+                    $menuOptions[$key]['CssClass'] .= ' Active';
+                }
+                echo '<li class="' . $menuOptions[$key]['CssClass'] . '">' . $menuOptions[$key]['Url'] . '</li> ';
+            }
         }
         /*
            <li id="RecentDiscussions" class="Discussions<?php echo strtolower($Controller->ControllerName) == 'discussionscontroller' && strtolower($Controller->RequestMethod) == 'index' && strpos(strtolower($Controller->Request->path()) , 'discussions') === 0? ' Active' : ''; ?>">

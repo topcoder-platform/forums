@@ -114,7 +114,7 @@ if (!function_exists('writeComment')) :
 
         // FIX: https://github.com/topcoder-platform/forums/issues/488:
         // ViewMode should be set before displaying comment
-        $viewMode = $sender->data('ViewMode');
+        $viewMode = $sender->data('ReplyTo.ViewMode');
         ?>
         <li class="<?php echo $cssClass; ?>" id="<?php echo 'Comment_'.$comment->CommentID; ?>">
             <div class="Comment">

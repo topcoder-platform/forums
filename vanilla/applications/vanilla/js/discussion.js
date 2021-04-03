@@ -135,6 +135,7 @@ jQuery(document).ready(function($) {
                     $('div.Popup,.Overlay').remove();
 
                 var commentID = json.CommentID;
+                var parentCommentID = json.ParentCommentID;
 
                 // Assign the comment id to the form if it was defined
                 if (commentID != null && commentID != '') {
@@ -194,11 +195,19 @@ jQuery(document).ready(function($) {
                             $(json.Data).prependTo('ul.Comments,.DiscussionTable');
                             $('ul.Comments li:first').effect("highlight", {}, "slow");
                         } else {
-                            $(json.Data)
-                                .appendTo('ul.Comments,.DiscussionTable')
-                                .effect("highlight", {}, "slow")
-                                .trigger('contentLoad');
-//                     $('ul.Comments li:last,.DiscussionTable li:last').effect("highlight", {}, "slow");
+                            var viewMode = json['ReplyTo.ViewMode'];
+                            if(viewMode === 'threaded') {
+                                item = $('ul.Comments');
+                                $('ul.Comments li').remove();
+                                $(item).append(json.Data)
+                                  //.effect("highlight", {}, "slow")
+                                  .trigger('contentLoad');
+                            } else {
+                                $(json.Data)
+                                  .appendTo('ul.Comments,.DiscussionTable')
+                                  //.effect("highlight", {}, "slow")
+                                  .trigger('contentLoad');
+                            }
                         }
                     }
                     // Remove any "More" pager links (because it is typically replaced with the latest comment by this function)
@@ -367,7 +376,7 @@ jQuery(document).ready(function($) {
         confirmHeading: gdn.definition('ConfirmDeleteCommentHeading', 'Delete Comment'),
         confirmText: gdn.definition('ConfirmDeleteCommentText', 'Are you sure you want to delete this comment?'),
         followConfirm: false,
-        deliveryType: 'BOOL', // DELIVERY_TYPE_BOOL
+        deliveryType: gdn.urlQueryParam( $('a.DeleteComment').attr('href'), 'deliveryType'), //'VIEW' - threaded, 'BOOL' - flat
         afterConfirm: function(json, sender) {
             var row = $(sender).parents('li.ItemComment');
             if (json.ErrorMessage) {
@@ -378,6 +387,15 @@ jQuery(document).ready(function($) {
                     $(this).remove();
                 });
                 gdn.processTargets(json.Targets);
+
+                var viewMode = json['ReplyTo.ViewMode'];
+                if(viewMode === 'threaded') {
+                    item = $('ul.Comments');
+                    $('ul.Comments li').remove();
+                    $(item).append(json.Data);
+                      //.effect("highlight", {}, "slow");
+                }
+
                 // Let listeners know that the comment was deleted.
                 $(document).trigger('CommentDeleted');
             }

@@ -395,10 +395,12 @@ class PostController extends VanillaController {
                         $this->EventArguments['Discussion'] = $discussion;
                         $this->fireEvent('AfterDiscussionSave');
 
+                        // FIX: https://github.com/topcoder-platform/forums/issues/511
+                        // if /discussion/{discussionID}/p{Page} is used then view mode is flat
                         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-                            redirectTo(discussionUrl($discussion, 1).'?new=1');
+                            redirectTo(discussionUrl($discussion).'?new=1');
                         } else {
-                            $this->setRedirectTo(discussionUrl($discussion, 1, true).'?new=1');
+                            $this->setRedirectTo(discussionUrl($discussion).'?new=1');
                         }
                     } else {
                         // If this was a draft save, notify the user about the save
