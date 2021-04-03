@@ -746,7 +746,7 @@ jQuery(document).ready(function($) {
           .exec(url);
 
         return (results !== null) ? results[1] || 0 : false;
-    }
+    };
 
     // Fill in placeholders.
     if (!gdn.elementSupports('input', 'placeholder')) {
