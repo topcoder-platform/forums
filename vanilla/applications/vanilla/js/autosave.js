@@ -1,7 +1,7 @@
 jQuery(document).ready(function($) {
     /* Autosave functionality for comment & discussion drafts */
     $.fn.autosave = function(opts) {
-        // Interval - 15 sec
+        // Interval - 15 secs
         var options = $.extend({interval: 15000, button: false}, opts);
         var textarea = this;
         if (!options.button)
