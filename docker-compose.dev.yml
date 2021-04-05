@@ -7,5 +7,7 @@ services:
     container_name: tideways-daemon
     build:
       context: ./tideways-daemon
+      args:
+        - TIDEWAYS_ENV
     ports:
       - 9135:9135
