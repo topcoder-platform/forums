@@ -6,8 +6,9 @@ jQuery(document).ready(function($) {
     // Hide it if they leave the area without typing
     $('div.CommentForm textarea').blur(function(ev) {
         var Comment = $(ev.target).val();
+        var textArea = $(ev.target);
         if (!Comment || Comment == '')
-            $('a.Cancel').hide();
+            $(textArea).closest('a.Cancel').hide();
     });
 
     // Reveal the textarea and hide previews.
@@ -33,6 +34,7 @@ jQuery(document).ready(function($) {
         var textbox = $(frm).find('textarea');
         var inpCommentID = $(frm).find('input:hidden[name$=CommentID]');
         var inpDraftID = $(frm).find('input:hidden[name$=DraftID]');
+        var maxCommentLength =  $(frm).find('input:hidden[name$=MaxCommentLength]');
         var type = 'Post';
         var preview = $(btn).hasClass('PreviewButton');
         var defaultValues = [
@@ -48,6 +50,34 @@ jQuery(document).ready(function($) {
                 return false;
             }
         }
+
+        var editorContainer = $(frm).find('.EasyMDEContainer');
+        var messageContainer = $(frm).find('.editor-statusbar .message');
+
+        var currentVal = $(textbox).val();
+        if(defaultValues.includes(currentVal) || currentVal.trim().length == 0) {
+            $(editorContainer).addClass('error');
+            $(messageContainer).text('Cannot post an empty message');
+            $(frm).find(':submit').attr('disabled', 'disabled');
+            $(frm).find('.Buttons a.Button:not(.Cancel)').addClass('Disabled');
+            return false;
+        }
+
+
+        if(currentVal.length > maxCommentLength.val()) {
+          $(editorContainer).addClass('error');
+          var count = currentVal.length - maxCommentLength.val();
+          $(messageContainer).text('Comment is '+ count +' characters too long');
+          $(frm).find(':submit').attr('disabled', 'disabled');
+          $(frm).find('.Buttons a.Button:not(.Cancel)').addClass('Disabled');
+          return false;
+        }
+
+        $(editorContainer).removeClass('error');
+        $(messageContainer).text('');
+        $(frm).find(':submit').removeAttr("disabled");
+        $(frm).find('.Buttons a.Button').removeClass('Disabled');
+
         var draft = $(btn).hasClass('DraftButton');
         if (draft) {
             var currentVal = $(textbox).val()
