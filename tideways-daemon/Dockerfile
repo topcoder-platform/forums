@@ -1,7 +1,8 @@
 FROM debian:stable-slim
 
-ARG TIDEWAYS_ENVIRONMENT_DEFAULT=production
-ENV TIDEWAYS_ENVIRONMENT=$TIDEWAYS_ENVIRONMENT_DEFAULT
+ARG TIDEWAYS_ENV
+ENV TIDEWAYS_ENVIRONMENT=$TIDEWAYS_ENV
+RUN echo "Tideways Daemon container for '$TIDEWAYS_ENV' env"
 
 RUN useradd --system tideways
 RUN apt-get update && apt-get install -yq --no-install-recommends gnupg2 curl sudo ca-certificates
