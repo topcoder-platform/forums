@@ -156,19 +156,17 @@ if (c('Garden.Installed')) {
     // FIX: https://github.com/topcoder-platform/forums/issues/479
     if(!Gdn::structure()->table('User')->columnExists('CountWatchedCategories')) {
         Gdn::structure()->table('User')
-        ->column('CountWatchedCategories', 'int', null)
+        ->column('CountWatchedCategories', 'int', true)
         ->set(false, false);
 
-        // Set count of WatchedCategories for users
-        Gdn::sql()->query('update GDN_User u set u.CountWatchedCategories  = (
-            select count(c.CategoryID) from GDN_Category c, (select distinct CAST(SUBSTRING_INDEX(um.Name, ".", -1) as UNSIGNED) as CategoryID from GDN_UserMeta  um
-            where um.Name LIKE "Preferences.%" AND UserID = u.UserID and Value = 1) ws where ws.CategoryID = c.CategoryID)', 'update');
+        // Set count of Watched Categories for users
+        Gdn::sql()->query('update GDN_User u, (select wc.UserID, count(wc.CategoryID) count from GDN_Category c
+            join (select distinct um.UserID, SUBSTRING_INDEX(um.Name, ".", -1) as CategoryID from GDN_UserMeta  um  where um.Name LIKE "Preferences.%" and Value = 1) wc
+            where wc.CategoryID = c.CategoryID group by wc.UserID) uc
+            set u.CountWatchedCategories  = uc.count
+            where u.UserID = uc.UserID', 'update');
 
+        Gdn::sql()->query('update GDN_User u set u.CountWatchedCategories  = 0 where u.CountWatchedCategories is null', 'update');
     }
 
-    // FIX: https://github.com/topcoder-platform/forums/issues/479
-    // Re-calculate count of WatchedCategories if WatchedCategories is null
-    // Gdn::sql()->query('update GDN_User u set u.CountWatchedCategories  = (
-    //        select count(c.CategoryID) from GDN_Category c, (select distinct CAST(SUBSTRING_INDEX(um.Name, ".", -1) as UNSIGNED) as CategoryID from GDN_UserMeta  um
-    //        where um.Name LIKE "Preferences.%" AND UserID = u.UserID and Value = 1) ws where ws.CategoryID = c.CategoryID) where CountWatchedCategories is null', 'update');
 }
