@@ -12,5 +12,6 @@ services:
         - VANILLA_VERSION=3.3
         - CI_DEPLOY_TOKEN
         - BRANCH
+        - TIDEWAYS_ENV
     ports:
       - 80:80

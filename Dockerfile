@@ -4,9 +4,14 @@ ARG CI_DEPLOY_TOKEN
 ARG VANILLA_VERSION=3.3
 ARG ENV
 ARG BRANCH
+ARG TIDEWAYS_ENV
 
 ENV TIDEWAYS_SERVICE web
+ENV TIDEWAYS_ENVIRONMENT=$TIDEWAYS_ENV
+ENV TIDEWAYS_DAEMON_EXTRA="--env=$TIDEWAYS_ENVIRONMENT"
 ENV WEB_DOCUMENT_ROOT /vanillapp
+
+RUN echo "Tideways Daemon for '$TIDEWAYS_ENV' env"
 
 # Get the latest release of Vanilla Forums
 RUN wget https://github.com/vanilla/vanilla/releases/download/Vanilla_${VANILLA_VERSION}/vanilla-${VANILLA_VERSION}.zip
@@ -74,14 +79,14 @@ RUN apt-get update && apt-get install -yq --no-install-recommends gnupg2;
 RUN echo 'deb https://packages.tideways.com/apt-packages debian main' > /etc/apt/sources.list.d/tideways.list && \
     curl -L -sS 'https://packages.tideways.com/key.gpg' | apt-key add - && \
     apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -yq install tideways-php && \
+    DEBIAN_FRONTEND=noninteractive apt-get -yq install tideways-php tideways-daemon && \
     apt-get autoremove --assume-yes && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*; \
-    echo 'extension=tideways.so\ntideways.connection=tcp://tideways-daemon:9135\ntideways.enable_cli=0\ntideways.sample_rate=25' >> opt/docker/etc/php/php.ini;
+    echo 'extension=tideways.so\ntideways.enable_cli=0\ntideways.sample_rate=25' >> opt/docker/etc/php/php.ini;
 
 # Copy custom supervisor's configs and scripts
 # Netcat is used to connect to a memcached server
 RUN apt-get update && apt-get install -y netcat
-COPY ./services/flush_cache.conf /opt/docker/etc/supervisor.d/
-COPY ./services/flush_cache.sh /opt/docker/bin/service.d/
+COPY ./services /opt/docker/etc/supervisor.d/
+COPY ./services /opt/docker/bin/service.d/
