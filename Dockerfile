@@ -88,5 +88,9 @@ RUN echo 'deb https://packages.tideways.com/apt-packages debian main' > /etc/apt
 # Copy custom supervisor's configs and scripts
 # Netcat is used to connect to a memcached server
 RUN apt-get update && apt-get install -y netcat
-COPY ./services /opt/docker/etc/supervisor.d/
-COPY ./services /opt/docker/bin/service.d/
+COPY ./services/*.conf /opt/docker/etc/supervisor.d/
+COPY ./services/*.sh /opt/docker/bin/service.d/
+
+# Ensure the service files are already executable
+RUN chmod +x /opt/docker/bin/service.d/flush_cache.sh
+RUN chmod +x /opt/docker/bin/service.d/tideways.sh
