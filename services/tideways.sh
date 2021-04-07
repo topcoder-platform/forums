@@ -5,5 +5,5 @@ exit_code=$?
 if [  $exit_code != 0 ]; then
   echo tideways.sh: exit code $exit_code
 else
-  echo tideways.sh: started successfully
+  echo tideways.sh: started successfully.
 fi
