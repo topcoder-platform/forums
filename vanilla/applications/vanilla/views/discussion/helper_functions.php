@@ -45,7 +45,7 @@ if (!function_exists('writeBookmarkLink')) :
         $output = '';
         $hasWatched = $discussion->Bookmarked == '1';
         $title = t($hasWatched? 'Stop watching the discussion' : 'Watch the discussion');
-        $icon = watchIcon($hasWatched);
+        $icon = watchIcon($hasWatched, $title);
         $output .= anchor(
             $icon,
             '/discussion/bookmark/'.$discussion->DiscussionID.'/'.Gdn::session()->transientKey().'?Target='.urlencode(Gdn::controller()->SelfUrl),

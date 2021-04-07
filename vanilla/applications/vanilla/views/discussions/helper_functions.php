@@ -73,7 +73,7 @@ if (!function_exists('BookmarkButton')) {
         // Bookmark link
         $hasWatched = $discussion->Bookmarked == '1';
         $title = t($hasWatched ? 'Stop watching the discussion' : 'Watch the discussion');
-        $icon = watchIcon($hasWatched);
+        $icon = watchIcon($hasWatched, $title);
         return anchor(
             $icon,
             '/discussion/bookmark/'.$discussion->DiscussionID.'/'.Gdn::session()->transientKey(),
