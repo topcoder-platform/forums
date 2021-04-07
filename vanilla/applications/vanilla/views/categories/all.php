@@ -19,4 +19,8 @@ if (!is_null($this->Category) && $this->Category->DisplayAs == 'Discussions') {
 }
 echo '</div>';
 $categories = $this->data('CategoryTree');
-writeCategoryList($categories, 1);
+if(!is_null($this->Category)) {
+    writeCategoryList($categories, 1);
+} else {
+    writeCategoryAccordion($categories, 1);
+}

@@ -150,12 +150,21 @@ class CategoriesController extends VanillaController {
             case 'Default':
             case 'Nested':
             default:
-            $categoryTree = $this->CategoryModel
-                    ->setJoinUserCategory(true)
-                    ->getChildTree(
-                        $categoryIdentifier ?: null,
-                        ['depth' => CategoryModel::instance()->getMaxDisplayDepth() ?: 10]
-                    );
+                // FIX: https://github.com/topcoder-platform/forums/issues/487
+                if( $categoryIdentifier != -1 && $categoryIdentifier != null) {
+                    $categoryTree = $this->CategoryModel
+                        ->setJoinUserCategory(true)
+                        ->getChildTree(
+                            $categoryIdentifier,
+                            ['depth' => CategoryModel::instance()->getMaxDisplayDepth() ?: 10]
+                        );
+                } else {
+                    $categoryTree =  $this->CategoryModel
+                        ->setJoinUserCategory(true)
+                        ->getChildTree(-1,  ['maxdepth' => 3,
+                            'collapsecategories' => false,
+                            'permission' => 'PermsDiscussionsView']);
+                }
         }
 
         if ($recent) {
@@ -293,6 +302,9 @@ class CategoriesController extends VanillaController {
         $this->setData('CategorySort', $sort);
 
         if ($categoryIdentifier == '') {
+            // Add jquery-accordion ui
+            $this->addJsFile('jquery-ui-1.10.0.custom.min.js');
+            $this->addJsFile('home.js');
             $this->fireEvent('EnableFollowingFilter', [
                 'CategoryIdentifier' => $categoryIdentifier,
                 'EnableFollowingFilter' => &$this->enableFollowingFilter

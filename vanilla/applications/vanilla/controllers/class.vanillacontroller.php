@@ -102,7 +102,6 @@ class VanillaController extends Gdn_Controller {
                 }
             }
 
-            array_unshift($ancestors, self::ROOT_CATEGORY);
             return $ancestors;
         }
     }
