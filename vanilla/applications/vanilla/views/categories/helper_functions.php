@@ -378,7 +378,7 @@ if (!function_exists('writeCategoryAccordion')):
 
         ?>
         <div class="DataListWrap DataAccordionWrap">
-            <div id="CategoryAccordion" class="CategoryAccordion">
+            <div id="CategoryAccordion" class="CategoryAccordion ui-accordion ui-widget ui-helper-reset">
                 <?php
                 foreach ($categories as $category) {
                     writeAccordionItem($category, $depth);
@@ -408,11 +408,12 @@ if (!function_exists('writeAccordionItem')):
         $categoryID = val('CategoryID', $category);
         $cssClass = cssClass($category, true);
 ?>
-        <div id="Category_<?php echo $categoryID; ?>" class="CategoryAccordionItem">
-            <div class="<?php echo $cssClass; ?> CategoryAccordionHeader">
+        <div id="Category_<?php echo $categoryID; ?>" class="CategoryAccordionItem ">
+            <div class="<?php echo $cssClass; ?> CategoryAccordionHeader accordion-header ui-accordion-header ui-helper-reset ui-state-default ui-accordion-icons ui-corner-all">
                 <a class="toggle" href="javascript:void(0);"><?php echo Gdn_Format::text(val('Name', $category)); ?></a>
+                <span class="ui-accordion-header-icon ui-icon icon icon-chevron-up"></span>
             </div>
-            <ul id="Category_<?php echo $categoryID; ?>_child" class="DataList CategoryList CategoryAccordionCollapse">
+            <ul id="Category_<?php echo $categoryID; ?>_child" class="DataList CategoryList ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom">
                <?php
                  foreach ($children as $child) {
                     writeListItem($child, $depth + 1);
