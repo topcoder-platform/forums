@@ -125,7 +125,10 @@ class DiscussionController extends VanillaController {
             Gdn_Theme::section($CategoryCssClass);
         }
 
-        $this->setData('Breadcrumbs', $this->buildBreadcrumbs($this->CategoryID));
+        $ancestors = $this->buildBreadcrumbs($this->CategoryID);
+        array_push($ancestors, ['Name' => $this->Discussion->Name]);
+
+        $this->setData('Breadcrumbs', $ancestors);
 
         // Setup
         $this->title($this->Discussion->Name);
@@ -513,6 +516,13 @@ class DiscussionController extends VanillaController {
         $CountBookmarksHtml = myBookmarksMenuItem($CountBookmarks);
         $this->jsonTarget('#MyBookmarks', $CountBookmarksHtml, 'ReplaceWith');
 
+       // FIX: https://github.com/topcoder-platform/forums/issues/479
+        $userMetaModel = new UserMetaModel();
+        $CountWatchedCategories = $userMetaModel->userWatchedCategoriesCount($UserID);
+        $TotalCount = $CountBookmarks + $CountWatchedCategories;
+        $CountWatchesHtml = myWatchingMenuItem($TotalCount);
+        $this->jsonTarget('#MyWatching', $CountWatchesHtml, 'ReplaceWith');
+
         //  Short circuit if this is an api call.
         if ($this->deliveryType() === DELIVERY_TYPE_DATA) {
             $this->render('Blank', 'Utility', 'Dashboard');
@@ -789,7 +799,7 @@ class DiscussionController extends VanillaController {
 
             if ($comment && $discussion) {
                 $defaultTarget = discussionUrl($discussion);
-
+                $this->json('DiscussionID', $discussionID);
                 // Make sure comment is this user's or they have Delete permission.
                 if ($comment->InsertUserID != $session->UserID || !c('Vanilla.Comments.AllowSelfDelete')) {
                     $this->categoryPermission($discussion->CategoryID, 'Vanilla.Comments.Delete');
@@ -804,6 +814,12 @@ class DiscussionController extends VanillaController {
                 // Delete the comment.
                 if (!$this->CommentModel->deleteID($commentID)) {
                     $this->Form->addError('Failed to delete comment');
+                } else {
+                    // FIX: https://github.com/topcoder-platform/forums/issues/511
+                    // Allow plugins to handle it
+                    $this->EventArguments['DiscussionID'] = $discussionID;
+                    $this->EventArguments['CommentID'] = $commentID;
+                    $this->fireEvent('AfterCommentDeleted');
                 }
             } else {
                 $this->Form->addError('Invalid comment');

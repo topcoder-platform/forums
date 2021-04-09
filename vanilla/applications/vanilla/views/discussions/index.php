@@ -6,9 +6,9 @@ include_once $this->fetchViewLocation('helper_functions', 'categories', 'vanilla
 echo '<h1 class="H HomepageTitle">'.
     adminCheck(NULL, ['', ' ']).
     $this->data('Title').
-    followButton($this->data('Category.CategoryID')).
-    watchButton($this->data('Category.CategoryID')).
-    '</h1>';
+    followButton($this->data('Category.CategoryID')).'</h1>';
+    //watchButton($this->data('Category.CategoryID')).
+
 
 $Description = $this->data('Category.Description', $this->description());
 echo wrapIf(Gdn_Format::htmlFilter($Description), 'div', ['class' => 'P PageDescription']);

@@ -29,7 +29,7 @@ builddeploy_steps: &builddeploy_steps
       - run: *install_dependency
       - run: *install_deploysuite
       #- restore_cache: *restore_cache_settings_for_build
-      - run: ./build.sh ${APPNAME} ${CI_DEPLOY_TOKEN} ${LOGICAL_ENV} ${BRANCH}
+      - run: ./build.sh ${APPNAME} ${CI_DEPLOY_TOKEN} ${LOGICAL_ENV} ${BRANCH} ${TIDEWAYS_ENV}
       #- save_cache: *save_cache_settings
       - deploy:
           name: Running MasterScript.
@@ -52,6 +52,7 @@ jobs:
       APPNAME: "vanilla-forums"
       CI_DEPLOY_TOKEN: $CI_DEPLOY_TOKEN
       BRANCH: "develop"
+      TIDEWAYS_ENV: "dev"
     steps: *builddeploy_steps
 
   "build-prod":
@@ -62,6 +63,7 @@ jobs:
       APPNAME: "vanilla-forums"
       CI_DEPLOY_TOKEN: $CI_DEPLOY_TOKEN
       BRANCH: "master"
+      TIDEWAYS_ENV: "production"
     steps: *builddeploy_steps
 
 workflows:

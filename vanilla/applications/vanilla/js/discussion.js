@@ -6,8 +6,9 @@ jQuery(document).ready(function($) {
     // Hide it if they leave the area without typing
     $('div.CommentForm textarea').blur(function(ev) {
         var Comment = $(ev.target).val();
+        var textArea = $(ev.target);
         if (!Comment || Comment == '')
-            $('a.Cancel').hide();
+            $(textArea).closest('a.Cancel').hide();
     });
 
     // Reveal the textarea and hide previews.
@@ -33,6 +34,7 @@ jQuery(document).ready(function($) {
         var textbox = $(frm).find('textarea');
         var inpCommentID = $(frm).find('input:hidden[name$=CommentID]');
         var inpDraftID = $(frm).find('input:hidden[name$=DraftID]');
+        var maxCommentLength =  $(frm).find('input:hidden[name$=MaxCommentLength]');
         var type = 'Post';
         var preview = $(btn).hasClass('PreviewButton');
         var defaultValues = [
@@ -48,6 +50,34 @@ jQuery(document).ready(function($) {
                 return false;
             }
         }
+
+        var editorContainer = $(frm).find('.EasyMDEContainer');
+        var messageContainer = $(frm).find('.editor-statusbar .message');
+
+        var currentVal = $(textbox).val();
+        if(defaultValues.includes(currentVal) || currentVal.trim().length == 0) {
+            $(editorContainer).addClass('error');
+            $(messageContainer).text('Cannot post an empty message');
+            $(frm).find(':submit').attr('disabled', 'disabled');
+            $(frm).find('.Buttons a.Button:not(.Cancel)').addClass('Disabled');
+            return false;
+        }
+
+
+        if(currentVal.length > maxCommentLength.val()) {
+          $(editorContainer).addClass('error');
+          var count = currentVal.length - maxCommentLength.val();
+          $(messageContainer).text('Comment is '+ count +' characters too long');
+          $(frm).find(':submit').attr('disabled', 'disabled');
+          $(frm).find('.Buttons a.Button:not(.Cancel)').addClass('Disabled');
+          return false;
+        }
+
+        $(editorContainer).removeClass('error');
+        $(messageContainer).text('');
+        $(frm).find(':submit').removeAttr("disabled");
+        $(frm).find('.Buttons a.Button').removeClass('Disabled');
+
         var draft = $(btn).hasClass('DraftButton');
         if (draft) {
             var currentVal = $(textbox).val()
@@ -135,6 +165,7 @@ jQuery(document).ready(function($) {
                     $('div.Popup,.Overlay').remove();
 
                 var commentID = json.CommentID;
+                var parentCommentID = json.ParentCommentID;
 
                 // Assign the comment id to the form if it was defined
                 if (commentID != null && commentID != '') {
@@ -194,11 +225,19 @@ jQuery(document).ready(function($) {
                             $(json.Data).prependTo('ul.Comments,.DiscussionTable');
                             $('ul.Comments li:first').effect("highlight", {}, "slow");
                         } else {
-                            $(json.Data)
-                                .appendTo('ul.Comments,.DiscussionTable')
-                                .effect("highlight", {}, "slow")
-                                .trigger('contentLoad');
-//                     $('ul.Comments li:last,.DiscussionTable li:last').effect("highlight", {}, "slow");
+                            var viewMode = json['ReplyTo.ViewMode'];
+                            if(viewMode === 'threaded') {
+                                item = $('ul.Comments');
+                                $('ul.Comments li').remove();
+                                $(item).append(json.Data)
+                                  //.effect("highlight", {}, "slow")
+                                  .trigger('contentLoad');
+                            } else {
+                                $(json.Data)
+                                  .appendTo('ul.Comments,.DiscussionTable')
+                                  //.effect("highlight", {}, "slow")
+                                  .trigger('contentLoad');
+                            }
                         }
                     }
                     // Remove any "More" pager links (because it is typically replaced with the latest comment by this function)
@@ -367,7 +406,7 @@ jQuery(document).ready(function($) {
         confirmHeading: gdn.definition('ConfirmDeleteCommentHeading', 'Delete Comment'),
         confirmText: gdn.definition('ConfirmDeleteCommentText', 'Are you sure you want to delete this comment?'),
         followConfirm: false,
-        deliveryType: 'BOOL', // DELIVERY_TYPE_BOOL
+        deliveryType: gdn.urlQueryParam( $('a.DeleteComment').attr('href'), 'deliveryType'), //'VIEW' - threaded, 'BOOL' - flat
         afterConfirm: function(json, sender) {
             var row = $(sender).parents('li.ItemComment');
             if (json.ErrorMessage) {
@@ -378,6 +417,15 @@ jQuery(document).ready(function($) {
                     $(this).remove();
                 });
                 gdn.processTargets(json.Targets);
+
+                var viewMode = json['ReplyTo.ViewMode'];
+                if(viewMode === 'threaded') {
+                    item = $('ul.Comments');
+                    $('ul.Comments li').remove();
+                    $(item).append(json.Data);
+                      //.effect("highlight", {}, "slow");
+                }
+
                 // Let listeners know that the comment was deleted.
                 $(document).trigger('CommentDeleted');
             }

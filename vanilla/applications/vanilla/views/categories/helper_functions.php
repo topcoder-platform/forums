@@ -149,7 +149,7 @@ if (!function_exists('writeListItem')):
         if($urlcode == VanillaController::CHALLENGE_FORUMS_URLCODE) {
             return;
         }
-        $children = $category['Children'];
+        $children = val('Children',$category);
         $categoryID = val('CategoryID', $category);
         $cssClass = cssClass($category, true);
         $writeChildren = getWriteChildrenMethod($category, $depth);
@@ -177,7 +177,10 @@ if (!function_exists('writeListItem')):
                 ?>
                 <div class="ItemContent Category">
                     <div class="Options">
-                        <?php echo getOptions($category) ?>
+                        <?php
+                        echo watchButton($category);
+                        echo getOptions($category);
+                        ?>
                     </div>
                     <?php echo categoryPhoto($category); ?>
                     <div role="heading" aria-level="<?php echo $headingLevel; ?>" class="TitleWrap">
@@ -218,7 +221,7 @@ if (!function_exists('writeListItem')):
                                     t('%s discussions')
                                 ), bigPlural(val('CountAllDiscussions', $category), '%s discussion')) ?>
                         </span>
-                        <span class="MiddleDot">&#183;</span>
+                        <span class="MItem MiddleDot">&#183;</span>
                         <span class="MItem CommentCount">
                             <?php echo sprintf(
                                 pluralTranslate(
@@ -357,6 +360,69 @@ if (!function_exists('WriteTableRow')):
                 writeTableRow($childRow, $depth + 1);
             }
         }
+    }
+endif;
+
+if (!function_exists('writeCategoryAccordion')):
+    /**
+     * Renders a category list (modern view).
+     *
+     * @param $categories
+     * @param int $depth
+     */
+    function writeCategoryAccordion($categories, $depth = 1) {
+        if (empty($categories)) {
+            echo '<div class="Empty">'.t('No categories were found.').'</div>';
+            return;
+        }
+
+        ?>
+        <div class="DataListWrap DataAccordionWrap">
+            <div id="CategoryAccordion" class="CategoryAccordion ui-accordion ui-widget ui-helper-reset">
+                <?php
+                foreach ($categories as $category) {
+                    writeAccordionItem($category, $depth);
+                }
+                ?>
+            </div>
+        </div>
+        <?php
+    }
+endif;
+
+if (!function_exists('writeAccordionItem')):
+    /**
+     * Renders a accordion item in a category list (modern view).
+     *
+     * @param $category
+     * @param $depth
+     * @throws Exception
+     */
+    function writeAccordionItem($category, $depth) {
+        $urlcode = $category['UrlCode'];
+        // FIX: https://github.com/topcoder-platform/forums/issues/477: Don't show 'Challenge Forums'
+        if($urlcode == VanillaController::CHALLENGE_FORUMS_URLCODE) {
+            return;
+        }
+        $children = val('Children',$category);
+        $categoryID = val('CategoryID', $category);
+        $cssClass = cssClass($category, true);
+?>
+        <div id="Category_<?php echo $categoryID; ?>" class="CategoryAccordionItem ">
+            <div class="<?php echo $cssClass; ?> CategoryAccordionHeader accordion-header ui-accordion-header ui-helper-reset ui-state-default ui-accordion-icons ui-corner-all">
+                <a class="toggle" href="javascript:void(0);"><?php echo Gdn_Format::text(val('Name', $category)); ?></a>
+                <span class="ui-accordion-header-icon ui-icon icon icon-chevron-up"></span>
+            </div>
+            <ul id="Category_<?php echo $categoryID; ?>_child" class="DataList CategoryList ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom">
+               <?php
+                 foreach ($children as $child) {
+                    writeListItem($child, $depth + 1);
+                 }
+                ?>
+            </ul>
+        </div>
+
+<?php
     }
 endif;
 

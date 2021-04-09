@@ -75,6 +75,7 @@ class VanillaController extends Gdn_Controller {
     protected function buildBreadcrumbs($CategoryID) {
         $Category = CategoryModel::categories($CategoryID);
         $ancestors = CategoryModel::getAncestors($CategoryID);
+        $parentCategoryID = val('ParentCategoryID', $Category);
         if(val('GroupID', $Category) > 0) {
             $temp = [];
             foreach ($ancestors as $id => $ancestor) {
@@ -102,7 +103,14 @@ class VanillaController extends Gdn_Controller {
                 }
             }
 
-            array_unshift($ancestors, self::ROOT_CATEGORY);
+            // FIX https://github.com/topcoder-platform/forums/issues/487
+            // Go to a parent category at a home page
+            foreach ($ancestors as $id => $ancestor) {
+                if ($ancestor['ParentCategoryID'] == -1) {
+                     $ancestors[$id]['Url'] = url('/categories/#Category_'.$parentCategoryID, true);
+                }
+            }
+
             return $ancestors;
         }
     }

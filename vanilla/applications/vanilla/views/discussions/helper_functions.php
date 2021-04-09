@@ -71,11 +71,13 @@ if (!function_exists('BookmarkButton')) {
         }
 
         // Bookmark link
-        $title = t($discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
+        $hasWatched = $discussion->Bookmarked == '1';
+        $title = t($hasWatched ? 'Stop watching the discussion' : 'Watch the discussion');
+        $icon = watchIcon($hasWatched, $title);
         return anchor(
-            $title,
+            $icon,
             '/discussion/bookmark/'.$discussion->DiscussionID.'/'.Gdn::session()->transientKey(),
-            'Hijack Bookmark'.($discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
+            'Hijack  watchButton '.($hasWatched ? ' isWatching' : ''),
             ['title' => $title]
         );
     }
@@ -218,7 +220,7 @@ if (!function_exists('WriteDiscussion')) :
                             '%s comment html', '%s comments html', t('%s comment'), t('%s comments')),
                             bigPlural($discussion->CountComments, '%s comment'));
                         ?></span>
-                    <span class="MiddleDot">&#183;</span>
+                    <span class="MItem MiddleDot">&#183;</span>
                     <span class="MItem MCount ViewCount"><?php
                         printf(pluralTranslate($discussion->CountViews,
                             '%s view html', '%s views html', t('%s view'), t('%s views')),
