@@ -748,6 +748,11 @@ jQuery(document).ready(function($) {
         return (results !== null) ? results[1] || 0 : false;
     };
 
+    gdn.normalizeText = function(value) {
+        var newV = value.replace(/\n/g, "\r\n");
+        return newV;
+    };
+
     // Fill in placeholders.
     if (!gdn.elementSupports('input', 'placeholder')) {
         $('input:text,textarea').not('.NoIE').each(function() {
