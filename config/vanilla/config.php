@@ -26,6 +26,7 @@ $Configuration['EnabledPlugins']['GettingStarted'] = 'GettingStarted';
 $Configuration['EnabledPlugins']['stubcontent'] = false;
 $Configuration['EnabledPlugins']['Topcoder'] = true;
 $Configuration['EnabledPlugins']['TopcoderEditor'] = true;
+$Configuration['EnabledPlugins']['Voting'] = true;
 $Configuration['EnabledPlugins']['rich-editor'] = true;
 $Configuration['EnabledPlugins']['editor'] = false;
 $Configuration['EnabledPlugins']['emojiextender'] = true;
