@@ -1975,7 +1975,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             // Add the favicon.
             $Favicon = c('Garden.FavIcon');
             if ($Favicon) {
-                $this->Head->setFavIcon(Gdn_Upload::url($Favicon));
+                $this->Head->setFavIcon($Favicon);
             }
 
             $touchIcon = c('Garden.TouchIcon');

@@ -205,3 +205,5 @@ $Configuration['Garden']['Upload']['AllowedFileExtensions'] = [
 ];
 // Allow "target='_blank'" for Markdown format;
 $Configuration['Garden']['Html']['BlockedAttributes']='on*, download';
+
+$Configuration['Garden']['FavIcon']='/themes/topcoder/design/images/favicon.png';
