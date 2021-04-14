@@ -207,3 +207,6 @@ $Configuration['Garden']['Upload']['AllowedFileExtensions'] = [
 $Configuration['Garden']['Html']['BlockedAttributes']='on*, download';
 
 $Configuration['Garden']['FavIcon']='/themes/topcoder/design/images/favicon.png';
+
+// This flag moves executing of ActivityModel queue to the scheduler
+$Configuration['Feature']['deferredNotifications']['Enabled'] = true;
