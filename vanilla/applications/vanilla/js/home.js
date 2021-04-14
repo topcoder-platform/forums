@@ -5,41 +5,41 @@ jQuery(document).ready(function ($) {
   //  active: 0,  heightStyle: "content" ,
   //  icons: { "header": "icon icon-chevron-down", "activeHeader": "icon icon-chevron-up" }});
 
-  var headers = $('.CategoryAccordion .accordion-header')
+  var headers = $('.CategoryAccordion .accordion-header');
 
   // add the accordion functionality
   headers.click(function () {
-    var panel = $(this).next()
-    var isOpen = panel.is(':visible')
+    var panel = $(this).next();
+    var isOpen = panel.is(':visible');
     if (isOpen) {
-      $(panel).parent().find('.ui-accordion-header-icon').removeClass('icon-chevron-up').addClass('icon-chevron-down')
-      $(panel).parent().find('.CategoryAccordionHeader').removeClass('ui-state-active')
+      $(panel).parent().find('.ui-accordion-header-icon').removeClass('icon-chevron-up').addClass('icon-chevron-down');
+      $(panel).parent().find('.CategoryAccordionHeader').removeClass('ui-state-active');
     } else {
-      $(panel).parent().find('.ui-accordion-header-icon').addClass('icon-chevron-up').removeClass('icon-chevron-down')
-      $(panel).parent().find('.CategoryAccordionHeader').addClass('ui-state-active')
+      $(panel).parent().find('.ui-accordion-header-icon').addClass('icon-chevron-up').removeClass('icon-chevron-down');
+      $(panel).parent().find('.CategoryAccordionHeader').addClass('ui-state-active');
     }
 
     //panel[isOpen? 'slideUp': 'slideDown']()
-    panel[isOpen ? 'hide' : 'show']().trigger(isOpen ? 'hide' : 'show')
-
-    return false
+    panel[isOpen ? 'hide' : 'show']().trigger(isOpen ? 'hide' : 'show');
+    return false;
   })
 
   // hook up the expand/collapse
-  var hash = window.location.hash.substr(1)
+  var hash = window.location.hash.substr(1);
   if (hash) {
+    window.location.hash = '#' + hash;
     // Collapse other categories
-    $('.CategoryAccordionHeader').removeClass('ui-state-active')
-    $('.CategoryAccordionHeader').find('.ui-accordion-header-icon').removeClass('icon-chevron-up').addClass('icon-chevron-down')
-    $('.ui-accordion-content').hide()
+    $('.CategoryAccordionHeader').removeClass('ui-state-active');
+    $('.CategoryAccordionHeader').find('.ui-accordion-header-icon').removeClass('icon-chevron-up').addClass('icon-chevron-down');
+    $('.ui-accordion-content').hide();
 
-    $('#' + hash).find('.CategoryAccordionHeader').addClass('ui-state-active')
+    $('#' + hash).find('.ui-accordion-content').show();
+    $('#' + hash).find('.CategoryAccordionHeader').addClass('ui-state-active');
     $('#' + hash).find('.ui-accordion-header-icon').removeClass('icon-chevron-down').addClass('icon-chevron-up');
-    $('#' + hash).find('.ui-accordion-content').show()
   } else {
     // Expand all categories
-    $('.CategoryAccordionHeader').addClass('ui-state-active')
+    $('.CategoryAccordionHeader').addClass('ui-state-active');
     $('.CategoryAccordionHeader').find('.ui-accordion-header-icon').removeClass('icon-chevron-down').addClass('icon-chevron-up');
-    $('.ui-accordion-content').show()
+    $('.ui-accordion-content').show();
   }
 })
