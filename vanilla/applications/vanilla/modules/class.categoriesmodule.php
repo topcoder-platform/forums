@@ -71,14 +71,12 @@ class CategoriesModule extends Gdn_Module {
      * @return array
      */
     private function filterCategories($categories) {
-        //Don't show `Challenges Forums` in the menu
-        $groupModel = new GroupModel();
-        $challengesForumsCategory = $groupModel->getChallengesForums();
-        $challengesForumsCategoryID = val('CategoryID',$challengesForumsCategory);
-
+        $hiddenCategories = ['challenges-forums', 'groups'];
         foreach ($categories as &$category) {
             $categoryID = $category['CategoryID'];
-            $category['isDisplayed'] = $challengesForumsCategoryID != $categoryID;
+            $categoryUrlCode = $category['UrlCode'];
+            $isHidden = in_array($categoryUrlCode, $hiddenCategories);
+            $category['isDisplayed'] = !$isHidden;
         }
 
         return array_filter($categories, function($e) {

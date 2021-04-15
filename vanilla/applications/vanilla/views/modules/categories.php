@@ -8,12 +8,12 @@ if ($this->Data !== FALSE) {
     }
     ?>
     <div class="Box BoxCategories">
-        <?php echo panelHeading(t('Categories')); ?>
+        <?php echo panelHeading(t('Public Forums Topics')); ?>
         <ul class="PanelInfo PanelCategories">
             <?php
-            echo '<li'.($OnCategories ? ' class="Active"' : '').'>'.
-                anchor(t('All Categories'), '/categories', 'ItemLink')
-                .'</li>';
+           // echo '<li'.($OnCategories ? ' class="Active"' : '').'>'.
+           //     anchor(t('All Categories'), '/categories', 'ItemLink')
+           //     .'</li>';
 
             $MaxDepth = c('Vanilla.Categories.MaxDisplayDepth');
 
@@ -24,13 +24,21 @@ if ($this->Data !== FALSE) {
                 $attributes = false;
 
                 if ($Category->DisplayAs === 'Heading') {
-
                     $CssClass = 'Heading '.$Category->CssClass;
                     $attributes = ['aria-level' => $Category->Depth + 2];
                 } else {
-                    $CssClass = 'Depth'.$Category->Depth.($CategoryID == $Category->CategoryID ? ' Active' : '').' '.$Category->CssClass;
-                }
+                    //$isActive = $CategoryID == $Category->CategoryID;
+                    $ancestors = CategoryModel::getAncestors($CategoryID);
+                    $isActive = false;
+                    foreach ($ancestors as $id => $ancestor) {
+                        if($id == $Category->CategoryID) {
+                            $isActive = true;
+                            break;
+                        }
+                    }
 
+                    $CssClass = 'Depth'.$Category->Depth.($isActive ? ' Active' : '').' '.$Category->CssClass;
+                }
 
                 if (is_array($attributes)) {
                     $attributes = attribute($attributes);

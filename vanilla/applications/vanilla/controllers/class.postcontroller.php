@@ -158,6 +158,12 @@ class PostController extends VanillaController {
 
         $categoryData = $this->ShowCategorySelector ? CategoryModel::categories() : false;
 
+        $isGroupCategory = val('GroupID',$category, false);
+        if($category && !$isGroupCategory) {
+            $this->addModule('CategoriesModule');
+        }
+
+
         // Check permission
         if (isset($this->Discussion)) {
             $this->setData('ShowPreviewButton', $this->Discussion->Format != 'Rich');
@@ -496,6 +502,7 @@ class PostController extends VanillaController {
      * @param int $DiscussionID Unique ID to add the comment to. If blank, this method will throw an error.
      */
     public function comment($DiscussionID = '') {
+
         // Get $DiscussionID from RequestArgs if valid
         if ($DiscussionID == '' && count($this->RequestArgs)) {
             if (is_numeric($this->RequestArgs[0])) {
@@ -1030,7 +1037,6 @@ class PostController extends VanillaController {
         // Add modules
         $this->addModule('NewDiscussionModule');
         $this->addModule('DiscussionFilterModule');
-        // $this->addModule('CategoriesModule');
         $this->addModule('BookmarkedModule');
 
         parent::initialize();
