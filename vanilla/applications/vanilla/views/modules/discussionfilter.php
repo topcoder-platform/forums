@@ -50,9 +50,11 @@ if (c('Vanilla.Discussions.ShowCounts', true)) {
                $isActive = true;
             }
 
-            $menuOptions['AllCategories']['Url'] = anchor('Public Forums', '/categories');
-            $menuOptions['AllCategories']['IsActive'] = $isActive;
-            $menuOptions['AllCategories']['CssClass'] = $CssClass;
+            if(gdn::session()->isValid()) {
+                $menuOptions['AllCategories']['Url'] = anchor('Public Forums', '/categories');
+                $menuOptions['AllCategories']['IsActive'] = $isActive;
+                $menuOptions['AllCategories']['CssClass'] = $CssClass;
+            }
 
             $Controller->EventArguments['Menu'] = &$menuOptions;
             $Controller->fireEvent('BeforeRenderDiscussionFilters');
