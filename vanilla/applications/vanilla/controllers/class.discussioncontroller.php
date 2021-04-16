@@ -296,7 +296,7 @@ class DiscussionController extends VanillaController {
 
         // Add modules
         $this->addModule('DiscussionFilterModule');
-        $this->addModule('NewDiscussionModule');
+        // $this->addModule('NewDiscussionModule');
 
         // FIX: https://github.com/topcoder-platform/forums/issues/548
         // Show only for 'Public forums'
