@@ -1035,7 +1035,7 @@ class PostController extends VanillaController {
      */
     public function initialize() {
         // Add modules
-        $this->addModule('NewDiscussionModule');
+        // $this->addModule('NewDiscussionModule');
         $this->addModule('DiscussionFilterModule');
         $this->addModule('BookmarkedModule');
 
