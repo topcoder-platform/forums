@@ -774,7 +774,7 @@ class DiscussionController extends VanillaController {
             }
         }
 
-        $this->setData('Title', t('Delete Discussion'));
+        $this->setData('Title', t('Delete'));
         $this->render();
     }
 

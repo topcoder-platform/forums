@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-    <h1><?php echo $this->data('Title'); ?></h1>
+    <h1><?php echo 'Move'; ?></h1>
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();
@@ -20,12 +20,12 @@ if ($CountNotAllowed > 0) {
         t('You are about to move %1$s of the %2$s of the selected discussions.'),
         $CountAllowed,
         $CountCheckedDiscussions
-    ), 'p');
+    ), 'p', array('class'=>'P Message') );
 } else {
     echo wrap(sprintf(
         t('You are about to move %s.'),
         plural($CountCheckedDiscussions, '%s discussion', '%s discussions')
-    ), 'p');
+    ), 'p',array('class'=>'P Message'));
 }
 ?>
 
@@ -51,7 +51,7 @@ if ($CountNotAllowed > 0) {
 <?php
 echo '<div class="Buttons Buttons-Confirm">';
 echo $this->Form->button('Cancel', ['type' => 'button', 'class' => 'Button Close']);
-echo $this->Form->button('Move', ['type' => 'submit', 'class' => 'Button Primary Move']);
+echo $this->Form->button('Move Discussion', ['type' => 'submit', 'class' => 'Button Primary Move']);
 echo '</div>';
 echo '</div>';
 
