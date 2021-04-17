@@ -76,7 +76,7 @@ RUN chmod ug=rwx,o=rx /vanillapp/conf/config.php
 
 # Tideways
 RUN apt-get update && apt-get install -yq --no-install-recommends gnupg2;
-RUN echo 'deb https://packages.tideways.com/apt-packages debian main' > /etc/apt/sources.list.d/tideways.list && \
+RUN echo 'deb https://packages.tideways.com/apt-packages-main any-version main' > /etc/apt/sources.list.d/tideways.list && \
     curl -L -sS 'https://packages.tideways.com/key.gpg' | apt-key add - && \
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -yq install tideways-php tideways-daemon && \
