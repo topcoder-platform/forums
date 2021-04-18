@@ -403,9 +403,32 @@ jQuery(document).ready(function($) {
 
     // Delete comment
     $('a.DeleteComment').popup({
+        okButtonText:'Delete',
+        cancelButtonText: 'Cancel',
         confirm: true,
-        confirmHeading: gdn.definition('ConfirmDeleteCommentHeading', 'Delete Comment'),
-        confirmText: gdn.definition('ConfirmDeleteCommentText', 'Are you sure you want to delete this comment?'),
+        confirmHtml:       '\
+  <div class="Overlay"> \
+    <div id="{popup.id}" class="Popup"> \
+      <div class="Border"> \
+        <div class="Body"> \
+          <div class="Content">\
+            <h1>Delete</h1>\
+            <form>\
+                <div>\
+                  <p class="P Message">Are you sure you want to delete this item?</p>\
+                  <div class="Buttons Buttons-Confirm"> \
+                    <input type="button" class="Button Cancel Close" value="Cancel" id="Form_Cancel"/> \
+                    <input type="button" class="Button Primary Okay Delete" value="Delete" /> \
+                  </div> \
+                  </div> \
+                </form> \
+           </div> \
+        </div> \
+      </div> \
+    </div> \
+  </div>',
+        confirmHeading: gdn.definition('ConfirmDeleteCommentHeading', 'Delete'),
+        confirmText: gdn.definition('ConfirmDeleteCommentText', 'Are you sure you want to delete this item?'),
         followConfirm: false,
         deliveryType: gdn.urlQueryParam( $('a.DeleteComment').attr('href'), 'deliveryType'), //'VIEW' - threaded, 'BOOL' - flat
         afterConfirm: function(json, sender) {
