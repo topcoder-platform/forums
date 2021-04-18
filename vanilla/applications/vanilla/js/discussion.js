@@ -401,6 +401,11 @@ jQuery(document).ready(function($) {
         return false;
     });
 
+    var currentCommentView = gdn.urlQueryParam(window.location.href, 'view');
+    var deliveryType = 'VIEW';
+    if (currentCommentView) {
+        deliveryType = currentCommentView == 'flat'?'BOOL':'VIEW';
+    }
     // Delete comment
     $('a.DeleteComment').popup({
         okButtonText:'Delete',
@@ -430,7 +435,8 @@ jQuery(document).ready(function($) {
         confirmHeading: gdn.definition('ConfirmDeleteCommentHeading', 'Delete'),
         confirmText: gdn.definition('ConfirmDeleteCommentText', 'Are you sure you want to delete this item?'),
         followConfirm: false,
-        deliveryType: gdn.urlQueryParam( $('a.DeleteComment').attr('href'), 'deliveryType'), //'VIEW' - threaded, 'BOOL' - flat
+        deliveryType: gdn.urlQueryParam( $('a.DeleteComment').attr('href'), 'deliveryType')?
+          gdn.urlQueryParam( $('a.DeleteComment').attr('href'), 'deliveryType'): deliveryType, //'VIEW' - threaded, 'BOOL' - flat
         afterConfirm: function(json, sender) {
             var row = $(sender).parents('li.ItemComment');
             if (json.ErrorMessage) {
