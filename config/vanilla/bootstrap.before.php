@@ -883,26 +883,30 @@ if(!function_exists('writeInlineDiscussionOptions')) {
        echo '<div class="center"></div>';
        echo '<div class="right">';
 
-       // Write the items.
+       $sender = Gdn::controller();
+
+       $sender->EventArguments['Object'] = $discussionRow;
+       $sender->EventArguments['Type'] = 'Discussion';
+       $sender->fireEvent('BeforeInlineDiscussionOptions');
+
        // DropdownModule
        $discussionDropdown = getDiscussionOptionsDropdown($discussionRow);
 
        // Allow plugins to edit the dropdown.
-       $sender = Gdn::controller();
        $sender->EventArguments['DiscussionOptions'] = &$discussionDropdown ;
        $sender->EventArguments['Discussion'] = $discussionRow;
        $sender->fireEvent('InlineDiscussionOptions');
 
-        $discussionDropdownItems = $discussionDropdown->toArray()['items'];
+       $discussionDropdownItems = $discussionDropdown->toArray()['items'];
 
-        unset($discussionDropdownItems['announce']);
-        unset($discussionDropdownItems['sink']);
-        unset($discussionDropdownItems['close']);
-        unset($discussionDropdownItems['dismiss']);
-        unset($discussionDropdownItems['move']);
-        unset($discussionDropdownItems['tag']);
+       unset($discussionDropdownItems['announce']);
+       unset($discussionDropdownItems['sink']);
+       unset($discussionDropdownItems['close']);
+       unset($discussionDropdownItems['dismiss']);
+       unset($discussionDropdownItems['move']);
+       unset($discussionDropdownItems['tag']);
 
-      if (!empty($discussionDropdownItems) && is_array($discussionDropdownItems)) {
+       if (!empty($discussionDropdownItems) && is_array($discussionDropdownItems)) {
            array_walk($discussionDropdownItems, function(&$value, $key) {
                $anchor = anchor($value['text'], $value['url'], val('cssClass', $value, $key));
                $value = '<span class="" style="">'.$anchor.'</span>';
@@ -925,6 +929,11 @@ if(!function_exists('writeInlineCommentOptions')) {
         echo '<div class="left"></div>';
         echo '<div class="center"></div>';
         echo '<div class="right">';
+
+        $sender = Gdn::controller();
+        $sender->EventArguments['Object'] = $comment;
+        $sender->EventArguments['Type'] = 'Comment';
+        $sender->fireEvent('BeforeInlineCommentOptions');
 
         // Write the items.
         $items = getCommentOptions($comment);

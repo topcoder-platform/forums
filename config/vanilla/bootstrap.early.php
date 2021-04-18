@@ -169,4 +169,21 @@ if (c('Garden.Installed')) {
         Gdn::sql()->query('update GDN_User u set u.CountWatchedCategories  = 0 where u.CountWatchedCategories is null', 'update');
     }
 
+    // https://github.com/topcoder-platform/forums/issues/475
+    // Add the column PScore/NScore in Discussion :
+    if(!Gdn::structure()->table('Discussion')->columnExists('PScore')) {
+        Gdn::structure()->table('Discussion')
+            ->column('PScore', 'float', null)
+            ->column('NScore', 'float', null)
+            ->set(false, false);
+    }
+
+    // https://github.com/topcoder-platform/forums/issues/475
+    // Add the column PScore/NScore in Comment :
+    if(!Gdn::structure()->table('Comment')->columnExists('PScore')) {
+        Gdn::structure()->table('Comment')
+            ->column('PScore', 'float', null)
+            ->column('NScore', 'float', null)
+            ->set(false, false);
+    }
 }

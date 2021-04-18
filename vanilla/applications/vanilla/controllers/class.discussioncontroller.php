@@ -296,8 +296,15 @@ class DiscussionController extends VanillaController {
 
         // Add modules
         $this->addModule('DiscussionFilterModule');
-        $this->addModule('NewDiscussionModule');
-       // $this->addModule('CategoriesModule');
+        // $this->addModule('NewDiscussionModule');
+
+        // FIX: https://github.com/topcoder-platform/forums/issues/548
+        // Show only for 'Public forums'
+        $isGroupDiscussion = val('GroupID',$Category, false);
+        if(gdn::session()->isValid() && !$isGroupDiscussion) {
+            $this->addModule('CategoriesModule');
+        }
+
         $this->addModule('BookmarkedModule');
 
         $this->CanEditComments = Gdn::session()->checkPermission('Vanilla.Comments.Edit', true, 'Category', 'any') && c('Vanilla.AdminCheckboxes.Use');
@@ -767,7 +774,7 @@ class DiscussionController extends VanillaController {
             }
         }
 
-        $this->setData('Title', t('Delete Discussion'));
+        $this->setData('Title', t('Delete'));
         $this->render();
     }
 

@@ -417,12 +417,17 @@ class CategoriesController extends VanillaController {
                 $this->Head->addRss(categoryUrl($category) . '/feed.rss', $this->Head->title());
             }
 
-            if($category->DisplayAs == 'Discussions') {
+           // if($category->DisplayAs == 'Discussions') {
                 // Add modules
-                $this->addModule('NewDiscussionModule');
-            }
+            //    $this->addModule('NewDiscussionModule');
+            //}
             $this->addModule('DiscussionFilterModule');
-          //  $this->addModule('CategoriesModule');
+            // FIX: https://github.com/topcoder-platform/forums/issues/548
+            // Show only for 'Public forums'
+            $isGroupCategory = val('GroupID',$category, false);
+            if(gdn::session()->isValid() && !$isGroupCategory) {
+                $this->addModule('CategoriesModule');
+            }
             $this->addModule('BookmarkedModule');
             $this->addModule('TagModule');
 
@@ -647,13 +652,20 @@ class CategoriesController extends VanillaController {
 
         $this->setData('CategoryTree', $categoryTree);
 
-        // Add modules
-        if($Category && $displayAs == 'Discussions') {
-            $this->addModule('NewDiscussionModule');
-        }
+       // Add modules
+       // FIX: https://github.com/topcoder-platform/forums/issues/553
+       // if($Category && $displayAs == 'Discussions') {
+       //     $this->addModule('NewDiscussionModule');
+       // }
         $this->addModule('DiscussionFilterModule');
         $this->addModule('BookmarkedModule');
-      //  $this->addModule('CategoriesModule');
+        // FIX: https://github.com/topcoder-platform/forums/issues/548
+        // Show only for 'Public forums'
+        $isGroupCategory = val('GroupID',$this->data('Category'));
+        if(gdn::session()->isValid() && $this->data('Category') && !$isGroupCategory) {
+            $this->addModule('CategoriesModule');
+        }
+
         $this->addModule($CategoryFollowToggleModule);
         $this->addModule('TagModule');
 
@@ -743,9 +755,15 @@ class CategoriesController extends VanillaController {
         $this->setData('Discussions', $Discussions);
 
         // Add modules
-        $this->addModule('NewDiscussionModule');
+        // https://github.com/topcoder-platform/forums/issues/553
+        // $this->addModule('NewDiscussionModule');
         $this->addModule('DiscussionFilterModule');
-     //   $this->addModule('CategoriesModule');
+        // FIX: https://github.com/topcoder-platform/forums/issues/548
+        // Show only for 'Public forums'
+        $isGroupCategory = val('GroupID',$Category, false);
+        if(gdn::session()->isValid() && $Category && !$isGroupCategory) {
+            $this->addModule('CategoriesModule');
+        }
         $this->addModule('BookmarkedModule');
         $this->addModule($CategoryFollowToggleModule);
 

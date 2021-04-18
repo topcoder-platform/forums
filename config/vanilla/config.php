@@ -26,6 +26,7 @@ $Configuration['EnabledPlugins']['GettingStarted'] = 'GettingStarted';
 $Configuration['EnabledPlugins']['stubcontent'] = false;
 $Configuration['EnabledPlugins']['Topcoder'] = true;
 $Configuration['EnabledPlugins']['TopcoderEditor'] = true;
+$Configuration['EnabledPlugins']['Voting'] = true;
 $Configuration['EnabledPlugins']['rich-editor'] = true;
 $Configuration['EnabledPlugins']['editor'] = false;
 $Configuration['EnabledPlugins']['emojiextender'] = true;
@@ -204,3 +205,8 @@ $Configuration['Garden']['Upload']['AllowedFileExtensions'] = [
 ];
 // Allow "target='_blank'" for Markdown format;
 $Configuration['Garden']['Html']['BlockedAttributes']='on*, download';
+
+$Configuration['Garden']['FavIcon']='/themes/topcoder/design/images/favicon.png';
+
+// This flag moves executing of ActivityModel queue to the scheduler
+$Configuration['Feature']['deferredNotifications']['Enabled'] = true;

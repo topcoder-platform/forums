@@ -55,6 +55,7 @@ jQuery(document).ready(function($) {
         var messageContainer = $(frm).find('.editor-statusbar .message');
 
         var currentVal = $(textbox).val();
+        currentVal = gdn.normalizeText(currentVal);
         if(defaultValues.includes(currentVal) || currentVal.trim().length == 0) {
             $(editorContainer).addClass('error');
             $(messageContainer).text('Cannot post an empty message');
