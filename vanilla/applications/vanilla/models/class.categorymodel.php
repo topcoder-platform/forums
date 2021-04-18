@@ -931,6 +931,10 @@ class CategoryModel extends Gdn_Model {
         }
 
         if($groupID && $groupID > 0) {
+           // FIX: https://github.com/topcoder-platform/forums/issues/587
+           if ($userID == 0) {
+               return false;
+           }
            $result = checkGroupPermission($userID, $groupID, $categoryID, $permissionCategoryID,  $permission, $fullMatch);
         } else {
            $result = PermissionModel::checkPermission($userPermissions,$permission, $fullMatch, 'Category', $permissionCategoryID)
