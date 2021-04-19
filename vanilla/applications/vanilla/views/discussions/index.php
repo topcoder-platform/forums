@@ -39,7 +39,6 @@ if ($this->data('_PagerUrl'))
     $PagerOptions['Url'] = $this->data('_PagerUrl');
 
 echo '<div class="PageControls Top">';
-PagerModule::write($PagerOptions);
 // Avoid displaying in a category's list of discussions.
 if ($this->data('EnableFollowingFilter')) {
     echo discussionFilters();
@@ -48,6 +47,9 @@ if($this instanceof CategoriesController) {
     echo discussionSorts();
 }
 echo Gdn_Theme::module('NewDiscussionModule', $this->data('_NewDiscussionProperties', ['CssClass' => 'Button Action Primary']));
+echo '</div>';
+echo '<div class="PageControls Top">';
+PagerModule::write($PagerOptions);
 $this->fireEvent('PageControls');
 echo '</div>';
 
