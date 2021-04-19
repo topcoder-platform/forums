@@ -460,9 +460,9 @@ if (!function_exists('sortsDropDown')) {
      * @param string $label Text for the label to attach to the cont
      * @return string
      */
-    function sortsDropDown($baseUrl, array $filters = [], $extraClasses = '', $default = null, $defaultUrl = null, $label = 'Sort') {
+    function sortsDropDown($preferenceKey, $baseUrl, array $filters = [], $extraClasses = '', $default = null, $defaultUrl = null, $label = 'Sort') {
         $links = [];
-        $active =  Gdn::session()->getPreference('CategorySort', null);
+        $active =  Gdn::session()->getPreference($preferenceKey, null);
         // Translate filters into links.
         foreach ($filters as $filter) {
             // Make sure we have the bare minimum: a label and a URL parameter.
@@ -550,7 +550,7 @@ if (!function_exists('categorySorts')) {
             $defaultUrl = $baseUrl;
         }
 
-        return sortsDropDown(
+        return sortsDropDown('CategorySort',
             $baseUrl,
             $filters,
             $extraClasses,
@@ -577,15 +577,22 @@ if (!function_exists('discussionSorts')) {
         $transientKey = Gdn::session()->transientKey();
         $filters = [
             [
-                'name' => t('New'),
+                'name' => t('Most recent'),
                 'param' => 'sort',
                 'value' => 'new',
                 'extra' => ['TransientKey' => $transientKey, 'save' => 1]
             ],
+
             [
-                'name' => t('Old'),
+                'name' => t('Highest views'),
                 'param' => 'sort',
-                'value' => 'old',
+                'value' => 'views',
+                'extra' => ['TransientKey' => $transientKey, 'save' => 1]
+            ],
+            [
+                'name' => t('Highest responses'),
+                'param' => 'sort',
+                'value' => 'comments',
                 'extra' => ['TransientKey' => $transientKey, 'save' => 1]
             ]
         ];
@@ -598,7 +605,7 @@ if (!function_exists('discussionSorts')) {
             $defaultUrl = $baseUrl;
         }
 
-        return sortsDropDown(
+        return sortsDropDown('DiscussionSort',
             $baseUrl,
             $filters,
             $extraClasses,
