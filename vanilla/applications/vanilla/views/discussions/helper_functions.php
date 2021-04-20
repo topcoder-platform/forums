@@ -71,15 +71,59 @@ if (!function_exists('BookmarkButton')) {
         }
 
         // Bookmark link
-        $hasWatched = $discussion->Bookmarked == '1';
-        $title = t($hasWatched ? 'Stop watching the discussion' : 'Watch the discussion');
-        $icon = watchIcon($hasWatched, $title);
-        return anchor(
-            $icon,
-            '/discussion/bookmark/'.$discussion->DiscussionID.'/'.Gdn::session()->transientKey(),
-            'Hijack  watchButton '.($hasWatched ? ' isWatching' : ''),
-            ['title' => $title]
-        );
+        // FIX : https://github.com/topcoder-platform/forums/issues/577
+        // If User is watching a category then show it as bookmarked
+        $categoryModel = new CategoryModel();
+        $category = CategoryModel::categories($discussion->CategoryID);
+        $groupID = val('GroupID', $category);
+        // No changes for Challenge Forums
+        if($groupID && $groupID > 0) {
+            // New value should be opposite
+            $hasWatched = $discussion->Bookmarked == 1;
+            $newValue = $hasWatched ? 0 : 1;
+            $title = t($hasWatched ? 'Stop watching the discussion' : 'Watch the discussion');
+            $icon = watchIcon($hasWatched, $title);
+            return anchor(
+                $icon,
+                '/discussion/bookmark/' . $discussion->DiscussionID . '/?tkey=' . Gdn::session()->transientKey() . '&bookmarked=' . $newValue,
+                'Hijack  watchButton ' . ($hasWatched ? ' isWatching' : ''),
+                ['title' => $title]
+            );
+        } else {
+            $hasWatchedCategory = $categoryModel->hasWatched($discussion->CategoryID, Gdn::session()->UserID);
+            $hasWatched = false;
+
+            // Author is added by default with Bookmarked = 0, Participated = 1
+            $isAuthor = ($discussion->InsertUserID == Gdn::session()->UserID);
+
+            // If Watched Category: unwatched discussion
+            if ($discussion->Bookmarked === null) {
+                $hasWatched = $hasWatchedCategory;
+                $newValue = $hasWatched === true ? 0 : 1;
+            } else if ($discussion->Bookmarked == 0) {
+                $hasWatched = false;
+                if ($isAuthor) {
+                    $hasWatched = $hasWatchedCategory;
+                    $newValue = 2;
+                } else {
+                    $newValue = 1;
+                }
+            } else if ($discussion->Bookmarked == 1) {
+                $hasWatched = true;
+                $newValue = $isAuthor? 2 : 0;
+            } else if ($discussion->Bookmarked == 2) {
+                $hasWatched = false;
+                $newValue = 1;
+            }
+            $title = t($hasWatched ? 'Stop watching the discussion' : 'Watch the discussion');
+            $icon = watchIcon($hasWatched, $title);
+            return anchor(
+                $icon,
+                '/discussion/bookmark/' . $discussion->DiscussionID . '/?tkey=' . Gdn::session()->transientKey() . '&bookmarked=' . $newValue,
+                'Hijack  watchButton ' . ($hasWatched ? ' isWatching' : ''),
+                ['title' => $title]
+            );
+        }
     }
 }
 

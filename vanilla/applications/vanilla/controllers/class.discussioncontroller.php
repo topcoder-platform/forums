@@ -476,9 +476,9 @@ class DiscussionController extends VanillaController {
      *
      * @param int $DiscussionID Unique discussion ID.
      */
-    public function bookmark($DiscussionID = null) {
+    public function bookmark($DiscussionID = null, $bookmarked=null, $tkey=null ) {
         // Make sure we are posting back.
-        if (!$this->Request->isAuthenticatedPostBack()) {
+        if (!$this->Request->isAuthenticatedPostBack() && !Gdn::session()->validateTransientKey($tkey)) {
             throw permissionException('Javascript');
         }
 
@@ -491,7 +491,11 @@ class DiscussionController extends VanillaController {
         // Check the form to see if the data was posted.
         $Form = new Gdn_Form();
         $DiscussionID = $Form->getFormValue('DiscussionID', $DiscussionID);
-        $Bookmark = $Form->getFormValue('Bookmark', null);
+        // FIX:  https://github.com/topcoder-platform/forums/issues/577
+        // 0 - not bookmarked
+        // 1 - bookmarked
+        // 2 - unbookmarked, if Discussion's Author
+        $Bookmark = $Form->getFormValue('Bookmark', $bookmarked);
         $UserID = $Form->getFormValue('UserID', $Session->UserID);
 
         // Check the permission on the user.
@@ -511,10 +515,11 @@ class DiscussionController extends VanillaController {
         $Bookmark = $this->DiscussionModel->bookmark($DiscussionID, $UserID, $Bookmark);
 
         // Set the new value for api calls and json targets.
+        // FIX: https://github.com/topcoder-platform/forums/issues/577
         $this->setData([
             'UserID' => $UserID,
             'DiscussionID' => $DiscussionID,
-            'Bookmarked' => (bool)$Bookmark
+            'Bookmarked' => (int)$Bookmark
         ]);
         setValue('Bookmarked', $Discussion, (int)$Bookmark);
 

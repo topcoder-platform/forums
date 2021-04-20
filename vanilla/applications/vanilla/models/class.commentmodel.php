@@ -1397,6 +1397,7 @@ class CommentModel extends Gdn_Model {
         }
 
         $categoryID = val('CategoryID', $discussion);
+        $discussionID = val('DiscussionID', $discussion);
 
         // Figure out the category that governs this notification preference.
         $category = CategoryModel::categories($categoryID);
@@ -1414,6 +1415,13 @@ class CommentModel extends Gdn_Model {
             $parentCategory = CategoryModel::categories($parentCategory["ParentCategoryID"]);
         }
 
+        $discussionModel = new DiscussionModel();
+        // FIX: https://github.com/topcoder-platform/forums/issues/577
+        $removeUserIDs = array_column(
+            $discussionModel->getUnBookmarkUsers($discussionID)->resultArray(),
+            "UserID"
+        );
+
         // Grab all of the users that need to be notified.
         $data = $this->SQL
             ->whereIn('Name', ['Preferences.Email.NewComment.'.$category['CategoryID'], 'Preferences.Popup.NewComment.'.$category['CategoryID']])
@@ -1426,8 +1434,12 @@ class CommentModel extends Gdn_Model {
             }
 
             $userID = $row['UserID'];
+
+            if (in_array($userID, $removeUserIDs)) {
+                continue;
+            }
+
             // Check user can still see the discussion.
-            $discussionModel = new DiscussionModel();
             if (!$discussionModel->canView($discussion, $userID)) {
                 continue;
             }

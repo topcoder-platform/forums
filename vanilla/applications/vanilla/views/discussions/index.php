@@ -3,11 +3,13 @@ $Session = Gdn::session();
 include_once $this->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
 include_once $this->fetchViewLocation('helper_functions', 'categories', 'vanilla');
 
-echo '<h1 class="H HomepageTitle">'.
-    adminCheck(NULL, ['', ' ']).
-    $this->data('Title').
-    followButton($this->data('Category.CategoryID')).'</h1>';
-    //watchButton($this->data('Category.CategoryID')).
+// FIX: https://github.com/topcoder-platform/forums/issues/577
+$title = adminCheck(NULL, ['', ' ']).$this->data('Title');
+if(!$this->data('Category.GroupID')) {
+    $title .= watchButton($this->data('Category.CategoryID'), false);
+}
+//followButton($this->data('Category.CategoryID'))
+echo '<h1 class="H HomepageTitle">'.$title.'</h1>';
 
 
 $Description = $this->data('Category.Description', $this->description());
