@@ -3,6 +3,9 @@ $Session = Gdn::session();
 if (!function_exists('WriteComment'))
     include $this->fetchViewLocation('helper_functions', 'discussion');
 
+if (!function_exists('bookmarkButton'))
+    include $this->fetchViewLocation('helper_functions', 'discussions');
+
 // Wrap the discussion related content in a div.
 echo '<div class="MessageList Discussion">';
 
@@ -13,7 +16,8 @@ echo '<!-- Page Title -->
 echo '<div class="Options">';
 
 $this->fireEvent('BeforeDiscussionOptions');
-writeBookmarkLink();
+//writeBookmarkLink();
+echo bookmarkButton($this->data('Discussion'));
 echo getDiscussionOptionsDropdown();
 writeAdminCheck();
 

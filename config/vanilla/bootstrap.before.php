@@ -375,7 +375,7 @@ if (!function_exists('watchButton')) {
      * @param int $categoryID
      * @return string
      */
-    function watchButton($category) {
+    function watchButton($category, $isHijackButton = true) {
         $output = ' ';
         $userID = Gdn::session()->UserID;
         if(is_numeric($category)) {
@@ -390,10 +390,15 @@ if (!function_exists('watchButton')) {
 
             $text = $hasWatched ? t('Stop watching the category') : t('Watch the category');
             $icon = watchIcon($hasWatched, $text);
+            $cssClasses =  'watchButton' . ($hasWatched ? ' isWatching': '');
+            if($isHijackButton) {
+                $cssClasses = 'Hijack '.$cssClasses;
+            }
+
             $output .= anchor(
                 $icon,
                 $hasWatched ? "/category/watched/{$categoryID}/" . Gdn::session()->transientKey() : "/category/watch/{$categoryID}/" . Gdn::session()->transientKey(),
-                'Hijack watchButton' . ($hasWatched ? ' isWatching' : ''),
+                $cssClasses,
                 ['title' => $text, 'aria-pressed' => $hasWatched ? 'true' : 'false', 'role' => 'button', 'tabindex' => '0']
             );
         }

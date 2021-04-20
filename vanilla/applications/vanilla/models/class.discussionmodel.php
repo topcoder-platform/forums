@@ -1339,6 +1339,20 @@ class DiscussionModel extends Gdn_Model {
             ->where('Bookmarked', '1')
             ->get();
     }
+    /**
+     * Gets all users who have unbookmarked the specified discussion.
+     *
+     */
+    // FIX: https://github.com/topcoder-platform/forums/issues/577
+    public function getUnBookmarkUsers($discussionID) {
+        return $this->SQL
+            ->select('UserID')
+            ->from('UserDiscussion')
+            ->where('DiscussionID', $discussionID)
+            ->whereIn('Bookmarked', [0, 2])
+            ->get();
+    }
+
 
     /**
      *
@@ -2872,8 +2886,8 @@ class DiscussionModel extends Gdn_Model {
         $this->EventArguments['UserID'] = $userID;
         $this->EventArguments['Bookmarked'] = $bookmarked;
         $this->fireEvent('AfterBookmark');
-
-        return (bool)$bookmarked;
+        // FIX: https://github.com/topcoder-platform/forums/issues/577
+        return (int)$bookmarked;
     }
 
     /**
