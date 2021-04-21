@@ -523,6 +523,24 @@ class DiscussionController extends VanillaController {
         ]);
         setValue('Bookmarked', $Discussion, (int)$Bookmark);
 
+        $category = CategoryModel::categories($categoryID);
+        $groupID = val('GroupID', $category);
+        // FIX: https://github.com/topcoder-platform/forums/issues/577
+        // No changes for Challenge Forums
+        if (!$groupID) {
+            $categoryModel = new CategoryModel();
+            $hasWatchedCategory = $categoryModel->hasWatched($categoryID, Gdn::session()->UserID);
+            // Category watch to be turned off but don't delete it to get notifications for new discussions
+            if($hasWatchedCategory && ($Bookmark == 0 || $Bookmark == 2)) {
+                // Set Preferences to '2' - watching all except unwatched discussions
+                $categoryModel->setCategoryMetaData($categoryID, Gdn::session()->UserID, 2);
+                // Category Title: vanilla/applications/vanilla/views/discussions/index.php
+                $title = val('Name', $category).watchButton($categoryID, false);
+                $updatedHeaderHtml = '<h1 class="H HomepageTitle">'.$title.'</h1>';
+                $this->jsonTarget('h1.H.HomepageTitle', $updatedHeaderHtml, 'ReplaceWith');
+            }
+        }
+
         // Update the user's bookmark count
         $CountBookmarks = $this->DiscussionModel->setUserBookmarkCount($UserID);
         $CountBookmarksHtml = myBookmarksMenuItem($CountBookmarks);
