@@ -90,31 +90,36 @@ if (!function_exists('BookmarkButton')) {
                 ['title' => $title]
             );
         } else {
-            $hasWatchedCategory = $categoryModel->hasWatched($discussion->CategoryID, Gdn::session()->UserID);
-            $hasWatched = false;
+            $notificationPreferences = $categoryModel->getCategoryNotificationPreferences($discussion->CategoryID, Gdn::session()->UserID);
 
+            $categoryNotificationPreferences = $notificationPreferences[$discussion->CategoryID];
+            $newEmailDiscussionKey = 'Preferences.Email.NewDiscussion.' . $discussion->CategoryID;
+            $hasWatchedCategory = val($newEmailDiscussionKey, $categoryNotificationPreferences);
+
+            $hasWatched = false;
             // Author is added by default with Bookmarked = 0, Participated = 1
             $isAuthor = ($discussion->InsertUserID == Gdn::session()->UserID);
 
             // If Watched Category: unwatched discussion
             if ($discussion->Bookmarked === null) {
-                $hasWatched = $hasWatchedCategory;
-                $newValue = $hasWatched === true ? 0 : 1;
+                $hasWatched = $hasWatchedCategory == '1' || $hasWatchedCategory == '2' ? true: false;
+                $newValue = $hasWatched ? 0 : 1;
             } else if ($discussion->Bookmarked == 0) {
                 $hasWatched = false;
                 if ($isAuthor) {
-                    $hasWatched = $hasWatchedCategory;
+                    $hasWatched = $hasWatchedCategory == '1' || $hasWatchedCategory == '2'? true: false;
                     $newValue = 2;
                 } else {
                     $newValue = 1;
                 }
             } else if ($discussion->Bookmarked == 1) {
                 $hasWatched = true;
-                $newValue = $isAuthor? 2 : 0;
+                $newValue = $isAuthor ? 2 : 0;
             } else if ($discussion->Bookmarked == 2) {
                 $hasWatched = false;
                 $newValue = 1;
             }
+
             $title = t($hasWatched ? 'Stop watching the discussion' : 'Watch the discussion');
             $icon = watchIcon($hasWatched, $title);
             return anchor(
@@ -390,8 +395,7 @@ if (!function_exists('NewComments')) :
             return ' <span class="MItem"><strong class="HasNew JustNew NewCommentCount" title="'.$title.'">'.t('new discussion', 'new').'</strong></span>';
         } elseif ($discussion->CountUnreadComments > 0) {
             $title = htmlspecialchars(plural($discussion->CountUnreadComments, "%s new comment since you last read this.", "%s new comments since you last read this."));
-
-            return ' <span class="MItem"><strong class="HasNew NewCommentCount" title="'.$title.'">'.plural($discussion->CountUnreadComments, '%s new', '%s new plural', bigPlural($discussion->CountUnreadComments, '%s new', '%s new plural')).'</strong><span>';
+            return ' <span class="MItem"><strong class="HasNew NewCommentCount" title="'.$title.'">'.plural($discussion->CountUnreadComments, '%s new', '%s new plural', bigPlural($discussion->CountUnreadComments, '%s new', '%s new plural')).'</strong></span>';
         }
         return '';
     }
