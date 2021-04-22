@@ -1435,7 +1435,7 @@ class CommentModel extends Gdn_Model {
 
             $userID = $row['UserID'];
 
-            if (in_array($userID, $removeUserIDs)) {
+            if ($row['Value'] == '2' && in_array($userID, $removeUserIDs)) {
                 continue;
             }
 

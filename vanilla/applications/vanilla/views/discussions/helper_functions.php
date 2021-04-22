@@ -91,33 +91,35 @@ if (!function_exists('BookmarkButton')) {
             );
         } else {
             $notificationPreferences = $categoryModel->getCategoryNotificationPreferences($discussion->CategoryID, Gdn::session()->UserID);
-
             $categoryNotificationPreferences = $notificationPreferences[$discussion->CategoryID];
-            $newEmailDiscussionKey = 'Preferences.Email.NewDiscussion.' . $discussion->CategoryID;
+            $newEmailDiscussionKey = 'Preferences.Email.NewComment.' . $discussion->CategoryID;
+            //$newPopupDiscussionKey = 'Preferences.Popup.NewComment.' . $discussion->CategoryID;
             $hasWatchedCategory = val($newEmailDiscussionKey, $categoryNotificationPreferences);
 
-            $hasWatched = false;
-            // Author is added by default with Bookmarked = 0, Participated = 1
-            $isAuthor = ($discussion->InsertUserID == Gdn::session()->UserID);
-
-            // If Watched Category: unwatched discussion
-            if ($discussion->Bookmarked === null) {
-                $hasWatched = $hasWatchedCategory == '1' || $hasWatchedCategory == '2' ? true: false;
-                $newValue = $hasWatched ? 0 : 1;
-            } else if ($discussion->Bookmarked == 0) {
-                $hasWatched = false;
-                if ($isAuthor) {
-                    $hasWatched = $hasWatchedCategory == '1' || $hasWatchedCategory == '2'? true: false;
-                    $newValue = 2;
-                } else {
+            if($hasWatchedCategory == '1') { // The watched category
+                $hasWatched  = true;
+                $newValue = 0;
+            } else if($hasWatchedCategory == '2') {// The watched category except some discussions
+                if ($discussion->Bookmarked === null) {
+                    $hasWatched  = true;
+                    $newValue = 0;
+                } else if ($discussion->Bookmarked == 0) {
+                    $hasWatched  = false;
                     $newValue = 1;
+                } else if ($discussion->Bookmarked == 1) {
+                    $hasWatched  = true;
+                    $newValue = 0;
                 }
-            } else if ($discussion->Bookmarked == 1) {
-                $hasWatched = true;
-                $newValue = $isAuthor ? 2 : 0;
-            } else if ($discussion->Bookmarked == 2) {
+            } else {
                 $hasWatched = false;
-                $newValue = 1;
+                if ($discussion->Bookmarked === null) {
+                    $newValue = 1;
+                } else if ($discussion->Bookmarked == 0) {
+                    $newValue = 1;
+                } else if ($discussion->Bookmarked == 1) {
+                    $hasWatched = true;
+                    $newValue = 0;
+                }
             }
 
             $title = t($hasWatched ? 'Stop watching the discussion' : 'Watch the discussion');

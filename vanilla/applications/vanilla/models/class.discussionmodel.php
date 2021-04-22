@@ -2891,6 +2891,40 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
+     * Bookmarks (or unbookmarks) all discussions in a category for the specified user.
+     *
+     * @param int|array $CategoryID The id of the category.
+     * @param int $userID The unique id of the user.
+     * @param bool|null $bookmarked Whether or not to bookmark or unbookmark. Pass null to toggle the bookmark.
+     */
+    public function bookmarkAll($categoryID, $userID, $bookmarked) {
+
+        if(is_numeric($categoryID)) {
+            $categoryID = [$categoryID];
+        }
+        $discussions =  $this->SQL
+            ->select('ud.DiscussionID')
+            ->from('UserDiscussion ud')
+            ->join('Discussion d', 'ud.DiscussionID = d.DiscussionID ')
+            ->join('Category c', 'd.CategoryID = c.CategoryID')
+            ->where('ud.UserID', $userID)
+            ->where('c.CategoryID', $categoryID)
+            ->get()->resultArray();
+        $discussionIDs = array_column($discussions, 'DiscussionID');
+        if(count($discussionIDs) > 0 ) {
+            // Update the bookmarked value.
+            $this->SQL
+                ->update('UserDiscussion')
+                ->set('Bookmarked', $bookmarked)
+                ->where('UserID', $userID)
+                ->where('DiscussionID', $discussionIDs)
+                ->put();
+
+            $this->setUserBookmarkCount($userID);
+        }
+    }
+
+    /**
      * Bookmarks (or unbookmarks) a discussion for specified user.
      *
      * Events: AfterBookmarkDiscussion.
