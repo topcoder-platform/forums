@@ -689,8 +689,9 @@ class CategoriesController extends VanillaController {
         $this->addModule('BookmarkedModule');
         // FIX: https://github.com/topcoder-platform/forums/issues/548
         // Show only for 'Public forums'
-        $isGroupCategory = val('GroupID',$this->data('Category'));
-        if(gdn::session()->isValid() && $this->data('Category') && !$isGroupCategory) {
+        $categoryID = val('CategoryID',$this->data('Category'));
+        $isChallengeForums = $this->checkChallengeForums($categoryID);
+        if(gdn::session()->isValid() && $this->data('Category') && !$isChallengeForums) {
             $this->addModule('CategoriesModule');
         }
 

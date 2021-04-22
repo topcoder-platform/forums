@@ -72,20 +72,58 @@ class VanillaController extends Gdn_Controller {
         }
     }
 
+    public function checkChallengeForums($CategoryID) {
+        $Category = CategoryModel::categories($CategoryID);
+        $ancestors = CategoryModel::getAncestors($CategoryID);
+        if(val('GroupID', $Category) > 0) {
+            return true;
+        }
+
+        foreach ($ancestors as $id => $ancestor) {
+            if($ancestor['UrlCode'] == self::CHALLENGE_FORUMS_URLCODE) {
+                return true;
+            }
+            if($ancestor['GroupID'] > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     protected function buildBreadcrumbs($CategoryID) {
         $Category = CategoryModel::categories($CategoryID);
         $ancestors = CategoryModel::getAncestors($CategoryID);
         $parentCategoryID = val('ParentCategoryID', $Category);
         if(val('GroupID', $Category) > 0) {
+            $challenge = $this->data('Challenge');
+            $track = $challenge ? $challenge['Track']: false;
             $temp = [];
+            $GroupCategoryID =  $this->data('Breadcrumbs.Options.GroupCategoryID');
             foreach ($ancestors as $id => $ancestor) {
                 if($ancestor['GroupID'] > 0) {
-                    $temp[$ancestor['CategoryID']] = $ancestor;
+                    if($GroupCategoryID == $ancestor['CategoryID']) {// root category for a group
+                        array_push($temp,  ['Name' => $ancestor['Name'], 'Url'=>'/group/'.$ancestor['GroupID']]);
+                    } else {
+                       $temp[$ancestor['CategoryID']] = $ancestor;
+                   }
                 } else {
                     if($ancestor['UrlCode'] == self::CHALLENGE_FORUMS_URLCODE) {
                         array_push($temp,  ['Name' => 'Challenge Forums', 'Url'=>'/groups/mine?filter=challenge']);
                     }else if($ancestor['UrlCode'] == 'groups') {
                         array_push($temp,  ['Name' => 'Group Forums', 'Url'=>'/groups/mine?filter=regular']);
+                    } else {
+                        if($track) {
+                            switch ($ancestor['UrlCode']) {
+                                case 'development-forums':
+                                case 'data-science-forums':
+                                case 'design-forums':
+                                    array_push($temp, ['Name' => $track, 'Url'=>'/groups/mine?filter=challenge']);
+                                    break;
+                                default:
+                                    $temp[$ancestor['CategoryID']] = $ancestor;
+                            }
+                        }
                     }
                 }
             }
