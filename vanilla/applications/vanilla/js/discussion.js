@@ -541,4 +541,10 @@ jQuery(document).ready(function($) {
             }
         });
     });
+
+    $(document).on('PreviewLoaded', function(ev, form, ) {
+        var previewContainer = $(form).find('.Preview');
+        $(previewContainer).prepend('<h2 class="H">Preview</h2>');
+        return false;
+    });
 });
