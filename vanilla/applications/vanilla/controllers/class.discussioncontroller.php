@@ -1143,6 +1143,7 @@ body { background: transparent !important; }
         if (!$this->Head) {
             return;
         }
-        $this->Head->addTag('meta', ['property' => 'og:type', 'content' => 'article']);
+        //$this->Head->addTag('meta', ['property' => 'og:type', 'content' => 'article']);
+        $this->Head->addTag('meta', ['property' => 'og:type', 'content' => 'website']);
     }
 }

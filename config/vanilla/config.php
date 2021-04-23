@@ -42,10 +42,13 @@ $Configuration['EnabledPlugins']['ReplyTo'] = true;
 // Feature
 $Configuration['Feature']['NewFlyouts']['Enabled'] = true;
 
+// Unfurl
+$Configuration['Garden']['Title'] = 'Topcoder Forums';
+$Configuration['Garden']['ShareImage'] = '/themes/topcoder/design/images/topcoder-image.png';
+
 // Garden
 $Configuration['Garden']['SignIn']['Popup'] = false;
 $Configuration['Garden']['EditContentTimeout'] = -1;
-$Configuration['Garden']['Title'] = 'Vanilla';
 $Configuration['Garden']['Cookie']['Salt'] = 'rLpGSLgZD1AGdJ4n';
 $Configuration['Garden']['Cookie']['Domain'] = '';
 $Configuration['Garden']['Registration']['ConfirmEmail'] = true;
