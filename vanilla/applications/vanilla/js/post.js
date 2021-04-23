@@ -17,7 +17,9 @@ jQuery(document).ready(function($) {
     function resetDiscussionForm(sender) {
         var parent = $(sender).parents('.DiscussionForm, .EditDiscussionForm');
         $(parent).find('.Preview').remove();
-        $(parent).find('.bodybox-wrap .TextBoxWrapper').show();
+        $(parent).find('.PreviewTitle').remove();
+        $(parent).find('h1.H').show();
+        $(parent).find('.bodybox-wrap .TextBoxWrapper,.P label[for=Form_Name], #Form_Name').show();
     }
 
     // Hijack comment form button clicks
@@ -151,7 +153,7 @@ jQuery(document).ready(function($) {
                     // Reveal the "Edit" button and hide this one
                     $(btn).hide();
                     $(frm).find('.WriteButton').removeClass('Hidden');
-
+                    $(frm).find('.P label[for=Form_Name], #Form_Name').hide();
                     $(frm).find('.bodybox-wrap .TextBoxWrapper').hide().after(json.Data);
                     $(frm).trigger('PreviewLoaded', [frm]);
                 } else if (!draft) {
@@ -193,4 +195,18 @@ jQuery(document).ready(function($) {
             button: btn
         });
     }
+
+    $(document).on('PreviewLoaded', function(ev, form, ) {
+        var previewContainer = $(form).find('.Preview');
+        var discussionTitle = $(form).find('#Form_Name').val();
+        $(previewContainer).prepend('<div class="Title">'+discussionTitle+'</div>');
+        var title = $(form).closest('.FormTitleWrapper').find('h1');
+        var currentTitle = $(title).text();
+        var previewTitle = $(title).clone();
+        $(previewTitle).text(currentTitle + ' (Preview)');
+        $(previewTitle).addClass('PreviewTitle');
+        $(title).after($(previewTitle).prop('outerHTML'));
+        $(title).hide();
+        return false;
+    });
 });
