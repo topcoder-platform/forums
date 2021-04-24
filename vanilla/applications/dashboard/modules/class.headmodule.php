@@ -470,7 +470,8 @@ if (!class_exists('HeadModule', false)) {
             $hasRelevantImage = false;
 
             // Default to the site logo if there were no images provided by the controller.
-            if (count($this->_Sender->image()) == 0) {
+            // Show the same image for all pages
+            //if (count($this->_Sender->image()) == 0) {
                 $logo = c('Garden.ShareImage', c('Garden.Logo', ''));
                 if ($logo != '') {
                     // Fix the logo path.
@@ -481,12 +482,12 @@ if (!class_exists('HeadModule', false)) {
                    // $logo = Gdn_Upload::url($logo);
                     $this->addTag('meta', ['property' => 'og:image', 'content' => Gdn::request()->domain().$logo]);
                 }
-            } else {
-                foreach ($this->_Sender->image() as $img) {
-                    $this->addTag('meta', ['name' => 'twitter:image', 'property' => 'og:image', 'content' => $img]);
-                    $hasRelevantImage = true;
-                }
-            }
+            // } else {
+            //    foreach ($this->_Sender->image() as $img) {
+            //        $this->addTag('meta', ['name' => 'twitter:image', 'property' => 'og:image', 'content' => $img]);
+            //        $hasRelevantImage = true;
+            //    }
+            // }
 
             // For the moment at least, only discussions are supported.
             if ($title && val('DiscussionID', $this->_Sender)) {
