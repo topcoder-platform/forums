@@ -87,7 +87,7 @@ if (!function_exists('BookmarkButton')) {
                 $icon,
                 '/discussion/bookmark/' . $discussion->DiscussionID . '/?tkey=' . Gdn::session()->transientKey() . '&bookmarked=' . $newValue,
                 'Hijack  watchButton ' . ($hasWatched ? ' isWatching tooltip' : 'tooltip'),
-                ['title' => $title]
+                []
             );
         } else {
             $notificationPreferences = $categoryModel->getCategoryNotificationPreferences($discussion->CategoryID, Gdn::session()->UserID);
@@ -128,7 +128,7 @@ if (!function_exists('BookmarkButton')) {
                 $icon,
                 '/discussion/bookmark/' . $discussion->DiscussionID . '/?tkey=' . Gdn::session()->transientKey() . '&bookmarked=' . $newValue,
                 'Hijack  watchButton ' . ($hasWatched ? ' isWatching tooltip' : 'tooltip'),
-                ['title' => $title]
+                []
             );
         }
     }
