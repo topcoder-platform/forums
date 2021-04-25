@@ -81,13 +81,13 @@ if (!function_exists('BookmarkButton')) {
             // New value should be opposite
             $hasWatched = $discussion->Bookmarked == 1;
             $newValue = $hasWatched ? 0 : 1;
-            $title = t($hasWatched ? 'Stop watching the discussion' : 'Watch the discussion');
-            $icon = watchIcon($hasWatched, $title);
+            $title = t($hasWatched ? 'Stop watching forum' : 'Watch forum');
+            $icon = '<span class="tooltiptext">'.$title.'</span>'.watchIcon($hasWatched);
             return anchor(
                 $icon,
                 '/discussion/bookmark/' . $discussion->DiscussionID . '/?tkey=' . Gdn::session()->transientKey() . '&bookmarked=' . $newValue,
-                'Hijack  watchButton ' . ($hasWatched ? ' isWatching' : ''),
-                ['title' => $title]
+                'Hijack  watchButton ' . ($hasWatched ? ' isWatching tooltip' : 'tooltip'),
+                []
             );
         } else {
             $notificationPreferences = $categoryModel->getCategoryNotificationPreferences($discussion->CategoryID, Gdn::session()->UserID);
@@ -122,13 +122,13 @@ if (!function_exists('BookmarkButton')) {
                 }
             }
 
-            $title = t($hasWatched ? 'Stop watching the discussion' : 'Watch the discussion');
-            $icon = watchIcon($hasWatched, $title);
+            $title = t($hasWatched ? 'Stop watching forum' : 'Watch forum');
+            $icon = '<span class="tooltiptext">'.$title.'</span>'.watchIcon($hasWatched, '');
             return anchor(
                 $icon,
                 '/discussion/bookmark/' . $discussion->DiscussionID . '/?tkey=' . Gdn::session()->transientKey() . '&bookmarked=' . $newValue,
-                'Hijack  watchButton ' . ($hasWatched ? ' isWatching' : ''),
-                ['title' => $title]
+                'Hijack  watchButton ' . ($hasWatched ? ' isWatching tooltip' : 'tooltip'),
+                []
             );
         }
     }
