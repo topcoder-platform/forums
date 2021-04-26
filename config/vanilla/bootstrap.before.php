@@ -305,7 +305,7 @@ if (!function_exists('dateUpdated')) {
 
         if ($dateUpdated) {
             $updateUser = Gdn::userModel()->getID($updateUserID);
-            $dateUpdatedFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($dateUpdated, false, DateTimeFormatter::FORCE_FULL_FORMAT);
+            $dateUpdatedFormatted = formatDateCustom($dateUpdated);
             if ($updateUser && $insertUserID != $updateUserID) {
                 $title = sprintf(t('Edited %s by %s.'), $dateUpdatedFormatted, val('Name', $updateUser));
                 $link = userAnchor($updateUser);
@@ -986,5 +986,20 @@ if (!function_exists('discussionUrl')) {
         }
 
         return url($result, $withDomain);
+    }
+}
+
+if (!function_exists('formatDateCustom')) {
+    function formatDateCustom($timestamp) {
+        $dateFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($timestamp, false, '%a, %b %e %Y');
+        $timeFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($timestamp, false, '%I:%M %p');
+        return sprintf('%1$s at %2$s', $dateFormatted, $timeFormatted);
+    }
+}
+if (!function_exists('authorProfileStats')) {
+    function authorProfileStats($user) {
+        $countDiscussions = plural( $user->CountDiscussions, '%s Post', '%s Posts');
+        $countComments = plural( $user->CountComments, '%s Comment', '%s Comments');
+        return '<span class="MItem AuthorProfileStats AuthorProfileStats_'.$user->UserID.'">'.sprintf('%1s %2s', $countDiscussions,$countComments).'</span>';
     }
 }

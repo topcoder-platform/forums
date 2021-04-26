@@ -52,10 +52,12 @@ $this->fireEvent('BeforeDiscussionDisplay');
             </span>
             </div>
             <div class="Meta DiscussionMeta">
-            <span class="MItem DateCreated">
-                <?php echo Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($Discussion->DateInserted, true,
-                    DateTimeFormatter::FORCE_FULL_FORMAT); ?>
-            </span>
+                <?php echo authorProfileStats($Author);?>
+                <span class="MItem DateCreated">
+                    <?php
+                    echo formatDateCustom($Discussion->DateInserted);
+                    ?>
+                </span>
                 <?php
                 echo dateUpdated($Discussion, ['<span class="MItem">', '</span>']);
                 ?>

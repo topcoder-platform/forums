@@ -794,6 +794,11 @@ class DiscussionController extends VanillaController {
                 }
 
                 $this->jsonTarget(".Section-DiscussionList #Discussion_$discussionID", null, 'SlideUp');
+                // FIX: https://github.com/topcoder-platform/forums/issues/533
+                $insertUserID = val('InsertUserID',$discussion);
+                $author =  Gdn::userModel()->getID($insertUserID, DATASET_TYPE_OBJECT);
+                $this->jsonTarget(".AuthorProfileStats_{$insertUserID}", authorProfileStats($author), 'ReplaceWith');
+
             }
         }
 
@@ -820,10 +825,11 @@ class DiscussionController extends VanillaController {
         $defaultTarget = '/discussions/';
         $validCommentID = is_numeric($commentID) && $commentID > 0;
         $validUser = $session->UserID > 0 && $session->validateTransientKey($transientKey);
-
+        $insertUserID = false;
         if ($validCommentID && $validUser) {
             // Get comment and discussion data
             $comment = $this->CommentModel->getID($commentID);
+            $insertUserID = $comment->InsertUserID;
             $discussionID = val('DiscussionID', $comment);
             $discussion = $this->DiscussionModel->getID($discussionID);
 
@@ -868,6 +874,9 @@ class DiscussionController extends VanillaController {
             $this->setJson('ErrorMessage', $this->Form->errors());
         } else {
             $this->jsonTarget("#Comment_$commentID", '', 'SlideUp');
+            // FIX: https://github.com/topcoder-platform/forums/issues/533
+            $author =  Gdn::userModel()->getID($insertUserID, DATASET_TYPE_OBJECT);
+            $this->jsonTarget(".AuthorProfileStats_{$insertUserID}", authorProfileStats($author), 'ReplaceWith');
         }
 
         $this->render();
