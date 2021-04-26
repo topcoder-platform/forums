@@ -917,6 +917,13 @@ class PostController extends VanillaController {
                             $this->ClassName = 'DiscussionController';
                             $this->ControllerName = 'discussion';
                             $this->View = 'comments';
+
+                            // FIX: https://github.com/topcoder-platform/forums/issues/533
+                            $comment = $this->CommentModel->getID($CommentID);
+                            $insertUserID = val('InsertUserID',$comment);
+                            $author =  Gdn::userModel()->getID($insertUserID, DATASET_TYPE_OBJECT);
+                            $this->jsonTarget(".AuthorProfileStats_{$insertUserID}", authorProfileStats($author), 'ReplaceWith');
+
 //                     }
 
                             // Make sure to set the user's discussion watch records

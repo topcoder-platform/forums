@@ -176,9 +176,9 @@ if (!function_exists('writeComment')) :
                         </span>
                     </div>
                     <div class="Meta CommentMeta CommentInfo">
+                        <?php echo authorProfileStats($author);?>
                         <span class="MItem DateCreated">
-                            <?php echo Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($comment->DateInserted, true,
-                                DateTimeFormatter::FORCE_FULL_FORMAT); ?>
+                            <?php echo formatDateCustom($comment->DateInserted); ?>
                         </span>
                         <?php
                         echo dateUpdated($comment, ['<span class="MItem">', '</span>']);
