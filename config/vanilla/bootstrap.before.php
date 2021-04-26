@@ -305,7 +305,7 @@ if (!function_exists('dateUpdated')) {
 
         if ($dateUpdated) {
             $updateUser = Gdn::userModel()->getID($updateUserID);
-            $dateUpdatedFormatted = formatDateCustom($dateUpdated);
+            $dateUpdatedFormatted = formatDateCustom($dateUpdated, false);
             if ($updateUser && $insertUserID != $updateUserID) {
                 $title = sprintf(t('Edited %s by %s.'), $dateUpdatedFormatted, val('Name', $updateUser));
                 $link = userAnchor($updateUser);
@@ -990,8 +990,9 @@ if (!function_exists('discussionUrl')) {
 }
 
 if (!function_exists('formatDateCustom')) {
-    function formatDateCustom($timestamp) {
-        $dateFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($timestamp, false, '%a, %b %e %Y');
+    function formatDateCustom($timestamp, $showDayOfWeek=true) {
+        $dateFormat = $showDayOfWeek? '%a, %b %e, %Y': '%b %e, %Y';
+        $dateFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($timestamp, false, $dateFormat);
         $timeFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($timestamp, false, '%I:%M %p');
         return sprintf('%1$s at %2$s', $dateFormatted, $timeFormatted);
     }
