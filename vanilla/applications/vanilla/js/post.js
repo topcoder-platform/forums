@@ -101,6 +101,41 @@ jQuery(document).ready(function($) {
 
         // Handler before submitting
         $(frm).triggerHandler('BeforeDiscussionSubmit', [frm, btn]);
+        var maxCommentLength =  $(frm).find('input:hidden[name$=MaxCommentLength]');
+        var defaultValues = [
+            undefined,
+            null,
+            '',
+            '[{\"insert\":\"\\n\"}]'
+        ];
+
+        var editorContainer = $(frm).find('.EasyMDEContainer');
+        var messageContainer = $(frm).find('.editor-statusbar .message');
+        var textbox = $(frm).find('textarea#Form_Body');
+        var currentVal = $(textbox).val();
+        currentVal = gdn.normalizeText(currentVal);
+        if(defaultValues.includes(currentVal) || currentVal.trim().length == 0) {
+            $(editorContainer).addClass('error');
+            $(messageContainer).text('Cannot post an empty message');
+            $(frm).find(':submit').attr('disabled', 'disabled');
+            $(frm).find('.Buttons a.Button:not(.Cancel)').addClass('Disabled');
+            return false;
+        }
+
+        if(currentVal.length > maxCommentLength.val()) {
+            $(editorContainer).addClass('error');
+            var count = currentVal.length - maxCommentLength.val();
+            $(messageContainer).text('Discussion is '+ count +' characters too long');
+            $(frm).find(':submit').attr('disabled', 'disabled');
+            $(frm).find('.Buttons a.Button:not(.Cancel)').addClass('Disabled');
+            return false;
+        }
+
+        $(editorContainer).removeClass('error');
+        $(messageContainer).text('');
+        $(frm).find(':submit').removeAttr("disabled");
+        $(frm).find('.Buttons a.Button').removeClass('Disabled');
+
 
         var inpDiscussionID = $(frm).find(':hidden[name$=DiscussionID]');
         var inpDraftID = $(frm).find(':hidden[name$=DraftID]');
