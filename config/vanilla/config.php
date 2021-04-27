@@ -213,3 +213,6 @@ $Configuration['Garden']['FavIcon']='/themes/topcoder/design/images/favicon.png'
 
 // This flag moves executing of ActivityModel queue to the scheduler
 $Configuration['Feature']['deferredNotifications']['Enabled'] = true;
+
+//If we allow users to dismiss discussions, skip ones this user dismissed
+$Configuration['Vanilla']['Discussions']['Dismiss']=0;
