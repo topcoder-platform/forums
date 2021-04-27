@@ -18,7 +18,16 @@ echo '<div class="Options">';
 $this->fireEvent('BeforeDiscussionOptions');
 //writeBookmarkLink();
 echo bookmarkButton($this->data('Discussion'));
-echo getDiscussionOptionsDropdown();
+$dropdown =  getDiscussionOptionsDropdown();
+$dropdownOptions = $dropdown->getItems();
+// FIX: https://github.com/topcoder-platform/forums/issues/499
+// Hide the dropdown if there is only the Edit option. The Edit option will be displayed in inline options.
+$hasOnlyEditOption = count($dropdownOptions) == 1 && $dropdownOptions['edit'];
+if(!$hasOnlyEditOption) {
+    echo getDiscussionOptionsDropdown();
+}
+
+
 writeAdminCheck();
 
 echo '</div>';
