@@ -999,8 +999,7 @@ if (!function_exists('formatDateCustom')) {
 }
 if (!function_exists('authorProfileStats')) {
     function authorProfileStats($user) {
-        $countDiscussions = plural( $user->CountDiscussions, '%s Post', '%s Posts');
-        $countComments = plural( $user->CountComments, '%s Comment', '%s Comments');
-        return '<span class="MItem AuthorProfileStats AuthorProfileStats_'.$user->UserID.'">'.sprintf('%1s %2s', $countDiscussions,$countComments).'</span>';
+        $totalCount = ($user->CountDiscussions?$user->CountDiscussions : 0) + ($user->CountComments?$user->CountComments:0);
+        return '<span class="MItem AuthorProfileStats AuthorProfileStats_'.$user->UserID.'">'.sprintf('%1s posts', $totalCount).'</span>';
     }
 }
