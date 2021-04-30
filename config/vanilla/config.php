@@ -42,10 +42,13 @@ $Configuration['EnabledPlugins']['ReplyTo'] = true;
 // Feature
 $Configuration['Feature']['NewFlyouts']['Enabled'] = true;
 
+// Unfurl
+$Configuration['Garden']['Title'] = 'Topcoder Forums';
+$Configuration['Garden']['ShareImage'] = '/themes/topcoder/design/images/topcoder-image.png';
+
 // Garden
 $Configuration['Garden']['SignIn']['Popup'] = false;
 $Configuration['Garden']['EditContentTimeout'] = -1;
-$Configuration['Garden']['Title'] = 'Vanilla';
 $Configuration['Garden']['Cookie']['Salt'] = 'rLpGSLgZD1AGdJ4n';
 $Configuration['Garden']['Cookie']['Domain'] = '';
 $Configuration['Garden']['Registration']['ConfirmEmail'] = true;
@@ -81,7 +84,7 @@ $Configuration['Plugins']['GooglePrettify']['Language'] = '';
 $Configuration['Plugins']['GettingStarted']['Dashboard'] = '1';
 $Configuration['Plugins']['GettingStarted']['Plugins'] = '1';
 
-
+$Configuration['Plugins']['Topcoder']['NDA_UUID'] = getenv('VANILLA_ENV') == 'prod'?'c41e90e5-4d0e-4811-bd09-38ff72674490':'e5811a7b-43d1-407a-a064-69e5015b4900';
 $Configuration['Plugins']['Topcoder']['BaseApiURL'] = getenv('TOPCODER_PLUGIN_BASE_API_URL');
 $Configuration['Plugins']['Topcoder']['MemberApiURI'] = getenv('TOPCODER_PLUGIN_MEMBER_API_URI');
 $Configuration['Plugins']['Topcoder']['RoleApiURI'] = getenv('TOPCODER_PLUGIN_ROLE_API_URI');
@@ -210,3 +213,6 @@ $Configuration['Garden']['FavIcon']='/themes/topcoder/design/images/favicon.png'
 
 // This flag moves executing of ActivityModel queue to the scheduler
 $Configuration['Feature']['deferredNotifications']['Enabled'] = true;
+
+//If we allow users to dismiss discussions, skip ones this user dismissed
+$Configuration['Vanilla']['Discussions']['Dismiss']=0;

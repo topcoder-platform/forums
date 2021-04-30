@@ -1283,6 +1283,10 @@ class CommentModel extends Gdn_Model {
                     $commentID = $this->SQL->insert($this->Name, $fields);
                 }
                 if ($commentID) {
+                    // FIX: https://github.com/topcoder-platform/forums/issues/533
+                    // if this comment is added by the discussion author.
+                    $this->updateUser($fields['InsertUserID'], false);
+
                     $bodyValue = $fields["Body"] ?? null;
                     if ($bodyValue) {
                         $this->calculateMediaAttachments($commentID, !$insert);
@@ -1356,7 +1360,8 @@ class CommentModel extends Gdn_Model {
         // the number of discussions created by the user that s/he has
         // unread messages in) if this comment was not added by the
         // discussion author.
-        $this->updateUser($Fields['InsertUserID'], $IncUser && $Insert);
+        // Move it to save() due to https://github.com/topcoder-platform/forums/issues/533
+        // $this->updateUser($Fields['InsertUserID'], $IncUser && $Insert);
 
         // Mark the user as participated.
         $this->SQL->replace(
@@ -1397,6 +1402,7 @@ class CommentModel extends Gdn_Model {
         }
 
         $categoryID = val('CategoryID', $discussion);
+        $discussionID = val('DiscussionID', $discussion);
 
         // Figure out the category that governs this notification preference.
         $category = CategoryModel::categories($categoryID);
@@ -1414,6 +1420,13 @@ class CommentModel extends Gdn_Model {
             $parentCategory = CategoryModel::categories($parentCategory["ParentCategoryID"]);
         }
 
+        $discussionModel = new DiscussionModel();
+        // FIX: https://github.com/topcoder-platform/forums/issues/577
+        $removeUserIDs = array_column(
+            $discussionModel->getUnBookmarkUsers($discussionID)->resultArray(),
+            "UserID"
+        );
+
         // Grab all of the users that need to be notified.
         $data = $this->SQL
             ->whereIn('Name', ['Preferences.Email.NewComment.'.$category['CategoryID'], 'Preferences.Popup.NewComment.'.$category['CategoryID']])
@@ -1426,8 +1439,12 @@ class CommentModel extends Gdn_Model {
             }
 
             $userID = $row['UserID'];
+
+            if ($row['Value'] == '2' && in_array($userID, $removeUserIDs)) {
+                continue;
+            }
+
             // Check user can still see the discussion.
-            $discussionModel = new DiscussionModel();
             if (!$discussionModel->canView($discussion, $userID)) {
                 continue;
             }

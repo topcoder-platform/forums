@@ -176,9 +176,9 @@ if (!function_exists('writeComment')) :
                         </span>
                     </div>
                     <div class="Meta CommentMeta CommentInfo">
+                        <?php echo authorProfileStats($author);?>
                         <span class="MItem DateCreated">
-                            <?php echo Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($comment->DateInserted, true,
-                                DateTimeFormatter::FORCE_FULL_FORMAT); ?>
+                            <?php echo formatDateCustom($comment->DateInserted); ?>
                         </span>
                         <?php
                         echo dateUpdated($comment, ['<span class="MItem">', '</span>']);
@@ -375,6 +375,8 @@ if (!function_exists('getDiscussionOptionsDropdown')):
         // Permissions
         $canEdit = DiscussionModel::canEdit($discussion, $timeLeft);
         $canAnnounce = CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Announce');
+        // FIX: https://github.com/topcoder-platform/forums/issues/456
+        $newAnnounceValue = $discussion->Announce > 0? 0 : 1;
         $canSink = CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Sink');
         $canClose = CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Close');
         $canDelete = CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Delete');
@@ -392,7 +394,7 @@ if (!function_exists('getDiscussionOptionsDropdown')):
 
         $dropdown->addLinkIf($canDismiss, t('Dismiss'), "vanilla/discussion/dismissannouncement?discussionid={$discussionID}", 'dismiss', 'DismissAnnouncement Hijack')
             ->addLinkIf($canEdit, t('Edit').$timeLeft, '/post/editdiscussion/'.$discussionID, 'edit')
-            ->addLinkIf($canAnnounce, t('Announce'), '/discussion/announce?discussionid='.$discussionID, 'announce', 'AnnounceDiscussion Popup')
+            ->addLinkIf($canAnnounce, $discussion->Announce  > 0 ? t('Don\'t Announce'):t('Announce'), '/discussion/announce?discussionid='.$discussionID.'&announce='.$newAnnounceValue, 'announce', 'AnnounceDiscussion Hijack')
             ->addLinkIf($canSink, t($discussion->Sink ? 'Unsink' : 'Sink'), '/discussion/sink?discussionid='.$discussionID.'&sink='.(int)!$discussion->Sink, 'sink', 'SinkDiscussion Hijack')
             ->addLinkIf($canClose, t($discussion->Closed ? 'Reopen' : 'Close'), '/discussion/close?discussionid='.$discussionID.'&close='.(int)!$discussion->Closed, 'close', 'CloseDiscussion Hijack')
             ->addLinkIf($canRefetch, t('Refetch Page'), '/discussion/refetchpageinfo.json?discussionid='.$discussionID, 'refetch', 'RefetchPage Hijack')

@@ -263,6 +263,7 @@ class CategoriesController extends VanillaController {
     }
 
 
+
     /**
      * Show all discussions in a particular category.
      *
@@ -293,15 +294,23 @@ class CategoriesController extends VanillaController {
         $this->setData('Followed', $followed);
         $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
 
+        // FIX: https://github.com/topcoder-platform/forums/issues/524
+        // There are different Sorting options (CategorySort/DiscussionSort)
+        // We need to know a category type before saving it in user preferences
         $sort = Gdn::request()->get('sort', null);
         $saveSorting = $sort !== null && Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
         if($saveSorting) {
-            Gdn::session()->setPreference('CategorySort', $sort);
+            // Reset pagination control to the first page
+            $page = 0;
         }
-        $sort =  Gdn::session()->getPreference('CategorySort', false);
-        $this->setData('CategorySort', $sort);
 
         if ($categoryIdentifier == '') {
+            if($saveSorting) {
+                Gdn::session()->setPreference('CategorySort', $sort);
+            }
+            $sort =  Gdn::session()->getPreference('CategorySort', false);
+            $this->setData('CategorySort', $sort);
+
             // Add jquery-accordion ui
             $this->addJsFile('jquery-ui-1.10.0.custom.min.js');
             $this->addJsFile('home.js');
@@ -363,6 +372,13 @@ class CategoriesController extends VanillaController {
                 case 'Categories':
                     $stopHeadings = val('Depth', $category) > CategoryModel::instance()->getNavDepth();
                     CategoryModel::instance()->setStopHeadingsCalculation($stopHeadings);
+
+                    if($saveSorting) {
+                        Gdn::session()->setPreference('CategorySort', $sort);
+                    }
+                    $sort =  Gdn::session()->getPreference('CategorySort', false);
+                    $this->setData('CategorySort', $sort);
+
                     if ($this->SyndicationMethod != SYNDICATION_NONE) {
                         // RSS can't show a category list so just tell it to expand all categories.
                         saveToConfig('Vanilla.ExpandCategories', true, false);
@@ -432,6 +448,12 @@ class CategoriesController extends VanillaController {
             $this->addModule('TagModule');
 
             // Get a DiscussionModel
+            if($saveSorting) {
+                Gdn::session()->setPreference('DiscussionSort', $sort);
+            }
+            $sort =  Gdn::session()->getPreference('DiscussionSort', false);
+            $this->setData('DiscussionSort', $sort);
+
             $discussionModel = new DiscussionModel();
             $discussionModel->setSort($sort);
             $discussionModel->setFilters(Gdn::request()->get());
@@ -480,10 +502,16 @@ class CategoriesController extends VanillaController {
             $this->setData('CountDiscussions', $countDiscussions);
             $this->setData('_Limit', $limit);
 
+            // FIX: https://github.com/topcoder-platform/forums/issues/524
+            // Added new sorting options for discussions.
+            // Sorting options are applied to Discussions and Announcements
+            // Don't show Announcements in a separate list
+
             // We don't wan't child categories in announcements.
-            $wheres['d.CategoryID'] = $categoryID;
-            $announceData = $discussionModel->getAnnouncements($wheres, $offset, $limit);
-            $this->AnnounceData = $this->setData('Announcements', $announceData);
+            // $wheres['d.CategoryID'] = $categoryID;
+            // $announceData = $discussionModel->getAnnouncements($wheres, $offset, $limit);
+            // $this->AnnounceData = $this->setData('Announcements', $announceData);
+            $wheres['Announce'] = 'all';
             $wheres['d.CategoryID'] = $categoryIDs;
 
             // RSS should include announcements.
@@ -661,8 +689,9 @@ class CategoriesController extends VanillaController {
         $this->addModule('BookmarkedModule');
         // FIX: https://github.com/topcoder-platform/forums/issues/548
         // Show only for 'Public forums'
-        $isGroupCategory = val('GroupID',$this->data('Category'));
-        if(gdn::session()->isValid() && $this->data('Category') && !$isGroupCategory) {
+        $categoryID = val('CategoryID',$this->data('Category'));
+        $isChallengeForums = $this->checkChallengeForums($categoryID);
+        if(gdn::session()->isValid() && $this->data('Category') && !$isChallengeForums) {
             $this->addModule('CategoriesModule');
         }
 

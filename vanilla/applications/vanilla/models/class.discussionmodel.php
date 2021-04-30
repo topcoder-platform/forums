@@ -1339,6 +1339,20 @@ class DiscussionModel extends Gdn_Model {
             ->where('Bookmarked', '1')
             ->get();
     }
+    /**
+     * Gets all users who have unbookmarked the specified discussion.
+     *
+     */
+    // FIX: https://github.com/topcoder-platform/forums/issues/577
+    public function getUnBookmarkUsers($discussionID) {
+        return $this->SQL
+            ->select('UserID')
+            ->from('UserDiscussion')
+            ->where('DiscussionID', $discussionID)
+            ->whereIn('Bookmarked', [0, 2])
+            ->get();
+    }
+
 
     /**
      *
@@ -2872,8 +2886,42 @@ class DiscussionModel extends Gdn_Model {
         $this->EventArguments['UserID'] = $userID;
         $this->EventArguments['Bookmarked'] = $bookmarked;
         $this->fireEvent('AfterBookmark');
+        // FIX: https://github.com/topcoder-platform/forums/issues/577
+        return (int)$bookmarked;
+    }
 
-        return (bool)$bookmarked;
+    /**
+     * Bookmarks (or unbookmarks) all discussions in a category for the specified user.
+     *
+     * @param int|array $CategoryID The id of the category.
+     * @param int $userID The unique id of the user.
+     * @param bool|null $bookmarked Whether or not to bookmark or unbookmark. Pass null to toggle the bookmark.
+     */
+    public function bookmarkAll($categoryID, $userID, $bookmarked) {
+
+        if(is_numeric($categoryID)) {
+            $categoryID = [$categoryID];
+        }
+        $discussions =  $this->SQL
+            ->select('ud.DiscussionID')
+            ->from('UserDiscussion ud')
+            ->join('Discussion d', 'ud.DiscussionID = d.DiscussionID ')
+            ->join('Category c', 'd.CategoryID = c.CategoryID')
+            ->where('ud.UserID', $userID)
+            ->where('c.CategoryID', $categoryID)
+            ->get()->resultArray();
+        $discussionIDs = array_column($discussions, 'DiscussionID');
+        if(count($discussionIDs) > 0 ) {
+            // Update the bookmarked value.
+            $this->SQL
+                ->update('UserDiscussion')
+                ->set('Bookmarked', $bookmarked)
+                ->where('UserID', $userID)
+                ->where('DiscussionID', $discussionIDs)
+                ->put();
+
+            $this->setUserBookmarkCount($userID);
+        }
     }
 
     /**

@@ -305,7 +305,7 @@ if (!function_exists('dateUpdated')) {
 
         if ($dateUpdated) {
             $updateUser = Gdn::userModel()->getID($updateUserID);
-            $dateUpdatedFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($dateUpdated, false, DateTimeFormatter::FORCE_FULL_FORMAT);
+            $dateUpdatedFormatted = formatDateCustom($dateUpdated, false);
             if ($updateUser && $insertUserID != $updateUserID) {
                 $title = sprintf(t('Edited %s by %s.'), $dateUpdatedFormatted, val('Name', $updateUser));
                 $link = userAnchor($updateUser);
@@ -339,7 +339,6 @@ if (!function_exists('watchIcon')) {
         if($hasWatched) {
             $icon = <<<EOT
 <svg width="21px" height="14px" viewBox="0 0 21 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>$title</title>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="02-Challenge-Forums" transform="translate(-1261.000000, -328.000000)" fill="#0AB88A" fill-rule="nonzero">
             <path d="M1271.08333,328 C1266.5,328 1262.58583,330.850833 1261,334.875 C1262.58583,338.899167 1266.5,341.75 1271.08333,341.75 C1275.66667,341.75 1279.58083,338.899167 1281.16667,334.875 C1279.58083,330.850833 1275.66667,328 1271.08333,328 Z M1271.08333,339.458333 C1268.55333,339.458333 1266.5,337.405 1266.5,334.875 C1266.5,332.345 1268.55333,330.291667 1271.08333,330.291667 C1273.61333,330.291667 1275.66667,332.345 1275.66667,334.875 C1275.66667,337.405 1273.61333,339.458333 1271.08333,339.458333 Z M1271.08333,332.125 C1269.56167,332.125 1268.33333,333.353333 1268.33333,334.875 C1268.33333,336.396667 1269.56167,337.625 1271.08333,337.625 C1272.605,337.625 1273.83333,336.396667 1273.83333,334.875 C1273.83333,333.353333 1272.605,332.125 1271.08333,332.125 Z" id="Shape"></path>
@@ -350,7 +349,6 @@ EOT;
         } else {
             $icon = <<<EOT
          <svg width="22px" height="22px" viewBox="0 0 22 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>$title</title>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="02-Challenge-Forums" transform="translate(-1260.000000, -594.000000)">
             <g id="watch-icon" transform="translate(1260.000000, 594.000000)">
@@ -375,7 +373,7 @@ if (!function_exists('watchButton')) {
      * @param int $categoryID
      * @return string
      */
-    function watchButton($category) {
+    function watchButton($category, $isHijackButton = true) {
         $output = ' ';
         $userID = Gdn::session()->UserID;
         if(is_numeric($category)) {
@@ -388,13 +386,17 @@ if (!function_exists('watchButton')) {
             $categoryID= val('CategoryID', $category);
             $hasWatched = $categoryModel->hasWatched($categoryID, $userID);
 
-            $text = $hasWatched ? t('Stop watching the category') : t('Watch the category');
-            $icon = watchIcon($hasWatched, $text);
-            $output .= anchor(
-                $icon,
+            $text = $hasWatched ? t('Stop watching forum') : t('Watch forum');
+            $icon = '<span class="tooltiptext">'.$text.'</span>'. watchIcon($hasWatched);
+            $cssClasses =  'watchButton ' . ($hasWatched ? ' isWatching tooltip': 'tooltip');
+            if($isHijackButton) {
+                $cssClasses = 'Hijack '.$cssClasses;
+            }
+
+            $output .= anchor($icon,
                 $hasWatched ? "/category/watched/{$categoryID}/" . Gdn::session()->transientKey() : "/category/watch/{$categoryID}/" . Gdn::session()->transientKey(),
-                'Hijack watchButton' . ($hasWatched ? ' isWatching' : ''),
-                ['title' => $text, 'aria-pressed' => $hasWatched ? 'true' : 'false', 'role' => 'button', 'tabindex' => '0']
+                $cssClasses,
+                [ 'aria-pressed' => $hasWatched ? 'true' : 'false', 'role' => 'button', 'tabindex' => '0']
             );
         }
         return $output;
@@ -460,9 +462,9 @@ if (!function_exists('sortsDropDown')) {
      * @param string $label Text for the label to attach to the cont
      * @return string
      */
-    function sortsDropDown($baseUrl, array $filters = [], $extraClasses = '', $default = null, $defaultUrl = null, $label = 'Sort') {
+    function sortsDropDown($preferenceKey, $baseUrl, array $filters = [], $extraClasses = '', $default = null, $defaultUrl = null, $label = 'Sort') {
         $links = [];
-        $active =  Gdn::session()->getPreference('CategorySort', null);
+        $active =  Gdn::session()->getPreference($preferenceKey, null);
         // Translate filters into links.
         foreach ($filters as $filter) {
             // Make sure we have the bare minimum: a label and a URL parameter.
@@ -550,7 +552,7 @@ if (!function_exists('categorySorts')) {
             $defaultUrl = $baseUrl;
         }
 
-        return sortsDropDown(
+        return sortsDropDown('CategorySort',
             $baseUrl,
             $filters,
             $extraClasses,
@@ -577,15 +579,22 @@ if (!function_exists('discussionSorts')) {
         $transientKey = Gdn::session()->transientKey();
         $filters = [
             [
-                'name' => t('New'),
+                'name' => t('Most recent'),
                 'param' => 'sort',
                 'value' => 'new',
                 'extra' => ['TransientKey' => $transientKey, 'save' => 1]
             ],
+
             [
-                'name' => t('Old'),
+                'name' => t('Highest views'),
                 'param' => 'sort',
-                'value' => 'old',
+                'value' => 'views',
+                'extra' => ['TransientKey' => $transientKey, 'save' => 1]
+            ],
+            [
+                'name' => t('Highest responses'),
+                'param' => 'sort',
+                'value' => 'comments',
                 'extra' => ['TransientKey' => $transientKey, 'save' => 1]
             ]
         ];
@@ -598,7 +607,7 @@ if (!function_exists('discussionSorts')) {
             $defaultUrl = $baseUrl;
         }
 
-        return sortsDropDown(
+        return sortsDropDown('DiscussionSort',
             $baseUrl,
             $filters,
             $extraClasses,
@@ -977,5 +986,20 @@ if (!function_exists('discussionUrl')) {
         }
 
         return url($result, $withDomain);
+    }
+}
+
+if (!function_exists('formatDateCustom')) {
+    function formatDateCustom($timestamp, $showDayOfWeek=true) {
+        $dateFormat = $showDayOfWeek? '%a, %b %e, %Y': '%b %e, %Y';
+        $dateFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($timestamp, false, $dateFormat);
+        $timeFormatted = Gdn::getContainer()->get(DateTimeFormatter::class)->formatDate($timestamp, false, '%I:%M %p');
+        return sprintf('%1$s at %2$s', $dateFormatted, $timeFormatted);
+    }
+}
+if (!function_exists('authorProfileStats')) {
+    function authorProfileStats($user) {
+        $totalCount = ($user->CountDiscussions?$user->CountDiscussions : 0) + ($user->CountComments?$user->CountComments:0);
+        return '<span class="MItem AuthorProfileStats AuthorProfileStats_'.$user->UserID.'">'.sprintf('%1s posts', $totalCount).'</span>';
     }
 }

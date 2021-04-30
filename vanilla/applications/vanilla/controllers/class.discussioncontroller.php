@@ -391,8 +391,8 @@ class DiscussionController extends VanillaController {
      */
     public function initialize() {
         parent::initialize();
-        $this->addDefinition('ConfirmDeleteCommentHeading', t('ConfirmDeleteCommentHeading', 'Delete Comment'));
-        $this->addDefinition('ConfirmDeleteCommentText', t('ConfirmDeleteCommentText', 'Are you sure you want to delete this comment?'));
+        $this->addDefinition('ConfirmDeleteCommentHeading', t('ConfirmDeleteCommentHeading', 'Delete'));
+        $this->addDefinition('ConfirmDeleteCommentText', t('ConfirmDeleteCommentText', 'Are you sure you want to delete this item?'));
         $this->Menu->highlightRoute('/discussions');
     }
 
@@ -476,9 +476,9 @@ class DiscussionController extends VanillaController {
      *
      * @param int $DiscussionID Unique discussion ID.
      */
-    public function bookmark($DiscussionID = null) {
+    public function bookmark($DiscussionID = null, $bookmarked=null, $tkey=null ) {
         // Make sure we are posting back.
-        if (!$this->Request->isAuthenticatedPostBack()) {
+        if (!$this->Request->isAuthenticatedPostBack() && !Gdn::session()->validateTransientKey($tkey)) {
             throw permissionException('Javascript');
         }
 
@@ -491,7 +491,11 @@ class DiscussionController extends VanillaController {
         // Check the form to see if the data was posted.
         $Form = new Gdn_Form();
         $DiscussionID = $Form->getFormValue('DiscussionID', $DiscussionID);
-        $Bookmark = $Form->getFormValue('Bookmark', null);
+        // FIX:  https://github.com/topcoder-platform/forums/issues/577
+        // 0 - not bookmarked
+        // 1 - bookmarked
+        // 2 - unbookmarked, if Discussion's Author
+        $Bookmark = $Form->getFormValue('Bookmark', $bookmarked);
         $UserID = $Form->getFormValue('UserID', $Session->UserID);
 
         // Check the permission on the user.
@@ -511,12 +515,31 @@ class DiscussionController extends VanillaController {
         $Bookmark = $this->DiscussionModel->bookmark($DiscussionID, $UserID, $Bookmark);
 
         // Set the new value for api calls and json targets.
+        // FIX: https://github.com/topcoder-platform/forums/issues/577
         $this->setData([
             'UserID' => $UserID,
             'DiscussionID' => $DiscussionID,
-            'Bookmarked' => (bool)$Bookmark
+            'Bookmarked' => (int)$Bookmark
         ]);
         setValue('Bookmarked', $Discussion, (int)$Bookmark);
+
+        $category = CategoryModel::categories($categoryID);
+        $groupID = val('GroupID', $category);
+        // FIX: https://github.com/topcoder-platform/forums/issues/577
+        // No changes for Challenge Forums
+        if (!$groupID) {
+            $categoryModel = new CategoryModel();
+            $hasWatchedCategory = $categoryModel->hasWatched($categoryID, Gdn::session()->UserID);
+            // Category watch to be turned off but don't delete it to get notifications for new discussions
+            if($hasWatchedCategory && ($Bookmark == 0 || $Bookmark == 2)) {
+                // Set Preferences to '2' - watching all except unwatched discussions
+                $categoryModel->setCategoryMetaData($categoryID, Gdn::session()->UserID, 2);
+                // Category Title: vanilla/applications/vanilla/views/discussions/index.php
+                $title = val('Name', $category).watchButton($categoryID, false);
+                $updatedHeaderHtml = '<h1 class="H HomepageTitle">'.$title.'</h1>';
+                $this->jsonTarget('h1.H.HomepageTitle', $updatedHeaderHtml, 'ReplaceWith');
+            }
+        }
 
         // Update the user's bookmark count
         $CountBookmarks = $this->DiscussionModel->setUserBookmarkCount($UserID);
@@ -771,6 +794,11 @@ class DiscussionController extends VanillaController {
                 }
 
                 $this->jsonTarget(".Section-DiscussionList #Discussion_$discussionID", null, 'SlideUp');
+                // FIX: https://github.com/topcoder-platform/forums/issues/533
+                $insertUserID = val('InsertUserID',$discussion);
+                $author =  Gdn::userModel()->getID($insertUserID, DATASET_TYPE_OBJECT);
+                $this->jsonTarget(".AuthorProfileStats_{$insertUserID}", authorProfileStats($author), 'ReplaceWith');
+
             }
         }
 
@@ -797,10 +825,11 @@ class DiscussionController extends VanillaController {
         $defaultTarget = '/discussions/';
         $validCommentID = is_numeric($commentID) && $commentID > 0;
         $validUser = $session->UserID > 0 && $session->validateTransientKey($transientKey);
-
+        $insertUserID = false;
         if ($validCommentID && $validUser) {
             // Get comment and discussion data
             $comment = $this->CommentModel->getID($commentID);
+            $insertUserID = $comment->InsertUserID;
             $discussionID = val('DiscussionID', $comment);
             $discussion = $this->DiscussionModel->getID($discussionID);
 
@@ -845,6 +874,9 @@ class DiscussionController extends VanillaController {
             $this->setJson('ErrorMessage', $this->Form->errors());
         } else {
             $this->jsonTarget("#Comment_$commentID", '', 'SlideUp');
+            // FIX: https://github.com/topcoder-platform/forums/issues/533
+            $author =  Gdn::userModel()->getID($insertUserID, DATASET_TYPE_OBJECT);
+            $this->jsonTarget(".AuthorProfileStats_{$insertUserID}", authorProfileStats($author), 'ReplaceWith');
         }
 
         $this->render();
@@ -1120,6 +1152,7 @@ body { background: transparent !important; }
         if (!$this->Head) {
             return;
         }
-        $this->Head->addTag('meta', ['property' => 'og:type', 'content' => 'article']);
+        //$this->Head->addTag('meta', ['property' => 'og:type', 'content' => 'article']);
+        $this->Head->addTag('meta', ['property' => 'og:type', 'content' => 'website']);
     }
 }

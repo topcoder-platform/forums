@@ -71,15 +71,66 @@ if (!function_exists('BookmarkButton')) {
         }
 
         // Bookmark link
-        $hasWatched = $discussion->Bookmarked == '1';
-        $title = t($hasWatched ? 'Stop watching the discussion' : 'Watch the discussion');
-        $icon = watchIcon($hasWatched, $title);
-        return anchor(
-            $icon,
-            '/discussion/bookmark/'.$discussion->DiscussionID.'/'.Gdn::session()->transientKey(),
-            'Hijack  watchButton '.($hasWatched ? ' isWatching' : ''),
-            ['title' => $title]
-        );
+        // FIX : https://github.com/topcoder-platform/forums/issues/577
+        // If User is watching a category then show it as bookmarked
+        $categoryModel = new CategoryModel();
+        $category = CategoryModel::categories($discussion->CategoryID);
+        $groupID = val('GroupID', $category);
+        // No changes for Challenge Forums
+        if($groupID && $groupID > 0) {
+            // New value should be opposite
+            $hasWatched = $discussion->Bookmarked == 1;
+            $newValue = $hasWatched ? 0 : 1;
+            $title = t($hasWatched ? 'Stop watching forum' : 'Watch forum');
+            $icon = '<span class="tooltiptext">'.$title.'</span>'.watchIcon($hasWatched);
+            return anchor(
+                $icon,
+                '/discussion/bookmark/' . $discussion->DiscussionID . '/?tkey=' . Gdn::session()->transientKey() . '&bookmarked=' . $newValue,
+                'Hijack  watchButton ' . ($hasWatched ? ' isWatching tooltip' : 'tooltip'),
+                []
+            );
+        } else {
+            $notificationPreferences = $categoryModel->getCategoryNotificationPreferences($discussion->CategoryID, Gdn::session()->UserID);
+            $categoryNotificationPreferences = $notificationPreferences[$discussion->CategoryID];
+            $newEmailDiscussionKey = 'Preferences.Email.NewComment.' . $discussion->CategoryID;
+            //$newPopupDiscussionKey = 'Preferences.Popup.NewComment.' . $discussion->CategoryID;
+            $hasWatchedCategory = val($newEmailDiscussionKey, $categoryNotificationPreferences);
+
+            if($hasWatchedCategory == '1') { // The watched category
+                $hasWatched  = true;
+                $newValue = 0;
+            } else if($hasWatchedCategory == '2') {// The watched category except some discussions
+                if ($discussion->Bookmarked === null) {
+                    $hasWatched  = true;
+                    $newValue = 0;
+                } else if ($discussion->Bookmarked == 0) {
+                    $hasWatched  = false;
+                    $newValue = 1;
+                } else if ($discussion->Bookmarked == 1) {
+                    $hasWatched  = true;
+                    $newValue = 0;
+                }
+            } else {
+                $hasWatched = false;
+                if ($discussion->Bookmarked === null) {
+                    $newValue = 1;
+                } else if ($discussion->Bookmarked == 0) {
+                    $newValue = 1;
+                } else if ($discussion->Bookmarked == 1) {
+                    $hasWatched = true;
+                    $newValue = 0;
+                }
+            }
+
+            $title = t($hasWatched ? 'Stop watching forum' : 'Watch forum');
+            $icon = '<span class="tooltiptext">'.$title.'</span>'.watchIcon($hasWatched, '');
+            return anchor(
+                $icon,
+                '/discussion/bookmark/' . $discussion->DiscussionID . '/?tkey=' . Gdn::session()->transientKey() . '&bookmarked=' . $newValue,
+                'Hijack  watchButton ' . ($hasWatched ? ' isWatching tooltip' : 'tooltip'),
+                []
+            );
+        }
     }
 }
 
@@ -346,8 +397,7 @@ if (!function_exists('NewComments')) :
             return ' <span class="MItem"><strong class="HasNew JustNew NewCommentCount" title="'.$title.'">'.t('new discussion', 'new').'</strong></span>';
         } elseif ($discussion->CountUnreadComments > 0) {
             $title = htmlspecialchars(plural($discussion->CountUnreadComments, "%s new comment since you last read this.", "%s new comments since you last read this."));
-
-            return ' <span class="MItem"><strong class="HasNew NewCommentCount" title="'.$title.'">'.plural($discussion->CountUnreadComments, '%s new', '%s new plural', bigPlural($discussion->CountUnreadComments, '%s new', '%s new plural')).'</strong><span>';
+            return ' <span class="MItem"><strong class="HasNew NewCommentCount" title="'.$title.'">'.plural($discussion->CountUnreadComments, '%s new', '%s new plural', bigPlural($discussion->CountUnreadComments, '%s new', '%s new plural')).'</strong></span>';
         }
         return '';
     }

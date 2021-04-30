@@ -3,6 +3,9 @@ $Session = Gdn::session();
 if (!function_exists('WriteComment'))
     include $this->fetchViewLocation('helper_functions', 'discussion');
 
+if (!function_exists('bookmarkButton'))
+    include $this->fetchViewLocation('helper_functions', 'discussions');
+
 // Wrap the discussion related content in a div.
 echo '<div class="MessageList Discussion">';
 
@@ -13,8 +16,18 @@ echo '<!-- Page Title -->
 echo '<div class="Options">';
 
 $this->fireEvent('BeforeDiscussionOptions');
-writeBookmarkLink();
-echo getDiscussionOptionsDropdown();
+//writeBookmarkLink();
+echo bookmarkButton($this->data('Discussion'));
+$dropdown =  getDiscussionOptionsDropdown();
+$dropdownOptions = $dropdown->getItems();
+// FIX: https://github.com/topcoder-platform/forums/issues/499
+// Hide the dropdown if there is only the Edit option. The Edit option will be displayed in inline options.
+$hasOnlyEditOption = count($dropdownOptions) == 1 && $dropdownOptions['edit'];
+if(!$hasOnlyEditOption) {
+    echo getDiscussionOptionsDropdown();
+}
+
+
 writeAdminCheck();
 
 echo '</div>';
