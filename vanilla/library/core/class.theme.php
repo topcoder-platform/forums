@@ -404,7 +404,8 @@ class Gdn_Theme {
                 $properties['title'] = c('Garden.LogoTitle');
             }
 
-            echo img(Gdn_Upload::url($logo), $properties);
+            // FIX:  Issues-623
+            echo img(url($logo, true), $properties);
         } else {
             echo htmlEsc($title);
         }
