@@ -47,6 +47,7 @@ $Configuration['Garden']['Title'] = 'Topcoder Forums';
 $Configuration['Garden']['ShareImage'] = '/themes/topcoder/design/images/topcoder-image.png';
 
 // Garden
+$Configuration['Garden']['Logo']='/themes/topcoder/design/images/topcoder-logo.svg';
 $Configuration['Garden']['SignIn']['Popup'] = false;
 $Configuration['Garden']['EditContentTimeout'] = -1;
 $Configuration['Garden']['Cookie']['Salt'] = 'rLpGSLgZD1AGdJ4n';
