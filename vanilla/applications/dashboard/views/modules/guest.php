@@ -11,15 +11,22 @@
 
     if ($signInUrl) {
         echo '<div class="P">';
-
         echo anchor(t('Login'), signInUrl($this->_Sender->SelfUrl), 'Button Primary SignIn BigButton'.(signInPopup() ? ' SignInPopup' : ''), ['rel' => 'nofollow']);
-       // $Url = registerUrl($this->_Sender->SelfUrl);
-       // if (!empty($Url)) {
-           // echo ' '.anchor(t('Register', t('Apply for Membership', 'Register')), $Url, 'Button ApplyButton', ['rel' => 'nofollow']);
-        // }
-
         echo '</div>';
     }
+
+    $Url = registerUrl($this->_Sender->SelfUrl);
+    if (!empty($Url)) {
+        ?>
+        <p class="SignUpBlock">
+            <span>Don't have an account?</span>
+        <?php
+            echo anchor(t('SIGN UP').sprite('SpArrowRight'), $Url, 'Button SignUp', ['rel' => 'nofollow']);
+        ?>
+        </p>
+      <?php
+    }
+
     ?>
     <?php $this->fireEvent('AfterSignInButton'); ?>
 </div>
