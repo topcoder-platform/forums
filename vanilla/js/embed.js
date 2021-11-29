@@ -1,5 +1,5 @@
 /* eslint-disable */
-export default () => {
+//export default () => {
   if (window.vanilla == undefined) window.vanilla = {};
   window.vanilla_lazy_load = undefined
 
@@ -394,4 +394,4 @@ export default () => {
     error.appendChild(document.createTextNode("Failed to embed Vanilla: " + e));
     document.getElementById("vanilla-comments").appendChild(error);
   }
-};
+//};
