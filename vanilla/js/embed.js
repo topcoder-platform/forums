@@ -134,8 +134,7 @@ window.vanilla.embed = function(host) {
     var iframe = document.getElementById('vanilla' + id);
 
     if (message[0] == 'height') {
-      // FIX: micro-frontends-forums-app #6
-      // setHeight(message[1]);
+      setHeight(message[1]);
 
       if (message[1] > 0) {
         iframe.style.visibility = "visible";
