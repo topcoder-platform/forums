@@ -297,8 +297,7 @@
     vanillaIframe.id = "vanilla" + id;
     vanillaIframe.name = "vanilla" + id;
     vanillaUrl(currentPath);
-    vanillaIframe.src =
-      "https://vanilla.topcoder-dev.com/?remote=https://local.topcoder-dev.com/forums&locale=";
+    //vanillaIframe.src = "https://vanilla.topcoder-dev.com/?remote=https://local.topcoder-dev.com/forums&locale=";
     vanillaIframe.scrolling = "yes";
     vanillaIframe.frameBorder = "0";
     vanillaIframe.allowTransparency = true;
