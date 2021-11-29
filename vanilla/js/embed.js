@@ -276,6 +276,7 @@ window.vanilla.embed = function(host) {
   vanillaIframe.id = "vanilla" + id;
   vanillaIframe.name = "vanilla" + id;
   vanillaIframe.src = vanillaUrl(currentPath);
+  // FIX: micro-frontends-forums-app #6
   vanillaIframe.scrolling = "yes";
   vanillaIframe.frameBorder = "0";
   vanillaIframe.allowTransparency = true;
