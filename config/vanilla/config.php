@@ -1,6 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 
 $Configuration['Garden']['Installed'] = true;
+//Embed
+$Configuration['Garden']['Embed']['Allow'] = true;
+$Configuration['Garden']['Embed']['ForceForum'] = true;
 
 $Configuration['Database']['Name'] = getenv('MYSQL_DATABASE');
 $Configuration['Database']['Host'] = getenv('MYSQL_HOST');
