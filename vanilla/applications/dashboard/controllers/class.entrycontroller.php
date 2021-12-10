@@ -375,10 +375,12 @@ class EntryController extends Gdn_Controller {
             // FIX: micro-frontends-forums-app issues-12
             $isEmbedded = (bool)  c('Garden.Embed.Allow',false);
             $remoteUrl = c("Garden.Embed.RemoteUrl");
-            $targetUrl = rawurlencode(url($target, true));
             if($isEmbedded && is_string( $remoteUrl)) {
                 $targetUrl = rawurlencode($remoteUrl.'/#'.url($target));
+            } else {
+                $targetUrl = rawurlencode(url($target, true));
             }
+
             $url = str_ireplace('{target}', $targetUrl, $url);
 
             if ($this->deliveryType() == DELIVERY_TYPE_ALL && strcasecmp($this->data('Method'), 'POST') != 0) {
@@ -1029,9 +1031,11 @@ class EntryController extends Gdn_Controller {
         // FIX: micro-frontends-forums-app issues-12
         $isEmbedded = (bool)  c('Garden.Embed.Allow',false);
         $remoteUrl = c("Garden.Embed.RemoteUrl");
-        $target = url($this->target(), true);
+
         if($isEmbedded && is_string( $remoteUrl)) {
-            $target = rawurlencode($remoteUrl.'/#'.url($target));
+            $target = rawurlencode($remoteUrl.'/#'.url($this->target()));
+        } else {
+            $target = url($this->target(), true);
         }
 
         if (!isTrustedDomain($target)) {
