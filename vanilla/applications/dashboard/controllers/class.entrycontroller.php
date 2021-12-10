@@ -372,7 +372,14 @@ class EntryController extends Gdn_Controller {
                     throw new Exception("Unknown entry type $type.");
             }
 
-            $url = str_ireplace('{target}', rawurlencode(url($target, true)), $url);
+            // FIX: micro-frontends-forums-app issues-12
+            $isEmbedded = (bool)  c('Garden.Embed.Allow',false);
+            $remoteUrl = c("Garden.Embed.RemoteUrl");
+            $targetUrl = rawurlencode(url($target, true));
+            if($isEmbedded && is_string( $remoteUrl)) {
+                $targetUrl = rawurlencode($remoteUrl.'/#'.url($target));
+            }
+            $url = str_ireplace('{target}', $targetUrl, $url);
 
             if ($this->deliveryType() == DELIVERY_TYPE_ALL && strcasecmp($this->data('Method'), 'POST') != 0) {
                 redirectTo(url($url, true), 302, false);
@@ -1019,7 +1026,14 @@ class EntryController extends Gdn_Controller {
             $this->_setRedirect();
         }
 
+        // FIX: micro-frontends-forums-app issues-12
+        $isEmbedded = (bool)  c('Garden.Embed.Allow',false);
+        $remoteUrl = c("Garden.Embed.RemoteUrl");
         $target = url($this->target(), true);
+        if($isEmbedded && is_string( $remoteUrl)) {
+            $target = rawurlencode($remoteUrl.'/#'.url($target));
+        }
+
         if (!isTrustedDomain($target)) {
             $target = Gdn::router()->getDestination('DefaultController');
         }
