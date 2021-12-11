@@ -71,7 +71,10 @@ $Configuration['Garden']['MobileInputFormatter'] = 'Markdown';
 $Configuration['Garden']['ForceInputFormatter'] = false;
 $Configuration['Garden']['Version'] = 'Undefined';
 $Configuration['Garden']['CanProcessImages'] = true;
-$Configuration['Garden']['Theme'] = 'topcoder';
+// Default Topcoder Theme
+//$Configuration['Garden']['Theme'] = 'topcoder';
+// MFE Topcoder Theme
+$Configuration['Garden']['Theme'] = 'mfe-topcoder';
 $Configuration['Garden']['MobileTheme'] = 'topcoder';
 $Configuration['Garden']['Profile']['EditPhotos'] = false;
 $Configuration['Garden']['SystemUserID'] = '1';
