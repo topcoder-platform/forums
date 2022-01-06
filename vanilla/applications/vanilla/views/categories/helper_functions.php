@@ -191,11 +191,13 @@ if (!function_exists('writeListItem')):
                     <div class="CategoryDescription">
                         <?php echo val('Description', $category) ?>
                     </div>
+                    <?php if(getIncomingValue('embed_type') != 'mfe') { ?>
                     <div class="Challenge">
                         <?php
                             Gdn::controller()->fireEvent('AfterChallenge', ['Category' =>$category]);
                         ?>
                     </div>
+                    <?php  } ?>
                     <div class="Meta">
                         <?php if (val('LastTitle', $category) != '') { ?>
                             <span class="MItem LastDiscussionTitle">

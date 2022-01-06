@@ -155,6 +155,7 @@ window.vanilla.embed = function(host) {
           // Strip off the values that this script added
           currentPath = stripParam(currentPath, 'remote='); // 1
           currentPath = stripParam(currentPath, 'locale='); // 2
+          currentPath = stripParam(currentPath, 'embed_type='); // 3
           // FIX: micro-frontends-forums-app #6
           // window.location.hash = currentPath;
         }
@@ -256,13 +257,30 @@ window.vanilla.embed = function(host) {
       if (typeof(vanilla_title) != 'undefined')
         result += '&title=' + encodeURIComponent(vanilla_title);
     } else {
-      result = '//'
-        + host
-        + path
-        + '&remote='
-        + encodeURIComponent(embedUrl)
-        + '&locale='
-        + encodeURIComponent(embed_locale);
+       var embed_type_result = '';
+       if(embed_type == 'mfe') {
+         embed_type_result = '&embed_type=mfe';
+      }
+      if (typeof (vanilla_category_id) != 'undefined') {
+        result = '//'
+          + host
+          + '/categories/' + encodeURIComponent(vanilla_category_id) + '/?'
+          + 'remote='
+          + encodeURIComponent(embedUrl)
+          + '&locale='
+          + encodeURIComponent(embed_locale)
+          + embed_type_result;
+        vanilla_category_id = undefined;
+      } else {
+        result = '//'
+          + host
+          + path
+          + '&remote='
+          + encodeURIComponent(embedUrl)
+          + '&locale='
+          + encodeURIComponent(embed_locale)
+          + embed_type_result;
+      }
     }
 
     if (window.vanilla_sso) {

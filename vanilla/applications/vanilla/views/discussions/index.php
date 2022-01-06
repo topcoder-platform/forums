@@ -48,7 +48,10 @@ if ($this->data('EnableFollowingFilter')) {
 if($this instanceof CategoriesController) {
     echo discussionSorts();
 }
-echo Gdn_Theme::module('NewDiscussionModule', $this->data('_NewDiscussionProperties', ['CssClass' => 'Button Action Primary']));
+
+if(getIncomingValue('embed_type') != 'mfe') {
+    echo Gdn_Theme::module('NewDiscussionModule', $this->data('_NewDiscussionProperties', ['CssClass' => 'Button Action Primary']));
+}
 echo '</div>';
 echo '<div class="PageControls Top">';
 PagerModule::write($PagerOptions);
@@ -65,7 +68,9 @@ if ($this->DiscussionData->numRows() > 0 || (isset($this->AnnounceData) && is_ob
 
     echo '<div class="PageControls Bottom">';
     PagerModule::write($PagerOptions);
-    echo Gdn_Theme::module('NewDiscussionModule', $this->data('_NewDiscussionProperties', ['CssClass' => 'Button Action Primary']));
+    if(getIncomingValue('embed_type') != 'mfe') {
+        echo Gdn_Theme::module('NewDiscussionModule', $this->data('_NewDiscussionProperties', ['CssClass' => 'Button Action Primary']));
+    }
     echo '</div>';
 
 } else {

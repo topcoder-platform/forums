@@ -3,7 +3,7 @@
 $Configuration['Garden']['Installed'] = true;
 //Embed
 $Configuration['Garden']['Embed']['Allow'] = true;
-$Configuration['Garden']['Embed']['ForceForum'] = true;
+$Configuration['Garden']['Embed']['ForceForum'] = false;
 
 $Configuration['Database']['Name'] = getenv('MYSQL_DATABASE');
 $Configuration['Database']['Host'] = getenv('MYSQL_HOST');
@@ -71,10 +71,8 @@ $Configuration['Garden']['MobileInputFormatter'] = 'Markdown';
 $Configuration['Garden']['ForceInputFormatter'] = false;
 $Configuration['Garden']['Version'] = 'Undefined';
 $Configuration['Garden']['CanProcessImages'] = true;
-// Default Topcoder Theme
-//$Configuration['Garden']['Theme'] = 'topcoder';
-// MFE Topcoder Theme
-$Configuration['Garden']['Theme'] = 'mfe-topcoder';
+// MFE Topcoder Theme 'mfe-topcoder'
+$Configuration['Garden']['Theme'] = 'topcoder';
 $Configuration['Garden']['MobileTheme'] = 'topcoder';
 $Configuration['Garden']['Profile']['EditPhotos'] = false;
 $Configuration['Garden']['SystemUserID'] = '1';
