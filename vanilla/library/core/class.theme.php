@@ -58,6 +58,10 @@ class Gdn_Theme {
      * @return string
      */
     public static function breadcrumbs($data, $homeLink = true, $options = []) {
+        // FIX https://github.com/topcoder-platform/forums/issues/648
+        if(getIncomingValue('embed_type') == 'mfe') {
+            $homeLink = false;
+        }
         $format = '<a href="{Url,html}" itemprop="url"><span itemprop="title">{Name,html}</span></a>';
 
         $result = '';

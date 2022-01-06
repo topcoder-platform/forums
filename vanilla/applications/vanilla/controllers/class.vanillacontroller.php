@@ -95,6 +95,19 @@ class VanillaController extends Gdn_Controller {
         $Category = CategoryModel::categories($CategoryID);
         $ancestors = CategoryModel::getAncestors($CategoryID);
         $parentCategoryID = val('ParentCategoryID', $Category);
+        // FIX https://github.com/topcoder-platform/forums/issues/648
+        if(getIncomingValue('embed_type') == 'mfe') {
+          if(val('GroupID', $Category) > 0) {
+            $temp = [];
+            foreach ($ancestors as $id => $ancestor) {
+                if ($ancestor['GroupID'] > 0) {
+                     $temp[$ancestor['CategoryID']] = $ancestor;
+                }
+            }
+            return $temp;
+          }
+        }
+
         if(val('GroupID', $Category) > 0) {
             $challenge = $this->data('Challenge');
             $track = $challenge ? $challenge['Track']: false;
