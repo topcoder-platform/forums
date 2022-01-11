@@ -70,6 +70,10 @@ if (!function_exists('BookmarkButton')) {
             return '';
         }
 
+        if(hideInMFE()) {
+            return '';
+        }
+
         // Bookmark link
         // FIX : https://github.com/topcoder-platform/forums/issues/577
         // If User is watching a category then show it as bookmarked

@@ -178,7 +178,9 @@ if (!function_exists('writeListItem')):
                 <div class="ItemContent Category">
                     <div class="Options">
                         <?php
-                        echo watchButton($category);
+                        if(!hideInMFE()){
+                            echo watchButton($category);
+                        }
                         echo getOptions($category);
                         ?>
                     </div>
@@ -191,13 +193,9 @@ if (!function_exists('writeListItem')):
                     <div class="CategoryDescription">
                         <?php echo val('Description', $category) ?>
                     </div>
-                    <?php if(getIncomingValue('embed_type') != 'mfe') { ?>
-                    <div class="Challenge">
                         <?php
                             Gdn::controller()->fireEvent('AfterChallenge', ['Category' =>$category]);
                         ?>
-                    </div>
-                    <?php  } ?>
                     <div class="Meta">
                         <?php if (val('LastTitle', $category) != '') { ?>
                             <span class="MItem LastDiscussionTitle">
@@ -537,6 +535,11 @@ if (!function_exists('followButton')) :
      */
     function followButton($categoryID) {
         $output = ' ';
+
+        if(hideInMFE()) {
+            return $output;
+        }
+
         $userID = Gdn::session()->UserID;
         $category = CategoryModel::categories($categoryID);
 

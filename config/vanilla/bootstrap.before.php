@@ -374,6 +374,10 @@ if (!function_exists('watchButton')) {
      * @return string
      */
     function watchButton($category, $isHijackButton = true) {
+        if(hideInMFE()){
+            return '';
+        }
+
         $output = ' ';
         $userID = Gdn::session()->UserID;
         if(is_numeric($category)) {

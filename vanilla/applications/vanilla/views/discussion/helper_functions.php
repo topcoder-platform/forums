@@ -502,11 +502,13 @@ if (!function_exists('getCommentOptions')) :
         );
         $canSelfDelete = ($canEdit && $session->UserID == $comment->InsertUserID && c('Vanilla.Comments.AllowSelfDelete'));
         if ($canDelete || $canSelfDelete) {
-            $options['DeleteComment'] = [
-                'Label' => t('Delete'),
-                'Url' => '/discussion/deletecomment/'.$comment->CommentID.'/'.$session->transientKey().'/?Target='.urlencode("/discussion/{$comment->DiscussionID}/x"),
-                'Class' => 'DeleteComment'
-            ];
+            if(!hideInMFE()) {
+                $options['DeleteComment'] = [
+                    'Label' => t('Delete'),
+                    'Url' => '/discussion/deletecomment/' . $comment->CommentID . '/' . $session->transientKey() . '/?Target=' . urlencode("/discussion/{$comment->DiscussionID}/x"),
+                    'Class' => 'DeleteComment'
+                ];
+            }
         }
 
         // DEPRECATED (as of 2.1)
