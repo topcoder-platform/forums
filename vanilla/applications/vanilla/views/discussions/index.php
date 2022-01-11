@@ -49,7 +49,7 @@ if($this instanceof CategoriesController) {
     echo discussionSorts();
 }
 
-if(getIncomingValue('embed_type') != 'mfe') {
+if(!hideInMFE()) {
     echo Gdn_Theme::module('NewDiscussionModule', $this->data('_NewDiscussionProperties', ['CssClass' => 'Button Action Primary']));
 }
 echo '</div>';
@@ -68,7 +68,7 @@ if ($this->DiscussionData->numRows() > 0 || (isset($this->AnnounceData) && is_ob
 
     echo '<div class="PageControls Bottom">';
     PagerModule::write($PagerOptions);
-    if(getIncomingValue('embed_type') != 'mfe') {
+    if(!hideInMFE()) {
         echo Gdn_Theme::module('NewDiscussionModule', $this->data('_NewDiscussionProperties', ['CssClass' => 'Button Action Primary']));
     }
     echo '</div>';
