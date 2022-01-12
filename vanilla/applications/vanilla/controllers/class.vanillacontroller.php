@@ -102,72 +102,79 @@ class VanillaController extends Gdn_Controller {
         $this->fireEvent('BeforeBuildBreadcrumbs');
         // getIncomingValue('embed_type') == 'mfe'
         if(!$showFullBreadcrumbs) {
+           $temp = [];
           if(val('GroupID', $Category) > 0) {
-            $temp = [];
-            foreach ($ancestors as $id => $ancestor) {
-                if ($ancestor['GroupID'] > 0) {
-                     $temp[$ancestor['CategoryID']] = $ancestor;
-                }
-            }
-            return $temp;
-          }
-        }
-
-        if(val('GroupID', $Category) > 0) {
-            $challenge = $this->data('Challenge');
-            $track = $challenge ? $challenge['Track']: false;
-            $temp = [];
             $GroupCategoryID =  $this->data('Breadcrumbs.Options.GroupCategoryID');
             foreach ($ancestors as $id => $ancestor) {
-                if($ancestor['GroupID'] > 0) {
-                    if($GroupCategoryID == $ancestor['CategoryID']) {// root category for a group
-                        array_push($temp,  ['Name' => $ancestor['Name'], 'Url'=>'/group/'.$ancestor['GroupID']]);
+                if($GroupCategoryID == $ancestor['CategoryID']) {// root category for a group
+                   array_push($temp,  ['Name' => $ancestor['Name'], 'Url'=>'/group/'.$ancestor['GroupID']]);
+                } else if($ancestor['GroupID'] > 0){
+                    $temp[$ancestor['CategoryID']] = $ancestor;
+                }
+            }
+          }
+          if(count($temp) == 1) {
+              return [];
+          }
+          return $temp;
+        } else {
+
+            if (val('GroupID', $Category) > 0) {
+                $challenge = $this->data('Challenge');
+                $track = $challenge ? $challenge['Track'] : false;
+                $temp = [];
+                $GroupCategoryID = $this->data('Breadcrumbs.Options.GroupCategoryID');
+                foreach ($ancestors as $id => $ancestor) {
+                    if ($ancestor['GroupID'] > 0) {
+                        if ($GroupCategoryID == $ancestor['CategoryID']) {// root category for a group
+                            array_push($temp, ['Name' => $ancestor['Name'], 'Url' => '/group/' . $ancestor['GroupID']]);
+                        } else {
+                            $temp[$ancestor['CategoryID']] = $ancestor;
+                        }
                     } else {
-                       $temp[$ancestor['CategoryID']] = $ancestor;
-                   }
-                } else {
-                    if($ancestor['UrlCode'] == self::CHALLENGE_FORUMS_URLCODE) {
-                        array_push($temp,  ['Name' => 'Challenge Forums', 'Url'=>'/groups/mine?filter=challenge']);
-                    }else if($ancestor['UrlCode'] == 'groups') {
-                        array_push($temp,  ['Name' => 'Group Forums', 'Url'=>'/groups/mine?filter=regular']);
-                    } else {
-                        if($track) {
-                            switch ($ancestor['UrlCode']) {
-                                case 'development-forums':
-                                case 'data-science-forums':
-                                case 'design-forums':
-                                    array_push($temp, ['Name' => $track, 'Url'=>'/groups/mine?filter=challenge']);
-                                    break;
-                                default:
-                                    $temp[$ancestor['CategoryID']] = $ancestor;
+                        if ($ancestor['UrlCode'] == self::CHALLENGE_FORUMS_URLCODE) {
+                            array_push($temp, ['Name' => 'Challenge Forums', 'Url' => '/groups/mine?filter=challenge']);
+                        } else if ($ancestor['UrlCode'] == 'groups') {
+                            array_push($temp, ['Name' => 'Group Forums', 'Url' => '/groups/mine?filter=regular']);
+                        } else {
+                            if ($track) {
+                                switch ($ancestor['UrlCode']) {
+                                    case 'development-forums':
+                                    case 'data-science-forums':
+                                    case 'design-forums':
+                                        array_push($temp, ['Name' => $track, 'Url' => '/groups/mine?filter=challenge']);
+                                        break;
+                                    default:
+                                        $temp[$ancestor['CategoryID']] = $ancestor;
+                                }
                             }
                         }
                     }
                 }
-            }
-            return $temp;
-        } else {
-            $urlCode = val('UrlCode', $Category);
-            if($urlCode == self::CHALLENGE_FORUMS_URLCODE) {
-                return $ancestors;
-            }
-
-            // Check if ancestors contains 'challenges-forums'
-            foreach ($ancestors as $id => $ancestor) {
-                if($ancestor['UrlCode'] == self::CHALLENGE_FORUMS_URLCODE) {
+                return $temp;
+            } else {
+                $urlCode = val('UrlCode', $Category);
+                if ($urlCode == self::CHALLENGE_FORUMS_URLCODE) {
                     return $ancestors;
                 }
-            }
 
-            // FIX https://github.com/topcoder-platform/forums/issues/487
-            // Go to a parent category at a home page
-            foreach ($ancestors as $id => $ancestor) {
-                if ($ancestor['ParentCategoryID'] == -1) {
-                     $ancestors[$id]['Url'] = url('/categories/#Category_'.$parentCategoryID, true);
+                // Check if ancestors contains 'challenges-forums'
+                foreach ($ancestors as $id => $ancestor) {
+                    if ($ancestor['UrlCode'] == self::CHALLENGE_FORUMS_URLCODE) {
+                        return $ancestors;
+                    }
                 }
-            }
 
-            return $ancestors;
+                // FIX https://github.com/topcoder-platform/forums/issues/487
+                // Go to a parent category at a home page
+                foreach ($ancestors as $id => $ancestor) {
+                    if ($ancestor['ParentCategoryID'] == -1) {
+                        $ancestors[$id]['Url'] = url('/categories/#Category_' . $parentCategoryID, true);
+                    }
+                }
+
+                return $ancestors;
+            }
         }
     }
 
