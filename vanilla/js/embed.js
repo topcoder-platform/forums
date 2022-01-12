@@ -262,9 +262,13 @@ window.vanilla.embed = function(host) {
          embed_type_result = '&embed_type=mfe';
       }
       if (typeof (vanilla_category_id) != 'undefined') {
+        var default_page = '/group/';
+        if(typeof(vanilla_embed_page) != 'undefined' && (vanilla_embed_page == 'group' || vanilla_embed_page == 'categories') ) {
+             default_page = '/' + vanilla_embed_page + '/';
+        }
         result = '//'
           + host
-          + '/categories/' + encodeURIComponent(vanilla_category_id) + '/?'
+          + default_page + encodeURIComponent(vanilla_category_id) + '/?'
           + 'remote='
           + encodeURIComponent(embedUrl)
           + '&locale='
