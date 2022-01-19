@@ -1,9 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
 
 $Configuration['Garden']['Installed'] = true;
-//Embed
+// Embed
 $Configuration['Garden']['Embed']['Allow'] = true;
 $Configuration['Garden']['Embed']['ForceForum'] = false;
+// Trusted Domains. Specify one domain per line; use * for wildcard matches
+$Configuration['Garden']['TrustedDomains'] = '*.topcoder-dev.com
+*.topcoder.com';
 
 $Configuration['Database']['Name'] = getenv('MYSQL_DATABASE');
 $Configuration['Database']['Host'] = getenv('MYSQL_HOST');
