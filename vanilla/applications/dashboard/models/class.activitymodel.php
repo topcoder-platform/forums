@@ -1054,8 +1054,6 @@ class ActivityModel extends Gdn_Model {
         $email->subject($subject);
         $email->to($user);
 
-        logMessage(__FILE__, __LINE__, 'ActivityModels', '!!!!!!!!!!', "".$activity['Data']['EmailUrl']);
-
         // FIX https://github.com/topcoder-platform/forums/issues/662
         if($activity['Data']['EmailUrl']) {
             $url = $activity['Data']['EmailUrl'];
