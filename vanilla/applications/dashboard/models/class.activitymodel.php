@@ -1054,7 +1054,13 @@ class ActivityModel extends Gdn_Model {
         $email->subject($subject);
         $email->to($user);
 
-        $url = externalUrl(val('Route', $activity) == '' ? '/' : val('Route', $activity));
+        // FIX https://github.com/topcoder-platform/forums/issues/662
+        if($activity['Data']['EmailUrl']) {
+            $url = $activity['Data']['EmailUrl'];
+        } else {
+            $url = externalUrl(val('Route', $activity) == '' ? '/' : val('Route', $activity));
+        }
+
 
         $emailTemplate = $email->getEmailTemplate()
             ->setButton($url, val('ActionText', $activity, t('Check it out')))
@@ -1067,7 +1073,7 @@ class ActivityModel extends Gdn_Model {
         $email->setEmailTemplate($emailTemplate);
 
         // Fire an event for the notification.
-        $notification = ['ActivityID' => $activityID, 'User' => $user, 'Email' => $email, 'Route' => $activity['Route'], 'Story' => $activity['Story'], 'Headline' => $activity['Headline'], 'Activity' => $activity];
+        $notification = ['ActivityID' => $activityID, 'User' => $user, 'Email' => $email, 'EmailUrl'=>$url, 'Route' => $activity['Route'], 'Story' => $activity['Story'], 'Headline' => $activity['Headline'], 'Activity' => $activity];
         $this->EventArguments = $notification;
         $this->fireEvent('BeforeSendNotification');
 
