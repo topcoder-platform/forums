@@ -151,8 +151,6 @@
             <tbody>
             <tr>
                 <td>
-                    {if $email.title}<h1 style='color: {$email.textColor};'>{$email.title}</h1>{/if}
-                    {if $email.lead}<p style='color: {$email.textColor}'>{$email.lead}</p>{/if}
                     <p class="message" style='margin: 0;Margin-bottom: 10px;padding: 0;color: {$email.textColor};text-align: left;margin-top: 10px;
                             margin-bottom: 15px'>{$email.message}</p>
                     {if $email.button}
