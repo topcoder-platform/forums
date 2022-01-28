@@ -96,15 +96,13 @@ class VanillaController extends Gdn_Controller {
         $ancestors = CategoryModel::getAncestors($CategoryID);
         $parentCategoryID = val('ParentCategoryID', $Category);
         // FIX https://github.com/topcoder-platform/forums/issues/648
-
         $showFullBreadcrumbs = true;
         $this->EventArguments['ShowFullBreadcrumbs'] = & $showFullBreadcrumbs;
         $this->fireEvent('BeforeBuildBreadcrumbs');
-        // getIncomingValue('embed_type') == 'mfe'
         if(!$showFullBreadcrumbs) {
            $temp = [];
           if(val('GroupID', $Category) > 0) {
-            $GroupCategoryID =  $this->data('Breadcrumbs.Options.GroupCategoryID');
+            $GroupCategoryID =  $this->data('BreadcrumbsOptionsGroupCategoryID');
             foreach ($ancestors as $id => $ancestor) {
                 if($GroupCategoryID == $ancestor['CategoryID']) {// root category for a group
                    array_push($temp,  ['Name' => $ancestor['Name'], 'Url'=>'/group/'.$ancestor['GroupID']]);
@@ -113,9 +111,6 @@ class VanillaController extends Gdn_Controller {
                 }
             }
           }
-          if(count($temp) == 1) {
-              return [];
-          }
           return $temp;
         } else {
 
@@ -123,7 +118,7 @@ class VanillaController extends Gdn_Controller {
                 $challenge = $this->data('Challenge');
                 $track = $challenge ? $challenge['Track'] : false;
                 $temp = [];
-                $GroupCategoryID = $this->data('Breadcrumbs.Options.GroupCategoryID');
+                $GroupCategoryID = $this->data('BreadcrumbsOptionsGroupCategoryID');
                 foreach ($ancestors as $id => $ancestor) {
                     if ($ancestor['GroupID'] > 0) {
                         if ($GroupCategoryID == $ancestor['CategoryID']) {// root category for a group
