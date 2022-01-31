@@ -4,6 +4,7 @@ $Configuration['Garden']['Installed'] = true;
 // Embed
 $Configuration['Garden']['Embed']['Allow'] = true;
 $Configuration['Garden']['Embed']['ForceForum'] = false;
+$Configuration['Garden']['Embed']['RemoteUrl'] = getenv('VANILLA_ENV') === 'prod'? 'https://platform.topcoder.com':'https://platform.topcoder-dev.com';
 // Trusted Domains. Specify one domain per line; use * for wildcard matches
 $Configuration['Garden']['TrustedDomains'] = '*.topcoder-dev.com
 *.topcoder.com';
