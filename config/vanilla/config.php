@@ -1,6 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
 
 $Configuration['Garden']['Installed'] = true;
+// Embed
+$Configuration['Garden']['Embed']['Allow'] = true;
+$Configuration['Garden']['Embed']['ForceForum'] = false;
+$Configuration['Garden']['Embed']['RemoteUrl'] = getenv('VANILLA_ENV') === 'prod'? 'https://platform.topcoder.com':'https://platform.topcoder-dev.com';
+// Trusted Domains. Specify one domain per line; use * for wildcard matches
+$Configuration['Garden']['TrustedDomains'] = '*.topcoder-dev.com
+*.topcoder.com';
 
 $Configuration['Database']['Name'] = getenv('MYSQL_DATABASE');
 $Configuration['Database']['Host'] = getenv('MYSQL_HOST');
@@ -68,6 +75,7 @@ $Configuration['Garden']['MobileInputFormatter'] = 'Markdown';
 $Configuration['Garden']['ForceInputFormatter'] = false;
 $Configuration['Garden']['Version'] = 'Undefined';
 $Configuration['Garden']['CanProcessImages'] = true;
+// MFE Topcoder Theme 'mfe-topcoder'
 $Configuration['Garden']['Theme'] = 'topcoder';
 $Configuration['Garden']['MobileTheme'] = 'topcoder';
 $Configuration['Garden']['Profile']['EditPhotos'] = false;

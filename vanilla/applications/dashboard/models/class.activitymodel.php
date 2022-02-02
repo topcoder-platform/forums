@@ -1054,10 +1054,21 @@ class ActivityModel extends Gdn_Model {
         $email->subject($subject);
         $email->to($user);
 
-        $url = externalUrl(val('Route', $activity) == '' ? '/' : val('Route', $activity));
+        // FIX https://github.com/topcoder-platform/forums/issues/662
+        if($activity['Data']['EmailUrl']) {
+            $url = $activity['Data']['EmailUrl'];
+        } else {
+            $url = externalUrl(val('Route', $activity) == '' ? '/' : val('Route', $activity));
+        }
 
-        $emailTemplate = $email->getEmailTemplate()
-            ->setButton($url, val('ActionText', $activity, t('Check it out')))
+        $emailTemplate = $email->getEmailTemplate();
+        // Set Custom Email View
+        if($activity['Data']['EmailTemplate']) {
+            $view = strval($activity['Data']['EmailTemplate']);
+            $emailTemplate->setView($view, 'email', 'dashboard');
+        }
+
+        $emailTemplate->setButton($url, val('ActionText', $activity, t('Check it out')))
             ->setTitle($subject);
 
         if ($message = $this->getEmailMessage($activity)) {
@@ -1067,7 +1078,7 @@ class ActivityModel extends Gdn_Model {
         $email->setEmailTemplate($emailTemplate);
 
         // Fire an event for the notification.
-        $notification = ['ActivityID' => $activityID, 'User' => $user, 'Email' => $email, 'Route' => $activity['Route'], 'Story' => $activity['Story'], 'Headline' => $activity['Headline'], 'Activity' => $activity];
+        $notification = ['ActivityID' => $activityID, 'User' => $user, 'Email' => $email, 'EmailUrl'=>$url, 'Route' => $activity['Route'], 'Story' => $activity['Story'], 'Headline' => $activity['Headline'], 'Activity' => $activity];
         $this->EventArguments = $notification;
         $this->fireEvent('BeforeSendNotification');
 
@@ -1090,12 +1101,14 @@ class ActivityModel extends Gdn_Model {
                 }
             }
         } catch (phpmailerException $pex) {
+            logException($pex);
             if ($pex->getCode() == PHPMailer::STOP_CRITICAL && !$email->PhpMailer->isServerError($pex)) {
                 $emailed = self::SENT_FAIL;
             } else {
                 $emailed = self::SENT_ERROR;
             }
         } catch (Exception $ex) {
+            logException($ex);
             switch ($ex->getCode()) {
                 case Gdn_Email::ERR_SKIPPED:
                     $emailed = self::SENT_SKIPPED;
