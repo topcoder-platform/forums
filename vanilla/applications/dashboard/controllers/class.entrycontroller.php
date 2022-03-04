@@ -377,9 +377,9 @@ class EntryController extends Gdn_Controller {
             $remoteUrl = c("Garden.Embed.RemoteUrl");
 
             // FIX Issues-681: signing from Forum
-            $forceEmbed = $this->Request->get('Source', '') != 'forum';
-
-            if($isEmbedded && is_string( $remoteUrl) && $forceEmbed) {
+            //$forceEmbed = $this->Request->get('Source', '') != 'forum';
+            $referer = $_SERVER['HTTP_REFERER'];
+            if($isEmbedded && is_string( $remoteUrl) && $referer != '' && strpos($referer, $remoteUrl) !== false) {
                 $targetUrl = rawurlencode($remoteUrl.'/#'.url($target));
             } else {
                 $targetUrl = rawurlencode(url($target, true));
