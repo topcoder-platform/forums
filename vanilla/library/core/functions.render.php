@@ -1729,7 +1729,8 @@ if (!function_exists('signInUrl')) {
             $target = '' ;
        }
 
-        return '/entry/signin'.($target ? '?Target='.urlencode($target) : '');
+        // FIX Issues-681: signing from Forum
+        return '/entry/signin'.($target ? '?Source=forum&Target='.urlencode($target) : '?Source=forum');
     }
 }
 
