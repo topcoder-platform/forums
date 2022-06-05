@@ -375,7 +375,11 @@ class EntryController extends Gdn_Controller {
             // FIX: micro-frontends-forums-app issues-12
             $isEmbedded = (bool)  c('Garden.Embed.Allow',false);
             $remoteUrl = c("Garden.Embed.RemoteUrl");
-            if($isEmbedded && is_string( $remoteUrl)) {
+
+            // FIX Issues-681: signing from Forum
+            //$forceEmbed = $this->Request->get('Source', '') != 'forum';
+            $referer = $_SERVER['HTTP_REFERER'];
+            if($isEmbedded && is_string( $remoteUrl) && $referer != '' && strpos($referer, $remoteUrl) !== false) {
                 $targetUrl = rawurlencode($remoteUrl.'/#'.url($target));
             } else {
                 $targetUrl = rawurlencode(url($target, true));
