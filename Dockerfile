@@ -57,9 +57,11 @@ RUN git clone --branch mfe https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platfo
 RUN cp -r /tmp/forums-plugins/. /vanillapp/plugins
 
 # Get the debug bar plugin
-RUN wget https://us.v-cdn.net/5018160/uploads/addons/KSBIPJYMC0F2.zip
-RUN unzip KSBIPJYMC0F2.zip
-RUN cp -r debugbar /vanillapp/plugins
+RUN if [ "$ENV" = "dev" ]; then \
+    wget https://us.v-cdn.net/5018160/uploads/addons/KSBIPJYMC0F2.zip; \
+    unzip KSBIPJYMC0F2.zip; \
+    cp -r debugbar /vanillapp/plugins; \
+fi
 
 # Install Topcoder dependencies
 RUN composer install --working-dir /vanillapp/plugins/Topcoder
