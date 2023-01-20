@@ -24,6 +24,9 @@ $Configuration['Cache']['Memcached']['Store']=[getenv('MEMCACHED_SERVER')];
 $Configuration['Conversations']['Version'] = '3.0';
 $Configuration['Conversations']['Moderation']['Allow'] = true;
 
+// all handles of users with this role will be displayed in purple
+$Configuration['ColorizedRole']='MIT_6.S099 Admin';
+
 // EnabledApplications
 $Configuration['EnabledApplications']['Conversations'] = 'conversations';
 $Configuration['EnabledApplications']['Vanilla'] = 'vanilla';
