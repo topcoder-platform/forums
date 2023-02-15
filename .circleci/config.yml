@@ -57,6 +57,17 @@ jobs:
       TIDEWAYS_ENV: "dev"
     steps: *builddeploy_steps
 
+  "build-qa":
+    <<: *defaults
+    environment:
+      DEPLOY_ENV: "QA"
+      LOGICAL_ENV: "qa"
+      APPNAME: "vanilla-forums"
+      CI_DEPLOY_TOKEN: $CI_DEPLOY_TOKEN
+      BRANCH: "qa"
+      TIDEWAYS_ENV: "dev"
+    steps: *builddeploy_steps
+
   "build-prod":
     <<: *defaults
     environment:
@@ -80,6 +91,13 @@ workflows:
               only:
                 - develop
 
+      - "build-qa":
+          context : org-global
+          filters:
+            branches:
+              only:
+                - qa
+                
       # Production builds are exectuted only on tagged commits to the
       # master branch.
       - "build-prod":
