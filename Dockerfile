@@ -35,34 +35,18 @@ RUN git clone --branch ${BRANCH} https://${CI_DEPLOY_TOKEN}@github.com/topcoder-
 
 # Copy the forum-theme repository
 RUN git clone --branch ${BRANCH} https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-theme.git /vanillapp/themes/topcoder
+
 RUN git clone --branch mfe https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-theme.git /vanillapp/themes/mfe-topcoder
-
-# Remove DebugPlugin from PROD env
-# RUN if [ "$ENV" = "prod" ]; \
-#    then rm -R /tmp/forums-plugins/DebugPlugin; \
-#    fi
-
-# Copy the Filestack plugin
-RUN git clone https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-filestack-plugin /tmp/forums-plugins/Filestack
-
-#Copy the Groups plugin
-RUN git clone https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-groups-plugin /tmp/forums-plugins/Groups
-
-#Copy the SumoLogic plugin
-RUN git clone https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-sumologic-plugin /tmp/forums-plugins/Sumologic
-
-#Copy the TopcoderEditor plugin
-RUN git clone https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-topcoder-editor-plugin /tmp/forums-plugins/TopcoderEditor
 
 # Copy all plugins to the Vanilla plugins folder
 RUN cp -r /tmp/forums-plugins/. /vanillapp/plugins
 
 #Get the debug bar plugin
-RUN if [ "$ENV" = "dev" ]; then \
-    wget https://us.v-cdn.net/5018160/uploads/addons/KSBIPJYMC0F2.zip; \
-    unzip KSBIPJYMC0F2.zip; \
-    cp -r debugbar /vanillapp/plugins; \
-fi
+#RUN if [ "$ENV" = "dev" ]; then \
+#    wget https://us.v-cdn.net/5018160/uploads/addons/KSBIPJYMC0F2.zip; \
+#    unzip KSBIPJYMC0F2.zip; \
+#    cp -r debugbar /vanillapp/plugins; \
+#fi
 
 # Install Topcoder dependencies
 RUN composer install --working-dir /vanillapp/plugins/Topcoder
