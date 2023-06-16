@@ -2112,11 +2112,6 @@ class Gdn_Controller extends Gdn_Pluggable {
             \Vanilla\Web\CacheControlMiddleware::sendCacheControlHeaders($this->_Headers['Cache-Control']);
         }
 
-        // FIX: https://github.com/topcoder-platform/forums/issues/381
-        if (class_exists('Tideways\Profiler')) {
-            safeHeader("Server-Timing: ".\Tideways\Profiler::generateServerTimingHeaderValue(), true);
-        }
-
         // Empty the collection after sending
         $this->_Headers = [];
     }
