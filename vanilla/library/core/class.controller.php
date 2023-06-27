@@ -1733,10 +1733,6 @@ class Gdn_Controller extends Gdn_Pluggable {
      * @param Exception $ex The exception to render.
      */
     public function renderException($ex) {
-        // FIX: https://github.com/topcoder-platform/forums/issues/570
-        if (class_exists('Tideways\Profiler')) {
-            \Tideways\Profiler::logException($ex);
-        }
         if ($this->deliveryMethod() == DELIVERY_METHOD_XHTML) {
             try {
                 // Pick our route.
@@ -2114,11 +2110,6 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         if (!empty($this->_Headers['Cache-Control'])) {
             \Vanilla\Web\CacheControlMiddleware::sendCacheControlHeaders($this->_Headers['Cache-Control']);
-        }
-
-        // FIX: https://github.com/topcoder-platform/forums/issues/381
-        if (class_exists('Tideways\Profiler')) {
-            safeHeader("Server-Timing: ".\Tideways\Profiler::generateServerTimingHeaderValue(), true);
         }
 
         // Empty the collection after sending

@@ -204,7 +204,8 @@ if (!function_exists('writeListItem')):
                         <?php  } else { ?>
                             <span class="MItem"></span>
                         <?php };
-                        if ($writeChildren === 'list'): ?>
+                        $show = false;
+                        if ($show && $writeChildren === 'list'): ?>
                             <div class="ChildCategories">
                                 <?php echo wrap(t('Child Categories').': ', 'b'); ?>
                                 <?php echo categoryString($children, $depth + 1); ?>
