@@ -6,7 +6,7 @@ install_dependency: &install_dependency
   name: Installation of build and deployment dependencies.
   command: |
     pip3 install awscli --upgrade
-  install_deploysuite: &install_deploysuite
+install_deploysuite: &install_deploysuite
   name: Installation of install_deploysuite.
   command: |
     git clone --branch v1.4.17 https://github.com/topcoder-platform/tc-deploy-scripts ../buildscript
