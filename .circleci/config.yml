@@ -1,7 +1,7 @@
 version: 2
 defaults: &defaults
-    docker:
-      - image: cimg/python:3.11.0-browsers
+  docker:
+    - image: cimg/python:3.11.0-browsers
 install_dependency: &install_dependency
   name: Installation of build and deployment dependencies.
   command: |
@@ -9,6 +9,7 @@ install_dependency: &install_dependency
     sudo apt update
     sudo apt install python3-pip
     sudo pip3 install awscli --upgrade
+    sudo pip3 install docker==6.1.3
     sudo pip3 install docker-compose
 install_deploysuite: &install_deploysuite
   name: Installation of install_deploysuite.
@@ -26,22 +27,21 @@ save_cache_settings: &save_cache_settings
     - node_modules
 
 builddeploy_steps: &builddeploy_steps
-      - checkout
-      - setup_remote_docker
-      - run: *install_dependency
-      - run: *install_deploysuite
-      #- restore_cache: *restore_cache_settings_for_build
-      - run: ./build.sh ${APPNAME} ${CI_DEPLOY_TOKEN} ${LOGICAL_ENV} ${BRANCH}
-      #- save_cache: *save_cache_settings
-      - deploy:
-          name: Running MasterScript.
-          command: |
-            ./awsconfiguration.sh $DEPLOY_ENV
-            source awsenvconf
-            ./buildenv.sh -e $DEPLOY_ENV -b ${LOGICAL_ENV}-${APPNAME}-deployvar
-            source buildenvvar
-            ./master_deploy.sh -d ECS -e $DEPLOY_ENV -t latest -s ${LOGICAL_ENV}-global-appvar,${LOGICAL_ENV}-${APPNAME}-appvar -i ${APPNAME}
-
+  - checkout
+  - setup_remote_docker
+  - run: *install_dependency
+  - run: *install_deploysuite
+  #- restore_cache: *restore_cache_settings_for_build
+  - run: ./build.sh ${APPNAME} ${CI_DEPLOY_TOKEN} ${LOGICAL_ENV} ${BRANCH}
+  #- save_cache: *save_cache_settings
+  - deploy:
+      name: Running MasterScript.
+      command: |
+        ./awsconfiguration.sh $DEPLOY_ENV
+        source awsenvconf
+        ./buildenv.sh -e $DEPLOY_ENV -b ${LOGICAL_ENV}-${APPNAME}-deployvar
+        source buildenvvar
+        ./master_deploy.sh -d ECS -e $DEPLOY_ENV -t latest -s ${LOGICAL_ENV}-global-appvar,${LOGICAL_ENV}-${APPNAME}-appvar -i ${APPNAME}
 
 jobs:
   # Build & Deploy against development backend
@@ -60,7 +60,7 @@ jobs:
     <<: *defaults
     environment:
       DEPLOY_ENV: "PROD"
-      LOGICAL_ENV: "prod"    
+      LOGICAL_ENV: "prod"
       APPNAME: "vanilla-forums"
       CI_DEPLOY_TOKEN: $CI_DEPLOY_TOKEN
       BRANCH: "master"
@@ -72,7 +72,7 @@ workflows:
     jobs:
       # Development builds are executed on "develop" branch only.
       - "build-dev":
-          context : org-global
+          context: org-global
           filters:
             branches:
               only:
@@ -81,7 +81,7 @@ workflows:
       # Production builds are exectuted only on tagged commits to the
       # master branch.
       - "build-prod":
-          context : org-global
+          context: org-global
           filters:
             branches:
               only: master
