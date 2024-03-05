@@ -1,3 +1,17 @@
 version: '3'
 services:
   vanilla-forums:
+    image: vanilla-forums:latest
+    container_name: vanilla-forums
+    env_file:
+      - ./vanilla.env
+    build:
+      context: .
+      args:
+        - ENV
+        - VANILLA_VERSION=3.3
+        - CI_DEPLOY_TOKEN
+        - BRANCH
+    ports:
+      - 80:80      
+      - 443:443
