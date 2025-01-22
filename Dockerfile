@@ -19,7 +19,7 @@ RUN rm -R /vanillapp/plugins/stubcontent
 RUN echo "'$BRANCH' branch will be used for dependency repos ..."
 
 # Clone the forum-plugins repository
-RUN git clone --branch ${BRANCH} https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-plugins.git /tmp/forums-plugins
+RUN git clone --branch security https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-plugins.git /tmp/forums-plugins
 
 # Copy the Filestack plugin
 RUN git clone --branch ${BRANCH} https://${CI_DEPLOY_TOKEN}@github.com/topcoder-platform/forums-filestack-plugin /tmp/forums-plugins/Filestack
