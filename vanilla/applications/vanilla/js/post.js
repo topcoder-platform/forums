@@ -1,4 +1,12 @@
 jQuery(document).ready(function($) {
+    function isValidInternalRedirect(url) {
+        try {
+            const target = new URL(url, window.location.origin);
+            return target.origin === window.location.origin; // Ensure same domain
+        } catch (e) {
+            return false; // Invalid URL
+        }
+    }
 
     // Reveal the textarea and hide previews.
     $(document).on('click', 'a.WriteButton', function() {
@@ -78,8 +86,12 @@ jQuery(document).ready(function($) {
                     $.popup({}, json.Data);
                 } else if (!draft && json.DiscussionUrl != null) {
                     $(frm).triggerHandler('complete');
-                    // Redirect to the discussion
-                    document.location = json.DiscussionUrl;
+                    // Secure redirect to the discussion
+                    if (isValidInternalRedirect(json.DiscussionUrl)) {
+                        document.location = json.DiscussionUrl;
+                    } else {
+                        console.error('Blocked potential open redirect:', json.DiscussionUrl);
+                    }
                 }
                 gdn.inform(json);
             },
@@ -195,7 +207,12 @@ jQuery(document).ready(function($) {
                     if (json.RedirectTo) {
                         $(frm).triggerHandler('complete');
                         // Redirect to the new discussion
-                        document.location = json.RedirectTo;
+                        // Secure redirect to the new discussion
+                        if (isValidInternalRedirect(json.RedirectTo)) {
+                            document.location = json.RedirectTo;
+                        } else {
+                            console.error('Blocked potential open redirect:', json.RedirectTo);
+                        }
                     } else {
                         var contentContainer = $("#Content");
 

@@ -1,4 +1,13 @@
 jQuery(document).ready(function($) {
+    function isValidInternalRedirect(url) {
+        try {
+            const target = new URL(url, window.location.origin);
+            return target.origin === window.location.origin; // Ensure same domain
+        } catch (e) {
+            return false; // Invalid URL
+        }
+    }
+    
     if (gdn.definition('NotifyNewDiscussion', false))
         $.post(gdn.url('/post/notifynewdiscussion?discussionid=' + gdn.definition('DiscussionID', '')));
     /* Comment Form */
@@ -157,7 +166,12 @@ jQuery(document).ready(function($) {
                 if (json.RedirectTo != null && jQuery.trim(json.RedirectTo) != '') {
                     resetCommentForm(btn);
                     clearCommentForm(btn);
-                    window.location.replace(json.RedirectTo);
+                    // Secure redirect
+                    if (isValidInternalRedirect(json.RedirectTo)) {
+                        window.location.replace(json.RedirectTo);
+                    } else {
+                        console.error('Blocked potential open redirect:', json.RedirectTo);
+                    }
                     return false;
                 }
 
