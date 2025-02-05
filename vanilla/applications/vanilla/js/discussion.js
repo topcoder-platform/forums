@@ -179,7 +179,7 @@ jQuery(document).ready(function($) {
                 if (!draft && json.FormSaved == true)
                     $('div.Popup,.Overlay').remove();
 
-                var commentID = json.CommentID;
+                var commentID = DOMPurify.sanitize(json.CommentID);
                 var parentCommentID = json.ParentCommentID;
 
                 // Assign the comment id to the form if it was defined
@@ -262,7 +262,7 @@ jQuery(document).ready(function($) {
                     // Set the discussionid on the form in case the discussion was created by adding the last comment
                     var discussionID = $(frm).find('[name$=DiscussionID]');
                     if (discussionID.length == 0 && json.DiscussionID) {
-                        $(frm).append('<input type="hidden" name="' + prefix + 'DiscussionID" value="' + json.DiscussionID + '">');
+                        $(frm).append('<input type="hidden" name="' + DOMPurify.sanitize(prefix) + 'DiscussionID" value="' + DOMPurify.sanitize(json.DiscussionID) + '">');
                     }
 
                     // Let listeners know that the comment was added.

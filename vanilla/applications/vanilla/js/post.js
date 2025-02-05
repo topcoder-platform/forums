@@ -79,7 +79,7 @@ jQuery(document).ready(function($) {
                 $(frm).find('div.Errors').remove();
 
                 if (json.FormSaved == false) {
-                    $(frm).prepend(json.ErrorMessages);
+                    $(frm).prepend(DOMPurify.sanitize(json.ErrorMessages));
                     json.ErrorMessages = null;
                 } else if (preview) {
                     // Pop up the new preview.
