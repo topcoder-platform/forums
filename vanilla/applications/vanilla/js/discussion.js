@@ -198,20 +198,21 @@ jQuery(document).ready(function($) {
                     } else {
                        $('li#MyDrafts').addClass('hidden');
                     }
-                    $('li#MyDrafts a').html(countMyDraftsHtml);
+                    $('li#MyDrafts a').html(DOMPurify.sanitize(countMyDraftsHtml));
                 }
 
+                const sanitizedResponseData = DOMPurify.sanitize(json.Data);
                 // Remove any old errors from the form
                 $(frm).find('div.Errors').remove();
                 if (json.FormSaved == false) {
-                    $(frm).prepend(json.ErrorMessages);
+                    $(frm).prepend(DOMPurify.sanitize(json.ErrorMessages));
                     json.ErrorMessages = null;
                 } else if (preview) {
                     // Reveal the "Edit" button and hide this one
                     $(btn).hide();
                     $(parent).find('.WriteButton').removeClass('Hidden');
 
-                    $(frm).find('.TextBoxWrapper').hide().afterTrigger(json.Data);
+                    $(frm).find('.TextBoxWrapper').hide().afterTrigger(sanitizedResponseData);
                     $(frm).trigger('PreviewLoaded', [frm]);
 
                 } else if (!draft) {
@@ -229,7 +230,7 @@ jQuery(document).ready(function($) {
                         // Don't do anything with the data b/c it's already been handled by processTargets
                     } else if (existingCommentRows.length > 0) {
                         existingCommentRows.each(function(i, element) {
-                            $(element).afterTrigger(json.Data);
+                            $(element).afterTrigger(sanitizedResponseData);
                             $(element).remove();
                             $(element).effect("highlight", {}, "slow");
                         });
@@ -237,18 +238,18 @@ jQuery(document).ready(function($) {
                         gdn.definition('LastCommentID', commentID, true);
                         // If adding a new comment, show all new comments since the page last loaded, including the new one.
                         if (gdn.definition('PrependNewComments') == '1') {
-                            $(json.Data).prependTo('ul.Comments,.DiscussionTable');
+                            $(sanitizedResponseData).prependTo('ul.Comments,.DiscussionTable');
                             $('ul.Comments li:first').effect("highlight", {}, "slow");
                         } else {
                             var viewMode = json['ReplyTo.ViewMode'];
                             if(viewMode === 'threaded') {
                                 item = $('ul.Comments');
                                 $('ul.Comments li').remove();
-                                $(item).append(json.Data)
+                                $(item).append(sanitizedResponseData)
                                   //.effect("highlight", {}, "slow")
                                   .trigger('contentLoad');
                             } else {
-                                $(json.Data)
+                                $(sanitizedResponseData)
                                   .appendTo('ul.Comments,.DiscussionTable')
                                   //.effect("highlight", {}, "slow")
                                   .trigger('contentLoad');
@@ -376,7 +377,7 @@ jQuery(document).ready(function($) {
                     gdn.informError(xhr);
                 },
                 success: function(json) {
-                    $(msg).afterTrigger(json.Data);
+                    $(msg).afterTrigger(DOMPurify.sanitize(json.Data));
                     $(msg).hide();
                     $(commentControls).hide();
                     $(document).trigger('EditCommentFormLoaded', [container]);
@@ -466,7 +467,7 @@ jQuery(document).ready(function($) {
                 if(viewMode === 'threaded') {
                     item = $('ul.Comments');
                     $('ul.Comments li').remove();
-                    $(item).append(json.Data);
+                    $(item).append(DOMPurify.sanitize(json.Data));
                       //.effect("highlight", {}, "slow");
                 }
 

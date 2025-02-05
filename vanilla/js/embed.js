@@ -9,7 +9,7 @@ window.vanilla.embed = function(host) {
     id = Math.floor((Math.random()) * 100000).toString(),
     embedUrl = window.location.href.split('#')[0],
     jsPath = '/js/embed.js',
-    currentPath = window.location.hash.substr(1),
+    currentPath = DOMPurify.sanitize(window.location.hash.substr(1)),
     disablePath = (window != top);
 
   var optStr = function(name, defaultValue, definedValue) {
@@ -94,7 +94,7 @@ window.vanilla.embed = function(host) {
   }
 
   checkHash = function() {
-    var path = window.location.hash.substr(1) || "/";
+    var path = DOMPurify.sanitize(window.location.hash.substr(1) || "/");
     if (path != currentPath) {
       currentPath = path;
       window.frames['vanilla' + id].location.replace(vanillaUrl(path));
@@ -149,7 +149,7 @@ window.vanilla.embed = function(host) {
       if (disablePath) {
         //currentPath = cmd[1];
       } else {
-        currentPath = window.location.hash.substr(1);
+        currentPath = DOMPurify.sanitize(window.location.hash.substr(1));
         if (currentPath != message[1]) {
           currentPath = message[1];
           // Strip off the values that this script added
@@ -175,7 +175,7 @@ window.vanilla.embed = function(host) {
     } else if (message[0] == 'scrollto') {
       window.scrollTo(0, document.getElementById('vanilla' + id).offsetTop - 40 + (message[1] * 1));
     } else if (message[0] == 'unembed') {
-      document.location = 'http://' + host + window.location.hash.substr(1);
+      document.location = 'http://' + host + DOMPurify.sanitize(window.location.hash.substr(1));
     }
   }
 
@@ -296,7 +296,7 @@ window.vanilla.embed = function(host) {
   var vanillaIframe = document.createElement('iframe');
   vanillaIframe.id = "vanilla" + id;
   vanillaIframe.name = "vanilla" + id;
-  vanillaIframe.src = vanillaUrl(currentPath);
+  vanillaIframe.src = vanillaUrl(DOMPurify.sanitize(currentPath));
   // FIX: micro-frontends-forums-app #6
   vanillaIframe.scrolling = "yes";
   vanillaIframe.frameBorder = "0";
