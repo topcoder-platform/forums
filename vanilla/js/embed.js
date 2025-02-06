@@ -1,3 +1,10 @@
+function getSecureRandomNumberString(length) {
+  length = length || 5;
+  const array = new Uint32Array(1);
+  window.crypto.getRandomValues(array);
+  return (array[0] % (10 ** length)).toString().padStart(length, '0');
+}
+
 if (window.vanilla == undefined)
   window.vanilla = {};
 
@@ -6,7 +13,7 @@ if (window.vanilla.embeds == undefined)
 
 window.vanilla.embed = function(host) {
   var scripts = document.getElementsByTagName('script'),
-    id = Math.floor((Math.random()) * 100000).toString(),
+    id = getSecureRandomNumberString(6),
     embedUrl = window.location.href.split('#')[0],
     jsPath = '/js/embed.js',
     currentPath = window.location.hash.substr(1),
