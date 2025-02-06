@@ -11,6 +11,14 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 */
 
 (function($) {
+  function isValidInternalRedirect(url) {
+    try {
+        const target = new URL(url, window.location.origin);
+        return target.origin === window.location.origin; // Ensure same domain
+    } catch (e) {
+        return false; // Invalid URL
+    }
+  }
 
   // Allows generating a popup by jQuery.popup('contents')
   $.popup = function(options, data) {
@@ -218,8 +226,9 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
               gdn.inform(json);
               gdn.processTargets(json.Targets);
 
-              if (json.RedirectUrl)
+              if (json.RedirectUrl && isValidInternalRedirect(json.RedirectUrl)) {
                 setTimeout(function() { document.location.replace(json.RedirectUrl); }, 300);
+              }
             }
           });
         }
@@ -334,7 +343,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
         // Ajax the link into the current popup.
         $.get($(this).attr('href'), {'DeliveryType': settings.deliveryType}, function(data, textStatus, xhr) {
           if (typeof(data) == 'object') {
-            if (data.RedirectUrl)
+            if (data.RedirectUrl && isValidInternalRedirect(data.RedirectUrl))
               setTimeout(function() { document.location.replace(data.RedirectUrl); }, 300);
           }
           $.popup.reveal(settings, data);
