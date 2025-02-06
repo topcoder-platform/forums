@@ -890,6 +890,13 @@ paths:
         - Categories
       summary: Get a category.
 components:
+  # use Bearer Token authentication for Vanilla Forums
+  # See: https://success.vanillaforums.com/kb/articles/122-authenticating-api-v2-calls-with-jwt
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   requestBodies:
     CategoryPost:
       content:
@@ -936,3 +943,5 @@ components:
       - name
       - urlcode
       type: object
+security:
+  - BearerAuth: []
