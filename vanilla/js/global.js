@@ -988,7 +988,8 @@ jQuery(document).ready(function($) {
                         informMessages.prependTrigger('<div class="' + css + '"' + elementId + '>' + message + '</div>');
                         // Is there a callback or callback url to request on dismiss of the inform message?
                         if (dismissCallback) {
-                            $('div.InformWrapper:first').find('a.Close').click(eval(dismissCallback));
+                            $('div.InformWrapper:first').find('a.Close').click();
+                            console.error('Not evaluating dismissCallback', dismissCallback);
                         } else if (dismissCallbackUrl) {
                             dismissCallbackUrl = dismissCallbackUrl.replace(/{TransientKey}/g, gdn.definition('TransientKey'));
                             var closeAnchor = $('div.InformWrapper:first').find('a.Close');
