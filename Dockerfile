@@ -1,4 +1,4 @@
-FROM webdevops/php-apache:8.0
+FROM webdevops/php-apache:ubuntu-18.04
 
 ARG CI_DEPLOY_TOKEN
 ARG VANILLA_VERSION=3.3
