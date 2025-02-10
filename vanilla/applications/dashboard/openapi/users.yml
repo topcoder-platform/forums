@@ -690,6 +690,13 @@ paths:
         required: true
       summary: Update notification preferences for current user.
 components:
+  # use Bearer Token authentication for Vanilla Forums
+  # See: https://success.vanillaforums.com/kb/articles/122-authenticating-api-v2-calls-with-jwt
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     User:
       properties:
@@ -953,3 +960,5 @@ components:
         required:
           - GeneralPreferences
           - CategoryPreferences
+security:
+  - BearerAuth: []

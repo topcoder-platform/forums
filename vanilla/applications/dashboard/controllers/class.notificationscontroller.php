@@ -23,6 +23,7 @@ class NotificationsController extends Gdn_Controller {
         $this->addJsFile('jquery.js');
         $this->addJsFile('jquery.form.js');
         $this->addJsFile('jquery.popup.js');
+        $this->addJsFile('purify.min.js');
         $this->addJsFile('jquery.gardenhandleajaxform.js');
         $this->addJsFile('global.js');
         $this->addCssFile('style.css');

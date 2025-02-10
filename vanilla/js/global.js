@@ -128,7 +128,7 @@
      */
     var funcTrigger = function(func, html) {
         this.each(function() {
-            var $elem = $($.parseHTML(html + '')); // Typecast html to a string and create a DOM node
+            var $elem = $($.parseHTML(DOMPurify.sanitize(html) + '')); // Typecast html to a string and create a DOM node
             $(this)[func]($elem);
             $elem.trigger('contentLoad');
         });
@@ -787,7 +787,7 @@ jQuery(document).ready(function($) {
                 url: gdn.url(url),
                 data: {DeliveryType: 'VIEW'},
                 success: function(data) {
-                    $elem.html($.parseHTML(data + '')).trigger('contentLoad');
+                    $elem.html($.parseHTML(DOMPurify.sanitize(data) + '')).trigger('contentLoad');
                 },
                 complete: function() {
                     $elem.removeClass('Progress TinyProgress InProgress');
@@ -931,16 +931,16 @@ jQuery(document).ready(function($) {
         for (var i = 0; i < response.InformMessages.length; i++) {
             css = 'InformWrapper';
             if (response.InformMessages[i].CssClass)
-                css += ' ' + response.InformMessages[i].CssClass;
+                css += ' ' + DOMPurify.sanitize(response.InformMessages[i].CssClass);
 
             elementId = '';
             if (response.InformMessages[i].id)
-                elementId = response.InformMessages[i].id;
+                elementId = DOMPurify.sanitize(response.InformMessages[i].id);
 
             sprite = '';
             if (response.InformMessages[i].Sprite) {
                 css += ' HasSprite';
-                sprite = response.InformMessages[i].Sprite;
+                sprite = DOMPurify.sanitize(response.InformMessages[i].Sprite);
             }
 
             dismissCallback = response.InformMessages[i].DismissCallback;
@@ -949,7 +949,7 @@ jQuery(document).ready(function($) {
                 dismissCallbackUrl = gdn.url(dismissCallbackUrl);
 
             try {
-                var message = response.InformMessages[i].Message;
+                var message = DOMPurify.sanitize(response.InformMessages[i].Message);
                 var emptyMessage = message === '';
 
                 message = '<span class="InformMessageBody">' + message + '</span>';
@@ -971,7 +971,7 @@ jQuery(document).ready(function($) {
                     message = message.replace(/{SelfUrl}/g, gdn.getMeta('SelfUrl'));
                 } else {
                     // Insert the current url as a target for inform anchors
-                    message = message.replace(/{SelfUrl}/g, document.URL);
+                    message = message.replace(/{SelfUrl}/g, DOMPurify.sanitize(document.URL));
                 }
                 var skip = false;
                 for (var j = 0; j < wrappers.length; j++) {
@@ -988,7 +988,8 @@ jQuery(document).ready(function($) {
                         informMessages.prependTrigger('<div class="' + css + '"' + elementId + '>' + message + '</div>');
                         // Is there a callback or callback url to request on dismiss of the inform message?
                         if (dismissCallback) {
-                            $('div.InformWrapper:first').find('a.Close').click(eval(dismissCallback));
+                            $('div.InformWrapper:first').find('a.Close').click();
+                            console.error('Not evaluating dismissCallback', dismissCallback);
                         } else if (dismissCallbackUrl) {
                             dismissCallbackUrl = dismissCallbackUrl.replace(/{TransientKey}/g, gdn.definition('TransientKey'));
                             var closeAnchor = $('div.InformWrapper:first').find('a.Close');
@@ -1000,7 +1001,7 @@ jQuery(document).ready(function($) {
                                     data: 'TransientKey=' + gdn.definition('TransientKey'),
                                     dataType: 'json',
                                     error: function(XMLHttpRequest, textStatus, errorThrown) {
-                                        gdn.informMessage(XMLHttpRequest.responseText, 'Dismissable AjaxError');
+                                        gdn.informMessage(DOMPurify.sanitize(XMLHttpRequest.responseText), 'Dismissable AjaxError');
                                     },
                                     success: function(json) {
                                         gdn.inform(json);
@@ -1043,7 +1044,7 @@ jQuery(document).ready(function($) {
         if (typeof(xhr) == 'string')
             xhr = {responseText: xhr, code: 500};
 
-        var message = xhr.responseText;
+        var message = DOMPurify.sanitize(xhr.responseText);
         var code = xhr.status;
 
         if (!message) {
@@ -1127,10 +1128,6 @@ jQuery(document).ready(function($) {
         $('.NotificationsAlert').remove();
     });
 
-    $(document).on('change', '.js-nav-dropdown', function() {
-        window.location = $(this).val();
-    });
-
     // Stash something in the user's session (or unstash the value if it was not provided)
     var stash = function(name, value, callback) {
         $.ajax({
@@ -1139,7 +1136,7 @@ jQuery(document).ready(function($) {
             data: {'TransientKey': gdn.definition('TransientKey'), 'Name': name, 'Value': value},
             dataType: 'json',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-                gdn.informMessage(XMLHttpRequest.responseText, 'Dismissable AjaxError');
+                gdn.informMessage(DOMPurify.sanitize(XMLHttpRequest.responseText), 'Dismissable AjaxError');
             },
             success: function(json) {
                 gdn.inform(json);

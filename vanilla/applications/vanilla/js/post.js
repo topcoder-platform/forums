@@ -1,4 +1,12 @@
 jQuery(document).ready(function($) {
+    function isValidInternalRedirect(url) {
+        try {
+            const target = new URL(url, window.location.origin);
+            return target.origin === window.location.origin; // Ensure same domain
+        } catch (e) {
+            return false; // Invalid URL
+        }
+    }
 
     // Reveal the textarea and hide previews.
     $(document).on('click', 'a.WriteButton', function() {
@@ -71,15 +79,19 @@ jQuery(document).ready(function($) {
                 $(frm).find('div.Errors').remove();
 
                 if (json.FormSaved == false) {
-                    $(frm).prepend(json.ErrorMessages);
+                    $(frm).prepend(DOMPurify.sanitize(json.ErrorMessages));
                     json.ErrorMessages = null;
                 } else if (preview) {
                     // Pop up the new preview.
-                    $.popup({}, json.Data);
+                    $.popup({}, DOMPurify.sanitize(json.Data));
                 } else if (!draft && json.DiscussionUrl != null) {
                     $(frm).triggerHandler('complete');
-                    // Redirect to the discussion
-                    document.location = json.DiscussionUrl;
+                    // Secure redirect to the discussion
+                    if (isValidInternalRedirect(json.DiscussionUrl)) {
+                        document.location = json.DiscussionUrl;
+                    } else {
+                        console.error('Blocked potential open redirect:', json.DiscussionUrl);
+                    }
                 }
                 gdn.inform(json);
             },
@@ -173,7 +185,7 @@ jQuery(document).ready(function($) {
                 if (json.MyDrafts != null && json.CountDrafts != null) {
                     var countMyDraftsHtml = '<span aria-hidden="true" class="Sprite SpMyDrafts"></span> My Drafts';
                     if(json.CountDrafts > 0) {
-                        countMyDraftsHtml += '<span class="Aside"><span class="Count">' + json.CountDrafts + '</span></span>';
+                        countMyDraftsHtml += '<span class="Aside"><span class="Count">' + DOMPurify.sanitize(json.CountDrafts) + '</span></span>';
                         $('li#MyDrafts').removeClass('hidden');
                     } else {
                         $('li#MyDrafts').addClass('hidden');
@@ -181,30 +193,36 @@ jQuery(document).ready(function($) {
                     $('li#MyDrafts a').html(countMyDraftsHtml);
                 }
 
+                const responseData = DOMPurify.sanitize(json.Data);
                 if (json.FormSaved == false) {
-                    $(frm).prepend(json.ErrorMessages);
+                    $(frm).prepend(DOMPurify.sanitize(json.ErrorMessages));
                     json.ErrorMessages = null;
                 } else if (preview) {
                     // Reveal the "Edit" button and hide this one
                     $(btn).hide();
                     $(frm).find('.WriteButton').removeClass('Hidden');
                     $(frm).find('.P label[for=Form_Name], #Form_Name').hide();
-                    $(frm).find('.bodybox-wrap .TextBoxWrapper').hide().after(json.Data);
+                    $(frm).find('.bodybox-wrap .TextBoxWrapper').hide().after(responseData);
                     $(frm).trigger('PreviewLoaded', [frm]);
                 } else if (!draft) {
                     if (json.RedirectTo) {
                         $(frm).triggerHandler('complete');
                         // Redirect to the new discussion
-                        document.location = json.RedirectTo;
+                        // Secure redirect to the new discussion
+                        if (isValidInternalRedirect(json.RedirectTo)) {
+                            document.location = json.RedirectTo;
+                        } else {
+                            console.error('Blocked potential open redirect:', json.RedirectTo);
+                        }
                     } else {
                         var contentContainer = $("#Content");
 
                         if (contentContainer.length === 1) {
-                            contentContainer.html(json.Data);
+                            contentContainer.html(responseData);
                         } else {
                             // Hack to emulate a content container.
                             contentContainer = $(document.createElement("div"));
-                            contentContainer.html(json.Data);
+                            contentContainer.html(responseData);
                             $(frm).replaceWith(contentContainer);
                         }
                     }
@@ -234,7 +252,7 @@ jQuery(document).ready(function($) {
     $(document).on('PreviewLoaded', function(ev, form, ) {
         var previewContainer = $(form).find('.Preview');
         var discussionTitle = $(form).find('#Form_Name').val();
-        $(previewContainer).prepend('<div class="Title">'+discussionTitle+'</div>');
+        $(previewContainer).prepend('<div class="Title">'+DOMPurify.sanitize(discussionTitle)+'</div>');
         var title = $(form).closest('.FormTitleWrapper').find('h1');
         var currentTitle = $(title).text();
         var previewTitle = $(title).clone();

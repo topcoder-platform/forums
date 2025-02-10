@@ -51,6 +51,7 @@ class SearchController extends Gdn_Controller {
         $this->addJsFile('jquery.js');
         $this->addJsFile('jquery.form.js');
         $this->addJsFile('jquery.popup.js');
+        $this->addJsFile('purify.min.js');
         $this->addJsFile('jquery.gardenhandleajaxform.js');
         $this->addJsFile('jquery.expander.js');
         $this->addJsFile('global.js');

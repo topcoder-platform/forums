@@ -8,7 +8,7 @@ $Configuration['Garden']['Embed']['RemoteUrl'] = getenv('VANILLA_ENV') === 'prod
 // Trusted Domains. Specify one domain per line; use * for wildcard matches
 $Configuration['Garden']['TrustedDomains'] = '*.topcoder-dev.com
 *.topcoder.com';
-$Configuration['Theme']['UniversalNavUrl'] = '//uni-nav.topcoder.com/v1/tc-universal-nav.js';
+$Configuration['Theme']['UniversalNavUrl'] = '//uni-nav.topcoder-dev.com/v1/tc-universal-nav.js';
 
 $Configuration['Database']['Name'] = getenv('MYSQL_DATABASE');
 $Configuration['Database']['Host'] = getenv('MYSQL_HOST');
@@ -121,8 +121,8 @@ $Configuration['Plugins']['Topcoder']['SSO']['TopcoderHS256']['ID'] =  getenv('T
 $Configuration['Plugins']['Topcoder']['SSO']['TopcoderHS256']['Secret'] =  getenv('TOPCODER_HS256_SECRET');
 $Configuration['Plugins']['Topcoder']['SSO']['TopcoderRS256']['UsernameClaim'] =  'nickname';
 $Configuration['Plugins']['Topcoder']['SSO']['TopcoderHS256']['UsernameClaim'] =  'handle';
-$Configuration['Plugins']['Topcoder']['SSO']['TopcoderHS256']['UserIDClaim'] = 'https://topcoder.com/userId';
-$Configuration['Plugins']['Topcoder']['SSO']['TopcoderRS256']['UserIDClaim'] = 'https://topcoder.com/userId';
+$Configuration['Plugins']['Topcoder']['SSO']['TopcoderHS256']['UserIDClaim'] = 'https://topcoder-dev.com/userId';
+$Configuration['Plugins']['Topcoder']['SSO']['TopcoderRS256']['UserIDClaim'] = 'https://topcoder-dev.com/userId';
 $Configuration['Plugins']['Topcoder']['SSO']['TopcoderHS256']['PhotoUrlClaim'] = 'picture';
 $Configuration['Plugins']['Topcoder']['SSO']['TopcoderRS256']['PhotoUrlClaim'] = 'picture';
 $Configuration['Plugins']['Topcoder']['SSO']['RefreshTokenURL' ] = getenv('TOPCODER_PLUGIN_SSO_REFRESHTOKENURL');

@@ -11,6 +11,14 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 */
 
 (function($) {
+  function isValidInternalRedirect(url) {
+    try {
+        const target = new URL(url, window.location.origin);
+        return target.origin === window.location.origin; // Ensure same domain
+    } catch (e) {
+        return false; // Invalid URL
+    }
+  }
 
   // Allows generating a popup by jQuery.popup('contents')
   $.popup = function(options, data) {
@@ -175,11 +183,12 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
   $.popup.loading = function(settings) {
     settings.onLoad(settings);
-    if ($('#'+settings.popupId+' .Loading').length == 1)
+    const popupId = DOMPurify.sanitize(settings.popupId);
+    if ($('#'+popupId+' .Loading').length == 1)
       return true;
 
-    $('#'+settings.popupId+' .Content').empty();
-    $('#'+settings.popupId+' .Body').children().hide().end().append('<div class="Loading">&#160;</div>');
+    $('#'+popupId+' .Content').empty();
+    $('#'+popupId+' .Body').children().hide().end().append('<div class="Loading">&#160;</div>');
     // Trigger an even that plugins can attach to when popups are loading.
     $('body').trigger('popupLoading');
   }
@@ -189,10 +198,11 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       $.popup.loading(settings);
     }
 
+    const popupId = DOMPurify.sanitize(settings.popupId);
     var target = $.popup.findTarget(settings);
     if (settings.confirm) {
       // Bind to the "Okay" button click
-      $('#'+settings.popupId+' .Okay').focus().click(function() {
+      $('#'+popupId+' .Okay').focus().click(function() {
         if (settings.followConfirm) {
           // follow the target
           document.location = target;
@@ -218,8 +228,9 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
               gdn.inform(json);
               gdn.processTargets(json.Targets);
 
-              if (json.RedirectUrl)
+              if (json.RedirectUrl && isValidInternalRedirect(json.RedirectUrl)) {
                 setTimeout(function() { document.location.replace(json.RedirectUrl); }, 300);
+              }
             }
           });
         }
@@ -250,6 +261,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
   }
 
   $.popup.reveal = function(settings, data) {
+    const popupId = DOMPurify.sanitize(settings.popupId);
     // First see if we've retrieved json or something else
     var json = false;
     if (data instanceof Array) {
@@ -261,13 +273,13 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     if (json == false) {
       // This is something other than json, so just put it into the popup directly
       if (data) { // Prevent blank popups
-        $('#'+settings.popupId+' .Content').append(data).trigger('contentLoad');
+        $('#'+popupId+' .Content').append(DOMPurify.sanitize(data)).trigger('contentLoad');
       }
 
     } else {
       gdn.inform(json);
       formSaved = json['FormSaved'];
-      data = json['Data'];
+      data = DOMPurify.sanitize(json['Data']);
 
       // Add any js that's come in.
       $(json.js).each(function(i, el){
@@ -282,14 +294,14 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       // the content?
       // if (formSaved == false)
       if (data) { // Prevent blank popups
-        $('#'+settings.popupId+' .Content').html(data).trigger('contentLoad');
+        $('#'+popupId+' .Content').html(data).trigger('contentLoad');
       }
     }
 
-    $('#'+settings.popupId+' .Loading').remove();
-    $('#'+settings.popupId+' .Body').children().fadeIn('normal');
+    $('#'+popupId+' .Loading').remove();
+    $('#'+popupId+' .Body').children().fadeIn('normal');
 
-    $('#'+settings.popupId+' .Close').unbind().click(function() {
+    $('#'+popupId+' .Close').unbind().click(function() {
       return $.popup.close(settings);
     });
 
@@ -297,7 +309,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
     // Now, if there are any forms in the popup, hijack them if necessary.
     if (settings.hijackForms == true) {
-      $('#'+settings.popupId+' form').ajaxForm({
+      $('#'+popupId+' form').ajaxForm({
         data: {
           'DeliveryType': settings.deliveryType,
           'DeliveryMethod': 'JSON'
@@ -328,17 +340,17 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
 
       // Hijack links to navigate within the same popup.
-      $('#'+settings.popupId+' .PopLink').click(function() {
+      $('#'+popupId+' .PopLink').click(function() {
         $.popup.loading(settings);
 
         // Ajax the link into the current popup.
         $.get($(this).attr('href'), {'DeliveryType': settings.deliveryType}, function(data, textStatus, xhr) {
           if (typeof(data) == 'object') {
-            if (data.RedirectUrl)
+            if (data.RedirectUrl && isValidInternalRedirect(data.RedirectUrl))
               setTimeout(function() { document.location.replace(data.RedirectUrl); }, 300);
           }
           $.popup.reveal(settings, data);
-          //$('#'+settings.popupId+' .Content').html(data);
+          //$('#'+popupId+' .Content').html(data);
         });
 
         return false;
@@ -346,7 +358,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
     }
 
     // If there is a cancel button in the popup, hide it (the popup has it's own close button)
-    $('#'+settings.popupId+' a.Cancel').hide();
+    $('#'+popupId+' a.Cancel').hide();
 
     // Trigger an even that plugins can attach to when popups are revealed.
     $('body').trigger('popupReveal');
