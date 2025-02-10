@@ -8,7 +8,7 @@ $Configuration['Garden']['Embed']['RemoteUrl'] = getenv('VANILLA_ENV') === 'prod
 // Trusted Domains. Specify one domain per line; use * for wildcard matches
 $Configuration['Garden']['TrustedDomains'] = '*.topcoder-dev.com
 *.topcoder.com';
-$Configuration['Theme']['UniversalNavUrl'] = '//uni-nav.topcoder-dev.com/v1/tc-universal-nav.js';
+$Configuration['Theme']['UniversalNavUrl'] = '//uni-nav.topcoder.com/v1/tc-universal-nav.js';
 
 $Configuration['Database']['Name'] = getenv('MYSQL_DATABASE');
 $Configuration['Database']['Host'] = getenv('MYSQL_HOST');
