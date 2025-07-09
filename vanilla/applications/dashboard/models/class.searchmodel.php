@@ -94,7 +94,7 @@ class SearchModel extends Gdn_Model {
      */
     public function reset() {
         $this->_Parameters = [];
-        $this->_SearchSql = '';
+        $this->_SearchSql = [];
     }
 
     /**
@@ -111,6 +111,10 @@ class SearchModel extends Gdn_Model {
         if (trim($search) == '') {
             return [];
         }
+
+        // Sanitize search input to prevent invalid syntax.
+        // Remove dangerous characters and SQL comment sequences.
+        $search = preg_replace('/(--|#|;)/', '', $search);
 
         // Figure out the exact search mode.
         if ($this->ForceSearchMode) {
