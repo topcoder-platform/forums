@@ -89,7 +89,7 @@ class SearchModel extends Gdn_Model {
 
             $sql->endWhereGroup();
         } else {
-            $boolean = $this->_SearchMode == 'boolean' ? ' in boolean mode' : ' in natural language mode';
+            $boolean = $this->_SearchMode == 'boolean' ? ' in natural language mode' : '';
 
             $param = $this->parameter();
             $sql->select($columns, "match(%s) against($param{$boolean})", 'Relevance');
