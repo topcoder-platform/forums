@@ -101,8 +101,8 @@ $Configuration['Plugins']['Topcoder']['NDA_UUID'] = getenv('VANILLA_ENV') == 'pr
 $Configuration['Plugins']['Topcoder']['BaseApiURL'] = getenv('TOPCODER_PLUGIN_BASE_API_URL');
 $Configuration['Plugins']['Topcoder']['MemberApiURI'] = getenv('TOPCODER_PLUGIN_MEMBER_API_URI');
 $Configuration['Plugins']['Topcoder']['RoleApiURI'] = getenv('TOPCODER_PLUGIN_ROLE_API_URI');
-$Configuration['Plugins']['Topcoder']['ResourceRolesApiURI'] = '/v5/resource-roles';
-$Configuration['Plugins']['Topcoder']['ResourcesApiURI'] = '/v5/resources';
+$Configuration['Plugins']['Topcoder']['ResourceRolesApiURI'] = '/v6/resource-roles';
+$Configuration['Plugins']['Topcoder']['ResourcesApiURI'] = '/v6/resources';
 $Configuration['Plugins']['Topcoder']['MemberProfileURL'] = getenv('TOPCODER_PLUGIN_MEMBER_PROFILE_URL');
 $Configuration['Plugins']['Topcoder']['UseTopcoderAuthToken'] = getenv('TOPCODER_PLUGIN_USE_AUTH_TOKEN');
 
