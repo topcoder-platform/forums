@@ -8,6 +8,26 @@
  * @since 2.0
  */
 
+function sanitizeSearchInput(string $input): string {
+    // Remove unwanted characters except word chars, spaces, +, -, and double quotes
+    $input = preg_replace('/[^\w\s\-\+"]/u', '', $input);
+
+    // Remove standalone or malformed + or - (e.g., 'or true-', '+', '-', etc.)
+    // Remove + or - not followed by a word
+    $input = preg_replace('/([\+\-])(\s|$)/u', '', $input);
+
+    // Remove leading + or - that are not followed by a word
+    $input = preg_replace('/(^|\s)[\+\-]+(?=\s|$)/u', '', $input);
+
+    // Remove trailing + or -
+    $input = preg_replace('/[\+\-]+$/u', '', $input);
+
+    // Collapse multiple spaces
+    $input = preg_replace('/\s+/u', ' ', $input);
+
+    return trim($input);
+}
+
 /**
  * Handles search data.
  */
@@ -69,7 +89,7 @@ class SearchModel extends Gdn_Model {
 
             $sql->endWhereGroup();
         } else {
-            $boolean = $this->_SearchMode == 'boolean' ? ' in boolean mode' : '';
+            $boolean = $this->_SearchMode == 'boolean' ? ' in natural language mode' : '';
 
             $param = $this->parameter();
             $sql->select($columns, "match(%s) against($param{$boolean})", 'Relevance');
@@ -94,7 +114,7 @@ class SearchModel extends Gdn_Model {
      */
     public function reset() {
         $this->_Parameters = [];
-        $this->_SearchSql = '';
+        $this->_SearchSql = [];
     }
 
     /**
@@ -111,6 +131,10 @@ class SearchModel extends Gdn_Model {
         if (trim($search) == '') {
             return [];
         }
+
+        // Sanitize search input to prevent invalid syntax.
+        // Remove dangerous characters and SQL comment sequences.
+        $search = sanitizeSearchInput($search);
 
         // Figure out the exact search mode.
         if ($this->ForceSearchMode) {

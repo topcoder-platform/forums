@@ -1,5 +1,4 @@
-FROM webdevops/php-apache:ubuntu-18.04
-
+FROM webdevops/php-apache:7.4-alpine
 ARG CI_DEPLOY_TOKEN
 ARG VANILLA_VERSION=3.3
 ARG ENV
